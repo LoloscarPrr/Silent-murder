@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Silent Murder 0.2.1 — independent multi-finger touch controls.
+## Silent Murder 0.3 — independent multi-finger touch controls and firing.
 ## The HUD buttons are visual only. ScreenTouch.index controls every action:
 ## finger 0 may move, finger 1 look, finger 2 sprint, finger 3 aim/crouch.
 
@@ -19,6 +19,8 @@ var _joystick_visual: Control
 var _buttons: Dictionary = {} # action name -> Button used only for drawing
 var _status: Label
 var _fps_label: Label
+var _ammo_label: Label
+var _training_label: Label
 var _fps_elapsed := 0.0
 var _scale := 1.0
 
@@ -35,8 +37,8 @@ func _ready() -> void:
  _joystick_visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
  _surface.add_child(_joystick_visual)
 
- _status = _label("SILENT MURDER  /  MULTITOUCH", Vector2(26,18), 22)
- var hint := _label("ALPHA 0.2.1  •  MOVER + MIRAR + BOTONES SIMULTANEOS", Vector2(28,49), 14)
+ _status = _label("SILENT MURDER  /  ENTRENAMIENTO", Vector2(26,18), 22)
+ var hint := _label("ALPHA 0.3  •  DISPARO Y MULTITOUCH", Vector2(28,49), 14)
  hint.modulate = Color(.75,.83,.83)
  var crosshair := Label.new()
  crosshair.text = "+"
@@ -53,6 +55,17 @@ func _ready() -> void:
  _fps_label.anchor_bottom = .03
  _fps_label.modulate = Color(.78,.90,.81)
 
+ _ammo_label = _label("12 / 48",Vector2.ZERO,23)
+ _ammo_label.anchor_left = .78
+ _ammo_label.anchor_right = .78
+ _ammo_label.anchor_top = .04
+ _ammo_label.anchor_bottom = .04
+ _ammo_label.modulate = Color(1.0,.85,.62)
+ _training_label = _label("BLANCOS 0 / 4",Vector2(28,79),17)
+ _training_label.modulate = Color(.82,.88,.76)
+
+ _add_button("DISPARAR","fire",Vector2(.79,.41))
+ _add_button("RECARGAR","reload",Vector2(.91,.35))
  _add_button("AGACHAR","crouch",Vector2(.79,.72))
  _add_button("CORRER","sprint",Vector2(.90,.84))
  _add_button("APUNTAR","aim",Vector2(.90,.57))
@@ -60,6 +73,8 @@ func _ready() -> void:
 
  if operative != null:
   operative.status_changed.connect(_set_status)
+  operative.ammo_changed.connect(_on_ammo_changed)
+  _ammo_label.text = operative.get_ammo_label()
  _surface.resized.connect(_layout)
  call_deferred("_layout")
 
@@ -134,6 +149,10 @@ func _press(index: int, at: Vector2) -> void:
   match action:
    "sprint":
     operative.is_sprinting = true
+   "fire":
+    operative.set_fire_held(true)
+   "reload":
+    operative.reload_weapon()
    "crouch":
     operative.toggle_crouch()
     operative.is_sprinting = _action_held("sprint")
@@ -186,12 +205,14 @@ func _release(index: int) -> void:
   "sprint":
    # Another finger could still be holding sprint.
    operative.is_sprinting = _action_held("sprint")
+  "fire":
+   operative.set_fire_held(_action_held("fire"))
  if _buttons.has(action):
   _refresh_button(action)
 
 func _find_button(at: Vector2) -> String:
  # Topmost buttons first (overlap resolved deterministically).
- for action in ["info","aim","crouch","sprint"]:
+ for action in ["info","reload","fire","aim","crouch","sprint"]:
   var button: Button = _buttons[action]
   if button.get_global_rect().has_point(at):
    return action
@@ -217,6 +238,17 @@ func _update_move(at: Vector2) -> void:
  operative.move_input = axis
  _redraw()
 
+func _on_ammo_changed(magazine: int, reserve: int) -> void:
+ if _ammo_label != null:
+  _ammo_label.text = "%02d / %02d" % [magazine,reserve]
+
+func set_training_progress(cleared: int, total: int) -> void:
+ if _training_label != null:
+  _training_label.text = "BLANCOS %d / %d" % [cleared,total]
+  if cleared == total and total > 0:
+   _training_label.modulate = Color(.53,1.0,.62)
+   _set_status("ENTRENAMIENTO COMPLETADO")
+
 func _set_status(message: String) -> void:
  if _status != null:
   _status.text = message
@@ -235,6 +267,7 @@ func _reset_touches() -> void:
  if operative != null:
   operative.move_input = Vector2.ZERO
   operative.is_sprinting = false
+  operative.set_fire_held(false)
  _layout()
  for action in _buttons:
   _refresh_button(action)
