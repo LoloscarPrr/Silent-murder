@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Silent Murder 0.3 — independent multi-finger touch controls and firing.
+## Silent Murder 0.4 — same multitouch with stealth/guard combat HUD.
 ## The HUD buttons are visual only. ScreenTouch.index controls every action:
 ## finger 0 may move, finger 1 look, finger 2 sprint, finger 3 aim/crouch.
 
@@ -21,6 +21,9 @@ var _status: Label
 var _fps_label: Label
 var _ammo_label: Label
 var _training_label: Label
+var _health_label: Label
+var _guards_label: Label
+var _alert_label: Label
 var _fps_elapsed := 0.0
 var _scale := 1.0
 
@@ -38,7 +41,7 @@ func _ready() -> void:
  _surface.add_child(_joystick_visual)
 
  _status = _label("SILENT MURDER  /  ENTRENAMIENTO", Vector2(26,18), 22)
- var hint := _label("ALPHA 0.3  •  DISPARO Y MULTITOUCH", Vector2(28,49), 14)
+ var hint := _label("ALPHA 0.4  •  GUARDIAS Y SIGILO", Vector2(28,49), 14)
  hint.modulate = Color(.75,.83,.83)
  var crosshair := Label.new()
  crosshair.text = "+"
@@ -63,6 +66,16 @@ func _ready() -> void:
  _ammo_label.modulate = Color(1.0,.85,.62)
  _training_label = _label("BLANCOS 0 / 4",Vector2(28,79),17)
  _training_label.modulate = Color(.82,.88,.76)
+ _guards_label = _label("GUARDIAS 0 / 3",Vector2(28,102),17)
+ _guards_label.modulate = Color(.79,.89,1.0)
+ _health_label = _label("VIDA 100 / 100",Vector2(28,126),18)
+ _health_label.modulate = Color(.57,.98,.71)
+ _alert_label = _label("ESTADO PATRULLA",Vector2.ZERO,17)
+ _alert_label.anchor_left = .39
+ _alert_label.anchor_right = .39
+ _alert_label.anchor_top = .04
+ _alert_label.anchor_bottom = .04
+ _alert_label.modulate = Color(.63,.93,.73)
 
  _add_button("DISPARAR","fire",Vector2(.79,.41))
  _add_button("RECARGAR","reload",Vector2(.91,.35))
@@ -248,6 +261,28 @@ func set_training_progress(cleared: int, total: int) -> void:
   if cleared == total and total > 0:
    _training_label.modulate = Color(.53,1.0,.62)
    _set_status("ENTRENAMIENTO COMPLETADO")
+
+func set_health(current: int,maximum: int) -> void:
+ if _health_label != null:
+  _health_label.text = "VIDA %d / %d" % [current,maximum]
+  _health_label.modulate = Color(.95,.34,.32) if current < maximum*.30 else Color(.57,.98,.71)
+
+func set_guard_progress(cleared: int,total: int) -> void:
+ if _guards_label != null:
+  _guards_label.text = "GUARDIAS %d / %d" % [cleared,total]
+  _guards_label.modulate = Color(.57,.98,.71) if cleared >= total and total > 0 else Color(.79,.89,1.0)
+
+func set_alert_status(state: String) -> void:
+ if _alert_label == null:
+  return
+ _alert_label.text = "ESTADO %s" % state
+ match state:
+  "ALERTA":
+   _alert_label.modulate = Color(1.0,.30,.26)
+  "SOSPECHA":
+   _alert_label.modulate = Color(1.0,.73,.26)
+  _:
+   _alert_label.modulate = Color(.63,.93,.73)
 
 func _set_status(message: String) -> void:
  if _status != null:
