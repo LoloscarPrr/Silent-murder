@@ -121,7 +121,7 @@ func can_see_player() -> bool:
  if player == null or not is_instance_valid(player):
   return false
  var eye := global_position + Vector3(0,1.53,0)
- var crouched := player.is_crouching
+ var crouched: bool = player.is_crouching
  var target := player.global_position + Vector3(0,.87 if crouched else 1.30,0)
  var toward := target-eye
  var distance := toward.length()
