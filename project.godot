@@ -1,8 +1,8 @@
-; Silent Murder - Godot 4.3
+; Silent Killer - Godot 4.3
 config_version=5
 
 [application]
-config/name="Silent Murder"
+config/name="Silent Killer"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 
