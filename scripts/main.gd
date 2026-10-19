@@ -1,10 +1,14 @@
 extends Node3D
-## Silent Murder v0.2: blockout environment with smoother 3D character.
+## Silent Murder v0.3: industrial practice range with stationary targets.
 
 const PLAYER_SCRIPT = preload("res://scripts/player_controller.gd")
 const UI_SCRIPT = preload("res://scripts/mobile_controls.gd")
+const TARGET_SCRIPT = preload("res://scripts/training_target.gd")
 var _player: CharacterBody3D
 var _level: Node3D
+var _targets_total := 0
+var _targets_disabled := 0
+var _hud
 
 func _ready() -> void:
  _make_environment()
@@ -12,12 +16,36 @@ func _ready() -> void:
  _level.name = "Depot_Blockout_00"
  add_child(_level)
  _build_depot()
+ _build_practice_range()
  _player = PLAYER_SCRIPT.new()
  _player.position = Vector3(0.0, 0.18, 9.0)
  add_child(_player)
- var ui := UI_SCRIPT.new()
- ui.operative = _player
- add_child(ui)
+ _hud = UI_SCRIPT.new()
+ _hud.operative = _player
+ add_child(_hud)
+ _hud.set_training_progress(_targets_disabled,_targets_total)
+
+func _build_practice_range() -> void:
+ # Clear forward lanes allow precision aiming while keeping the existing level.
+ for location in [
+  Vector3(-3.1,1.42,3.1),
+  Vector3(0.5,1.42,-2.9),
+  Vector3(3.5,1.42,2.1),
+  Vector3(1.9,1.42,-11.2)
+ ]:
+  var target := TARGET_SCRIPT.new()
+  target.name = "PracticeTarget_%d" % (_targets_total + 1)
+  target.position = location
+  _level.add_child(target)
+  target.disabled.connect(_on_target_disabled)
+  _targets_total += 1
+
+func _on_target_disabled(_target: Node3D) -> void:
+ _targets_disabled += 1
+ if _hud != null:
+  _hud.set_training_progress(_targets_disabled,_targets_total)
+ if _targets_disabled == _targets_total and _player != null:
+  _player.status_changed.emit("Entrenamiento completo: %d blancos" % _targets_total)
 
 func _make_environment() -> void:
  var world := WorldEnvironment.new()
