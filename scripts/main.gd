@@ -1,10 +1,11 @@
 extends Node3D
-## Silent Murder v0.4: industrial practice range plus patrol guards.
+## Silent Killer v0.5: Noche Cero contract with patrol guards and extraction.
 
 const PLAYER_SCRIPT = preload("res://scripts/player_controller.gd")
 const UI_SCRIPT = preload("res://scripts/mobile_controls.gd")
 const TARGET_SCRIPT = preload("res://scripts/training_target.gd")
 const GUARD_SCRIPT = preload("res://scripts/guard_ai.gd")
+const MISSION_SCRIPT = preload("res://scripts/mission_manager.gd")
 var _player: CharacterBody3D
 var _level: Node3D
 var _targets_total := 0
@@ -13,6 +14,7 @@ var _guards_total := 0
 var _guards_disabled := 0
 var _guards: Array[CharacterBody3D] = []
 var _hud
+var _mission
 
 func _ready() -> void:
  _make_environment()
@@ -34,6 +36,12 @@ func _ready() -> void:
  _hud.set_guard_progress(_guards_disabled,_guards_total)
  _hud.set_health(_player.health,_player.MAX_HEALTH)
  _player.health_changed.connect(_hud.set_health)
+ _mission = MISSION_SCRIPT.new()
+ _mission.player = _player
+ _mission.hud = _hud
+ _mission.guards = _guards
+ _hud.mission_manager = _mission
+ add_child(_mission)
 
 func _spawn_guards() -> void:
  var paths: Array[Array] = [
@@ -83,8 +91,11 @@ func _refresh_guard_status() -> void:
  _hud.set_alert_status(state)
 
 func _on_player_defeated() -> void:
- for guard in _guards:
-  guard.reset_after_player_defeat()
+ if _mission != null:
+  _mission.on_player_defeated()
+ else:
+  for guard in _guards:
+   guard.reset_after_player_defeat()
  _refresh_guard_status()
 
 func _build_practice_range() -> void:
