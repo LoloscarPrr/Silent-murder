@@ -1,0 +1,34 @@
+name: Android - Silent Murder
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**.gd'
+      - '**.tscn'
+      - 'project.godot'
+      - 'export_presets.cfg'
+      - '.github/workflows/build-android.yml'
+
+jobs:
+  export-android-debug:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import Godot project
+        run: godot --headless --path . --import
+      - name: Export Android debug APK
+        run: |
+          mkdir -p build
+          godot --headless --path . --export-debug "Android" build/SilentMurder_v0.1_debug.apk
+          test -s build/SilentMurder_v0.1_debug.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SilentMurder-Android-debug
+          path: build/SilentMurder_v0.1_debug.apk
+          if-no-files-found: error
+          retention-days: 30
