@@ -1,9 +1,12 @@
 extends CharacterBody3D
-## Silent Murder v0.3 — responsive motion, aim and training pistol,
+## Silent Murder v0.4 — tactical movement, pistol and player survivability,
 ## articulated locomotion and obstacle-aware over-shoulder camera.
 
 signal status_changed(status: String)
 signal ammo_changed(magazine: int, reserve: int)
+signal health_changed(current: int, maximum: int)
+signal player_defeated() 
+signal weapon_fired(origin: Vector3, radius: float)
 
 const VISUAL_SCRIPT = preload("res://scripts/operative_visual.gd")
 const WEAPON_SCRIPT = preload("res://scripts/weapon_controller.gd")
@@ -16,9 +19,13 @@ const DECELERATION := 26.0
 const TURN_SMOOTH := 13.0
 const TOUCH_SENSITIVITY := .0030
 const MOUSE_SENSITIVITY := .0025
+const MAX_HEALTH := 100
 const STANDING_HEIGHT := 1.8
 const CROUCHED_HEIGHT := 1.20
 
+var health := MAX_HEALTH
+var _damage_grace := 0.0
+var _spawn_point := Vector3.ZERO
 var move_input := Vector2.ZERO
 var is_sprinting := false
 var is_crouching := false
@@ -36,6 +43,7 @@ var _weapon
 
 func _ready() -> void:
  name = "SilentMurder_Operative"
+ _spawn_point = global_position
  _desired_yaw = rotation.y
  _make_collision()
  _visual = VISUAL_SCRIPT.new()
@@ -46,11 +54,14 @@ func _ready() -> void:
  _weapon.camera = _camera
  _weapon.visual = _visual
  _weapon.ammo_updated.connect(_on_ammo_updated)
+ _weapon.gunshot_at.connect(_on_weapon_fired)
  _weapon.shot_report.connect(_on_shot_report)
  add_child(_weapon)
- status_changed.emit("Pistola de entrenamiento • Alpha 0.3")
+ status_changed.emit("Infiltración táctica • Alpha 0.4")
+ health_changed.emit(health,MAX_HEALTH)
 
 func _physics_process(delta: float) -> void:
+ _damage_grace = maxf(0.0,_damage_grace-delta)
  rotation.y = lerp_angle(rotation.y,_desired_yaw,minf(1.0,TURN_SMOOTH*delta))
  _current_pitch = lerpf(_current_pitch,_desired_pitch,minf(1.0,10.0*delta))
  _rig.rotation.x = _current_pitch
@@ -121,6 +132,34 @@ func reload_weapon() -> void:
 
 func get_ammo_label() -> String:
  return _weapon.get_ammo_label() if _weapon != null else "-- / --"
+
+func receive_enemy_damage(amount: int) -> void:
+ if _damage_grace > 0.0 or amount <= 0:
+  return
+ health = maxi(0,health-amount)
+ _damage_grace = .48
+ health_changed.emit(health,MAX_HEALTH)
+ if health == 0:
+  _respawn_player()
+ else:
+  status_changed.emit("Bajo fuego: -%d HP" % amount)
+
+func _respawn_player() -> void:
+ health = MAX_HEALTH
+ global_position = _spawn_point
+ velocity = Vector3.ZERO
+ is_sprinting = false
+ is_crouching = false
+ is_aiming = false
+ move_input = Vector2.ZERO
+ _desired_yaw = 0.0
+ _damage_grace = 3.0
+ player_defeated.emit()
+ health_changed.emit(health,MAX_HEALTH)
+ status_changed.emit("Operativo neutralizado: reaparición segura")
+
+func _on_weapon_fired(origin: Vector3,radius: float) -> void:
+ weapon_fired.emit(origin,radius)
 
 func _on_ammo_updated(magazine: int, reserve: int) -> void:
  ammo_changed.emit(magazine,reserve)
