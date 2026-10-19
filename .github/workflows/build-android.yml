@@ -1,4 +1,4 @@
-name: Android - Silent Murder
+name: Android - Silent Killer
 
 on:
   workflow_dispatch:
@@ -105,13 +105,13 @@ jobs:
         run: |
           set -e
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/SilentMurder_v0.4_debug.apk
-          test -s build/SilentMurder_v0.4_debug.apk
+          godot --headless --path . --export-debug "Android" build/SilentKiller_v0.4_debug.apk
+          test -s build/SilentKiller_v0.4_debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SilentMurder-v0.4-Android-debug
-          path: build/SilentMurder_v0.4_debug.apk
+          name: SilentKiller-v0.4-Android-debug
+          path: build/SilentKiller_v0.4_debug.apk
           if-no-files-found: error
           retention-days: 30
