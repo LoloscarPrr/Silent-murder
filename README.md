@@ -1,6 +1,6 @@
-# SILENT MURDER
+# SILENT KILLER
 
-Juego original de sigilo y acción en tercera persona para Android, realizado con Godot 4.3 / GDScript. Repositorio: `LoloscarPrr/Silent-murder`.
+Juego original de sigilo y acción en tercera persona para Android, realizado con Godot 4.3 / GDScript. Repositorio actual: `LoloscarPrr/Silent-murder` (pendiente de renombrar a `Silent-Killer`).
 
 ## Alpha 0.4 — Guardia, visión y sigilo
 
@@ -23,7 +23,7 @@ Los guardias son modelos de bloque de prueba con animaciones simples, no humanos
 
 ### Cómo obtener el APK
 
-Abre [GitHub Actions](https://github.com/LoloscarPrr/Silent-murder/actions) y descarga el artefacto **SilentMurder-v0.4-Android-debug** de la última ejecución exitosa. La app usa el mismo ID `com.loloscarprr.silentmurder`, código de versión 5 y Android arm64.
+Abre [GitHub Actions](https://github.com/LoloscarPrr/Silent-murder/actions) y descarga el artefacto **SilentKiller-v0.4-Android-debug** de la última ejecución exitosa. La app usa el mismo ID `com.loloscarprr.silentmurder`, código de versión 5 y Android arm64.
 
 ### Pruebas automatizadas
 
