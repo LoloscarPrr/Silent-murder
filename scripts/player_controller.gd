@@ -1,139 +1,162 @@
 extends CharacterBody3D
-## Silent Murder v0.1: provisional character, movement and over-shoulder camera.
+## Silent Murder v0.2 — responsive analog movement, crouch collision,
+## articulated locomotion and obstacle-aware over-shoulder camera.
 
 signal status_changed(status: String)
 
-const WALK_SPEED := 4.0
-const SPRINT_SPEED := 6.3
-const CROUCH_SPEED := 2.0
-const MOUSE_SENSITIVITY := 0.0025
-const TOUCH_SENSITIVITY := 0.0034
+const VISUAL_SCRIPT = preload("res://scripts/operative_visual.gd")
+const WALK_SPEED := 3.75
+const SPRINT_SPEED := 6.2
+const CROUCH_SPEED := 1.85
+const AIM_SPEED := 2.65
+const ACCELERATION := 20.0
+const DECELERATION := 26.0
+const TURN_SMOOTH := 13.0
+const TOUCH_SENSITIVITY := .0030
+const MOUSE_SENSITIVITY := .0025
+const STANDING_HEIGHT := 1.8
+const CROUCHED_HEIGHT := 1.20
 
 var move_input := Vector2.ZERO
 var is_sprinting := false
 var is_crouching := false
 var is_aiming := false
-var walk_time := 0.0
-var pitch := -0.09
 
+var _desired_yaw := 0.0
+var _desired_pitch := -0.09
+var _current_pitch := -0.09
 var _camera: Camera3D
-var _camera_rig: Node3D
-var _body: Node3D
-var _left_leg: MeshInstance3D
-var _right_leg: MeshInstance3D
-var _left_arm: MeshInstance3D
-var _right_arm: MeshInstance3D
+var _rig: Node3D
+var _collider: CollisionShape3D
+var _capsule: CapsuleShape3D
+var _visual: Node3D
 
 func _ready() -> void:
- name = "Operative_Prototype"
+ name = "SilentMurder_Operative"
+ _desired_yaw = rotation.y
  _make_collision()
- _make_model()
+ _visual = VISUAL_SCRIPT.new()
+ add_child(_visual)
  _make_camera()
- status_changed.emit("Infiltración de prueba: explorar el depósito")
+ status_changed.emit("Movimiento mejorado • Alpha 0.2")
 
 func _physics_process(delta: float) -> void:
- var keyboard_move := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
- var directional := move_input if move_input.length() > 0.08 else keyboard_move
- var speed := CROUCH_SPEED if is_crouching else (SPRINT_SPEED if is_sprinting else WALK_SPEED)
- var local_direction := Vector3(directional.x,0.0,directional.y)
- var world_direction := global_transform.basis * local_direction
- if world_direction.length() > 1.0:
-  world_direction = world_direction.normalized()
- velocity.x = world_direction.x * speed
- velocity.z = world_direction.z * speed
+ rotation.y = lerp_angle(rotation.y,_desired_yaw,minf(1.0,TURN_SMOOTH*delta))
+ _current_pitch = lerpf(_current_pitch,_desired_pitch,minf(1.0,10.0*delta))
+ _rig.rotation.x = _current_pitch
+
+ var keys := Input.get_vector("ui_left","ui_right","ui_up","ui_down")
+ var axis := move_input if move_input.length() > .08 else keys
+ axis = axis.limit_length(1.0)
+ if absf(axis.x) < .045:
+  axis.x = 0.0
+ if absf(axis.y) < .045:
+  axis.y = 0.0
+ var running := is_sprinting and not is_crouching and not is_aiming
+ var speed := WALK_SPEED
+ if is_crouching:
+  speed = CROUCH_SPEED
+ elif is_aiming:
+  speed = AIM_SPEED
+ elif running:
+  speed = SPRINT_SPEED
+ var input_direction := Vector3(axis.x,0.0,axis.y)
+ var direction := global_transform.basis * input_direction
+ var target := Vector2(direction.x,direction.z) * speed
+ var current := Vector2(velocity.x,velocity.z)
+ current = current.move_toward(target,(ACCELERATION if axis.length() > .04 else DECELERATION)*delta)
+ velocity.x = current.x
+ velocity.z = current.y
  if not is_on_floor():
   velocity.y -= 20.0 * delta
  else:
-  velocity.y = -0.05
+  velocity.y = -0.08
  move_and_slide()
- _animate_prototype(delta,directional.length())
- _camera.fov = lerpf(_camera.fov,49.0 if is_aiming else 65.0,minf(1.0,delta*6.0))
- _camera.position.x = lerpf(_camera.position.x,0.42 if is_aiming else 0.67,minf(1.0,delta*6.0))
+
+ _update_crouch_shape(delta)
+ var horizontal := Vector2(velocity.x,velocity.z).length()
+ _visual.animate_pose(delta,minf(1.0,horizontal/maxf(speed,.1)),axis.x,is_crouching,is_aiming,running)
+ _update_camera(delta)
 
 func apply_look(delta_pixels: Vector2,touch: bool = true) -> void:
  var sensitivity := TOUCH_SENSITIVITY if touch else MOUSE_SENSITIVITY
- rotate_y(-delta_pixels.x*sensitivity)
- pitch = clampf(pitch-delta_pixels.y*sensitivity,-0.92,0.62)
- _camera_rig.rotation.x = pitch
+ _desired_yaw -= delta_pixels.x * sensitivity
+ _desired_pitch = clampf(_desired_pitch - delta_pixels.y * sensitivity,-.88,.52)
 
 func toggle_crouch() -> void:
- is_crouching = not is_crouching
- status_changed.emit("Agachado" if is_crouching else "De pie")
+ if is_crouching:
+  if not _can_stand():
+   status_changed.emit("No hay espacio para levantarse")
+   return
+  is_crouching = false
+  status_changed.emit("De pie")
+ else:
+  is_crouching = true
+  is_sprinting = false
+  status_changed.emit("Sigilo: agachado")
 
 func toggle_aim() -> void:
  is_aiming = not is_aiming
- status_changed.emit("Apuntando (sin arma en 0.1)" if is_aiming else "Explorando")
+ if is_aiming:
+  is_sprinting = false
+ status_changed.emit("Apuntando (arma en una fase futura)" if is_aiming else "Explorando")
 
 func _make_collision() -> void:
- var shape := CapsuleShape3D.new()
- shape.radius = .34
- shape.height = 1.78
- var collider := CollisionShape3D.new()
- collider.shape = shape
- collider.position.y = .90
- add_child(collider)
+ _capsule = CapsuleShape3D.new()
+ _capsule.radius = .32
+ _capsule.height = STANDING_HEIGHT
+ _collider = CollisionShape3D.new()
+ _collider.name = "OperativeCollision"
+ _collider.shape = _capsule
+ _collider.position.y = STANDING_HEIGHT * .5
+ add_child(_collider)
 
-func _make_model() -> void:
- _body = Node3D.new()
- _body.name = "Model_Primitive_Placeholder"
- add_child(_body)
- var fabric := _material(Color(.075,.086,.105))
- var vest := _material(Color(.15,.18,.19))
- var trousers := _material(Color(.09,.115,.13))
- var gloves := _material(Color(.02,.027,.033))
- var boots := _material(Color(.035,.044,.051))
- var skin := _material(Color(.52,.385,.32))
- var collar := _material(Color(.28,.305,.315))
- _part("Torso - tailored jacket",Vector3(0,1.30,0),Vector3(.57,.72,.32),fabric)
- _part("Reinforced vest",Vector3(0,1.36,-.175),Vector3(.39,.48,.045),vest)
- _part("Collar",Vector3(0,1.74,0),Vector3(.27,.14,.3),collar)
- _part("Head",Vector3(0,1.91,0),Vector3(.27,.30,.27),skin)
- _part("Hair",Vector3(0,2.075,0),Vector3(.28,.065,.29),gloves)
- _left_arm = _part("Left glove and sleeve",Vector3(-.38,1.31,0),Vector3(.16,.66,.19),fabric)
- _right_arm = _part("Right glove and sleeve",Vector3(.38,1.31,0),Vector3(.16,.66,.19),fabric)
- _part("Left glove",Vector3(-.38,.96,0),Vector3(.16,.18,.20),gloves)
- _part("Right glove",Vector3(.38,.96,0),Vector3(.16,.18,.20),gloves)
- _left_leg = _part("Left leg",Vector3(-.16,.49,0),Vector3(.22,.87,.23),trousers)
- _right_leg = _part("Right leg",Vector3(.16,.49,0),Vector3(.22,.87,.23),trousers)
- _part("Left boot",Vector3(-.16,.075,-.045),Vector3(.23,.16,.35),boots)
- _part("Right boot",Vector3(.16,.075,-.045),Vector3(.23,.16,.35),boots)
+func _update_crouch_shape(delta: float) -> void:
+ var wanted := CROUCHED_HEIGHT if is_crouching else STANDING_HEIGHT
+ _capsule.height = move_toward(_capsule.height,wanted,delta * 2.5)
+ _collider.position.y = _capsule.height*.5
+
+func _can_stand() -> bool:
+ var stand := CapsuleShape3D.new()
+ stand.radius = _capsule.radius
+ stand.height = STANDING_HEIGHT
+ var query := PhysicsShapeQueryParameters3D.new()
+ query.shape = stand
+ query.transform = Transform3D(global_transform.basis,global_position+Vector3.UP*(STANDING_HEIGHT*.5))
+ query.exclude = [get_rid()]
+ query.collision_mask = collision_mask
+ return get_world_3d().direct_space_state.intersect_shape(query,1).is_empty()
 
 func _make_camera() -> void:
- _camera_rig = Node3D.new()
- _camera_rig.name = "OverShoulder_Rig"
- _camera_rig.position = Vector3(0,1.48,0)
- add_child(_camera_rig)
- _camera_rig.rotation.x = pitch
+ _rig = Node3D.new()
+ _rig.name = "ShoulderCameraPivot"
+ _rig.position = Vector3(0,1.47,0)
+ add_child(_rig)
+ _rig.rotation.x = _desired_pitch
  _camera = Camera3D.new()
- _camera.name = "FollowCamera"
- _camera.position = Vector3(.67,.07,3.1)
- _camera.fov = 65.0
+ _camera.name = "CollisionAwareCamera"
+ _camera.position = Vector3(.64,.08,3.00)
+ _camera.fov = 66.0
+ _camera.near = .06
  _camera.current = true
- _camera_rig.add_child(_camera)
+ _rig.add_child(_camera)
 
-func _animate_prototype(delta: float,intensity: float) -> void:
- var moving := intensity > .1
- walk_time += delta*(9.0 if is_sprinting else 6.0)*(intensity if moving else 0.0)
- var cycle := sin(walk_time)*minf(intensity,1.0)
- _left_leg.rotation.x = lerpf(_left_leg.rotation.x,cycle*.16,delta*10.0)
- _right_leg.rotation.x = lerpf(_right_leg.rotation.x,-cycle*.16,delta*10.0)
- _left_arm.rotation.x = lerpf(_left_arm.rotation.x,-cycle*.11,delta*9.0)
- _right_arm.rotation.x = lerpf(_right_arm.rotation.x,cycle*.11,delta*9.0)
- _body.scale.y = lerpf(_body.scale.y,.78 if is_crouching else 1.0,delta*7.0)
-
-func _part(label: String,at: Vector3,dimensions: Vector3,mat: Material) -> MeshInstance3D:
- var node := MeshInstance3D.new()
- node.name = label
- var mesh := BoxMesh.new()
- mesh.size = dimensions
- node.mesh = mesh
- node.material_override = mat
- node.position = at
- _body.add_child(node)
- return node
-
-func _material(tint: Color) -> StandardMaterial3D:
- var m := StandardMaterial3D.new()
- m.albedo_color = tint
- m.roughness = .92
- return m
+func _update_camera(delta: float) -> void:
+ var pivot_height := (1.04 if is_crouching else 1.47)
+ _rig.position.y = lerpf(_rig.position.y,pivot_height,minf(1.0,delta*7.0))
+ var target_x := .46 if is_aiming else .66
+ var target_distance := 2.15 if is_aiming else 3.08
+ var desired_local := Vector3(target_x,.10,target_distance)
+ var from := _rig.global_position
+ var to := _rig.to_global(desired_local)
+ var ray := PhysicsRayQueryParameters3D.create(from,to)
+ ray.exclude = [get_rid()]
+ ray.collision_mask = collision_mask
+ var hit := get_world_3d().direct_space_state.intersect_ray(ray)
+ var blocked := not hit.is_empty()
+ if blocked:
+  var allowed := maxf(.35,from.distance_to(hit["position"])-.20)
+  desired_local = desired_local.normalized()*allowed
+ var response := 16.0 if blocked else 7.5
+ _camera.position = _camera.position.lerp(desired_local,minf(1.0,delta*response))
+ _camera.fov = lerpf(_camera.fov,51.0 if is_aiming else 66.0,minf(1.0,delta*7.0))
