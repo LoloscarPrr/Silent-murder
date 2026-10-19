@@ -1,13 +1,17 @@
 extends Node3D
-## Silent Murder v0.3: industrial practice range with stationary targets.
+## Silent Murder v0.4: industrial practice range plus patrol guards.
 
 const PLAYER_SCRIPT = preload("res://scripts/player_controller.gd")
 const UI_SCRIPT = preload("res://scripts/mobile_controls.gd")
 const TARGET_SCRIPT = preload("res://scripts/training_target.gd")
+const GUARD_SCRIPT = preload("res://scripts/guard_ai.gd")
 var _player: CharacterBody3D
 var _level: Node3D
 var _targets_total := 0
 var _targets_disabled := 0
+var _guards_total := 0
+var _guards_disabled := 0
+var _guards: Array[CharacterBody3D] = []
 var _hud
 
 func _ready() -> void:
@@ -20,10 +24,68 @@ func _ready() -> void:
  _player = PLAYER_SCRIPT.new()
  _player.position = Vector3(0.0, 0.18, 9.0)
  add_child(_player)
+ _player.weapon_fired.connect(_on_player_shot)
+ _player.player_defeated.connect(_on_player_defeated)
+ _spawn_guards()
  _hud = UI_SCRIPT.new()
  _hud.operative = _player
  add_child(_hud)
  _hud.set_training_progress(_targets_disabled,_targets_total)
+ _hud.set_guard_progress(_guards_disabled,_guards_total)
+ _hud.set_health(_player.health,_player.MAX_HEALTH)
+ _player.health_changed.connect(_hud.set_health)
+
+func _spawn_guards() -> void:
+ var paths: Array[Array] = [
+  [Vector3(-3.2,.15,5.0),Vector3(-3.2,.15,0.3),Vector3(-3.2,.15,-4.7)],
+  [Vector3(3.2,.15,-5.0),Vector3(3.2,.15,.8),Vector3(3.2,.15,6.2)],
+  [Vector3(-2.1,.15,-12.5),Vector3(1.5,.15,-12.5),Vector3(1.5,.15,-8.2)]
+ ]
+ for i in range(paths.size()):
+  var guard := GUARD_SCRIPT.new()
+  guard.player = _player
+  guard.position = paths[i][0]
+  guard.waypoints.assign(paths[i])
+  guard.name = "Guard_%02d" % (i + 1)
+  _level.add_child(guard)
+  guard.guard_disabled.connect(_on_guard_disabled)
+  guard.awareness_changed.connect(_on_guard_awareness)
+  _guards.append(guard)
+  _guards_total += 1
+
+func _on_player_shot(origin: Vector3, radius: float) -> void:
+ for guard in _guards:
+  if not guard.is_disabled:
+   guard.hear_noise(origin,radius)
+ _refresh_guard_status()
+
+func _on_guard_disabled(_guard: Node3D) -> void:
+ _guards_disabled += 1
+ if _hud != null:
+  _hud.set_guard_progress(_guards_disabled,_guards_total)
+ _refresh_guard_status()
+
+func _on_guard_awareness(_guard: Node3D,_new_state: String) -> void:
+ _refresh_guard_status()
+
+func _refresh_guard_status() -> void:
+ if _hud == null:
+  return
+ var state := "PATRULLA"
+ for guard in _guards:
+  if guard.is_disabled:
+   continue
+  if guard.state == guard.ALERT:
+   state = "ALERTA"
+   break
+  elif guard.state == guard.INVESTIGATE or guard.state == guard.SEARCH:
+   state = "SOSPECHA"
+ _hud.set_alert_status(state)
+
+func _on_player_defeated() -> void:
+ for guard in _guards:
+  guard.reset_after_player_defeat()
+ _refresh_guard_status()
 
 func _build_practice_range() -> void:
  # Clear forward lanes allow precision aiming while keeping the existing level.
