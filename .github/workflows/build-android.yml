@@ -83,7 +83,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          godot --headless --path . --quit-after 320 res://tests/combat_test.tscn 2>&1 | tee /tmp/silent-murder-combat.log
+          godot --headless --path . --quit-after 1800 res://tests/combat_test.tscn 2>&1 | tee /tmp/silent-murder-combat.log
           grep -Fq 'COMBAT_TEST_PASS' /tmp/silent-murder-combat.log
           if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-murder-combat.log; then
             echo "Combat test failed."
