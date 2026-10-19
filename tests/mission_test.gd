@@ -40,7 +40,12 @@ func _test_contract() -> void:
  # Objective location unlocks the interaction button and dossier.
  player.global_position = mission.INTEL_POSITION + Vector3(0,.15,0)
  await get_tree().physics_frame
- assert(mission.interact(),"Cannot retrieve dossier at console")
+ mission._process(.2)
+ assert(hud._buttons["interact"].visible,"Interaction button absent near dossier")
+ var pickup_point: Vector2 = hud._buttons["interact"].get_global_rect().get_center()
+ hud._press(50,pickup_point)
+ hud._release(50)
+ assert(mission.intel_collected,"Touching RECUPERAR did not retrieve dossier")
  assert(mission.intel_collected,"Dossier flag missing")
  assert(mission.state == mission.EXTRACT,"Mission did not advance to extraction")
  assert(mission._extraction_marker.visible,"Extraction indicator did not activate")
@@ -50,7 +55,12 @@ func _test_contract() -> void:
  assert(not mission.interact(),"Extraction should still require proximity")
  player.global_position = mission.EXTRACTION_POSITION + Vector3(0,.15,0)
  await get_tree().physics_frame
- assert(mission.interact(),"Cannot extract with dossier")
+ mission._process(.2)
+ assert(hud._buttons["interact"].visible,"Extraction button absent at beacon")
+ var extract_point: Vector2 = hud._buttons["interact"].get_global_rect().get_center()
+ hud._press(51,extract_point)
+ assert(mission.state == mission.SUCCESS,"EXTRAER button did not complete mission")
+ hud._release(51)
  assert(mission.state == mission.SUCCESS,"Mission did not complete")
  assert(player.controls_locked,"Player remains controllable after success")
  assert(hud._mission_state == "success","Mission result screen missing")
