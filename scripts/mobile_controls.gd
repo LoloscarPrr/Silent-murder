@@ -7,7 +7,7 @@ const JOYSTICK_SCRIPT = preload("res://scripts/joystick_canvas.gd")
 const JOYSTICK_RADIUS := 78.0
 const DEAD_ZONE := 0.09
 
-var operative: CharacterBody3D
+var operative
 var _roles: Dictionary = {} # touch index -> "move", "look", "sprint", "aim", "crouch", "info" or "idle"
 var _move_touch := -1
 var _look_touch := -1
@@ -136,8 +136,10 @@ func _press(index: int, at: Vector2) -> void:
     operative.is_sprinting = true
    "crouch":
     operative.toggle_crouch()
+    operative.is_sprinting = _action_held("sprint")
    "aim":
     operative.toggle_aim()
+    operative.is_sprinting = _action_held("sprint")
    "info":
     _set_status("Dedo izquierdo: mover  |  derecho: mirar  |  otro: correr")
   return
