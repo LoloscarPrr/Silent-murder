@@ -50,7 +50,7 @@ func _physics_process(delta: float) -> void:
  _camera.fov = lerpf(_camera.fov,49.0 if is_aiming else 65.0,minf(1.0,delta*6.0))
  _camera.position.x = lerpf(_camera.position.x,0.42 if is_aiming else 0.67,minf(1.0,delta*6.0))
 
-func apply_look(delta_pixels: Vector2,touch := true) -> void:
+func apply_look(delta_pixels: Vector2,touch: bool = true) -> void:
  var sensitivity := TOUCH_SENSITIVITY if touch else MOUSE_SENSITIVITY
  rotate_y(-delta_pixels.x*sensitivity)
  pitch = clampf(pitch-delta_pixels.y*sensitivity,-0.92,0.62)
