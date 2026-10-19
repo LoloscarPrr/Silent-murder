@@ -1,47 +1,34 @@
 # SILENT MURDER
 
-Prototipo Android original de acción y sigilo 3D en **Godot 4.3 / GDScript**.
+Juego original de sigilo y acción en tercera persona para Android, realizado con Godot 4.3 / GDScript. Repositorio: `LoloscarPrr/Silent-murder`.
 
-## Alpha 0.3 — polígono de entrenamiento
+## Alpha 0.4 — Guardia, visión y sigilo
 
-Primera iteración con disparos reales y blancos estacionarios, no humanos. Conserva el depósito 3D y los controles multitouch de la 0.2.1.
+El depósito de pruebas de la 0.3 ahora contiene **tres guardias patrullando** en rutas predefinidas y cuatro blancos de entrenamiento.
 
-- Pistola de entrenamiento provisional con supresor visual y destello de boca.
-- Disparos por **raycast** desde el centro de la cámara; efecto luminoso breve del cañón al punto de impacto.
-- Cargador de 12 balas, 48 de reserva, 1,3 segundos de recarga.
-- Disparo sostenido con cadencia limitada, independiente de caminar y mirar.
-- Cuatro blancos en el depósito. Cada uno soporta **tres impactos** antes de quedar desactivado.
-- Marcador de blancos abatidos, contador de munición y FPS.
-- Botones táctiles adicionales **DISPARAR** (mantener) y **RECARGAR** (tocar).
-- Se mantiene el apuntado con cámara cercana, carrera, postura agachada y los identificadores independientes de cada dedo.
-- Prueba automática de disparo, impactos, recarga y multitouch, además de la prueba de escena y la anterior de multitouch.
+### Qué probar
 
-### Controles Android
+- **Patrulla:** los guardias recorren distintas zonas del depósito.
+- **Visión real:** el guardia usa distancia, ángulo frontal y un raycast físico que no puede atravesar paredes ni cajas; agacharse reduce la rapidez de detección y correr la aumenta.
+- **Sospecha:** al observar algo extraño, investiga el lugar; al perder el contacto, busca antes de volver a patrullar.
+- **Ruido:** la pistola con supresor todavía se oye a corta distancia (9 metros en el prototipo). Los guardias cercanos investigan.
+- **Combate:** si te detectan y tienen línea de visión, pueden disparar. El protagonista tiene 100 HP, tiempo breve de invulnerabilidad tras un golpe, y reaparece en la entrada si se queda sin vida.
+- **Guardias resistentes:** 3 impactos de pistola para neutralizarlos. Los neutralizados ya no disparan ni bloquean balas.
+- **Indicadores:** GUARDIAS neutralizados, VIDA y ESTADO PATRULLA / SOSPECHA / ALERTA.
+- **Multitouch:** joysticks, apuntado, disparo, carrera, agacharse y recarga conservan los contactos independientes de 0.2.1.
 
-| Acción | Control |
-|---|---|
-| Mover | Joystick táctil izquierdo |
-| Girar cámara | Deslizar libremente a la derecha sin ocupar botones |
-| Correr | Mantener CORRER |
-| Sigilo | Tocar AGACHAR |
-| Apuntar | Tocar APUNTAR (alternar) |
-| Disparar | Mantener DISPARAR |
-| Recargar | Tocar RECARGAR |
+### Límites de esta fase
 
-En esta Alpha no hay enemigos, IA, bajas humanas, contratos ni campaña; los blancos son placas de entrenamiento.
+Los guardias son modelos de bloque de prueba con animaciones simples, no humanos riggeados. Las patrullas todavía no usan navegación por malla; pueden atascarse con determinados objetos (eso es algo que evaluaremos en el teléfono). Los enemigos hacen daño por disparo cuando tienen línea de visión, pero todavía faltan efectos de sonido, animaciones y sistemas completos de cobertura, misión y extracción.
 
-## Compilar sin PC
+### Cómo obtener el APK
 
-[GitHub Actions](https://github.com/LoloscarPrr/Silent-murder/actions) → ejecución más reciente verde de **Android - Silent Murder** → artefacto `SilentMurder-v0.3-Android-debug`.
+Abre [GitHub Actions](https://github.com/LoloscarPrr/Silent-murder/actions) y descarga el artefacto **SilentMurder-v0.4-Android-debug** de la última ejecución exitosa. La app usa el mismo ID `com.loloscarprr.silentmurder`, código de versión 5 y Android arm64.
 
-La exportación usa Android arm64 y package `com.loloscarprr.silentmurder` con versionCode 4. Las APK de prueba solo se actualizan directamente si mantienen el mismo certificado de firma.
+### Pruebas automatizadas
 
-## Línea de producción
+GitHub valida importación de Godot, carga de escena, multitouch independiente, disparos y recarga, y añade pruebas de visión, obstáculos, ruido, IA, daño y neutralización. La aprobación real de jugabilidad y FPS requiere prueba en tu Android.
 
-- 0.1: motor, entorno 3D, cámara y control básico.
-- 0.2: locomoción procedimental, sigilo, cámara anticolisión.
-- 0.2.1: multitouch con contactos independientes.
-- **0.3:** disparos, munición, recarga y blancos estacionarios.
-- 0.4 propuesta: estados básicos de guardias y reacción ante disparos, luego evaluaremos audio, animaciones y objetivos de misión.
+### Próximo objetivo
 
-Los elementos gráficos son provisionales y originales. No se reutilizan archivos ni personajes de Contract Killer 2.
+Después de validar la IA, implementar navegación/cobertura y una misión pequeña con objetivo y extracción. Mantener la identidad original de espía elegante + táctico oscuro; no reutilizar contenido de Contract Killer 2.
