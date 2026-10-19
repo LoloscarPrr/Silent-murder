@@ -18,13 +18,43 @@ jobs:
       image: barichello/godot-ci:4.3
     steps:
       - uses: actions/checkout@v4
+
+      # GitHub Actions overwrites HOME with /github/home; the Godot CI
+      # image installed Android templates and editor configuration in /root.
+      - name: Configure Godot Android tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/share/godot/export_templates" "$HOME/.config/godot"
+          cp -a /root/.local/share/godot/export_templates/4.3.stable "$HOME/.local/share/godot/export_templates/"
+          if [ -f /root/.config/godot/editor_settings-4.3.tres ]; then
+            cp -a /root/.config/godot/editor_settings-4.3.tres "$HOME/.config/godot/editor_settings-4.3.tres"
+          else
+            cat > "$HOME/.config/godot/editor_settings-4.3.tres" <<'SETTINGS'
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
+          export/android/android_sdk_path = "/usr/lib/android-sdk"
+          export/android/debug_keystore = "/root/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          SETTINGS
+          fi
+          test -s "$HOME/.local/share/godot/export_templates/4.3.stable/android_debug.apk"
+          test -s /root/debug.keystore
+          command -v keytool
+          command -v godot
+
       - name: Import Godot project
         run: godot --headless --path . --import
+
       - name: Export Android debug APK
         run: |
+          set -e
           mkdir -p build
           godot --headless --path . --export-debug "Android" build/SilentMurder_v0.1_debug.apk
           test -s build/SilentMurder_v0.1_debug.apk
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
