@@ -56,17 +56,27 @@ jobs:
       - name: Import Godot project
         run: godot --headless --path . --import
 
+      - name: Smoke-test scene and GDScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path . --quit-after 90 2>&1 | tee /tmp/silent-murder-smoke.log
+          if grep -E 'SCRIPT ERROR|Parse Error|ERROR:' /tmp/silent-murder-smoke.log; then
+            echo "Scene startup or script errors detected."
+            exit 1
+          fi
+
       - name: Export Android debug APK
         run: |
           set -e
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/SilentMurder_v0.1_debug.apk
-          test -s build/SilentMurder_v0.1_debug.apk
+          godot --headless --path . --export-debug "Android" build/SilentMurder_v0.2_debug.apk
+          test -s build/SilentMurder_v0.2_debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SilentMurder-Android-debug
-          path: build/SilentMurder_v0.1_debug.apk
+          name: SilentMurder-v0.2-Android-debug
+          path: build/SilentMurder_v0.2_debug.apk
           if-no-files-found: error
           retention-days: 30
