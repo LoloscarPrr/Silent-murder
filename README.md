@@ -2,28 +2,36 @@
 
 Juego original de acción y sigilo en tercera persona para Android, desarrollado con **Godot 4.3 / GDScript**.
 
-## Estado — prototipo v0.1
+## Estado — Alpha v0.2 (movimiento y cámara)
 
-- Depósito industrial 3D provisional con colisiones.
-- Protagonista de geometría básica: traje elegante + chaleco táctico y guantes negros.
-- Cámara sobre el hombro, joystick izquierdo y arrastre derecho para la cámara.
-- Botones de correr, agacharse (visual) y apuntar (zoom de cámara).
-- Exportación Android arm64 con GitHub Actions.
+Prototipo funcional de exploración sin combate; pensada para probar directamente en un teléfono Android.
 
-**No contiene aún:** disparos, armas funcionales, enemigos, IA, animaciones definitivas, misiones ni progresión.
+- Depósito industrial 3D con colisiones.
+- Protagonista **articulado provisional** construido con primitivas 3D (no es un humanoide riggeado definitivo).
+- Transiciones procedurales de caminar, correr, agacharse, apuntar, brazos y rodillas.
+- Movimiento analógico suavizado con aceleración y frenado.
+- Agacharse también reduce la cápsula de colisión; se comprueba espacio para levantarse.
+- Cámara sobre el hombro con suavizado, zoom al apuntar y chequeo de obstáculos.
+- Joystick izquierdo independiente de la cámara táctil derecha.
+- Contador de FPS para medir rendimiento en el Redmi 12 5G.
+- Exportación Android arm64 mediante GitHub Actions y prueba automática de arranque.
+
+**Todavía no existen:** disparos, arma real, enemigos, IA, animaciones definitivas, misiones ni progresión.
 
 ## Dirección artística
 
-Combinación de un asesino elegante y un operador táctico discreto, con identidad original y sin reutilizar recursos ni código de Contract Killer 2.
+Combinación aprobada de asesino elegante y operador táctico discreto; depósito industrial nocturno. No utiliza recursos ni código de Contract Killer 2.
 
-## APK para probar (sin PC)
+## Android — sin PC
 
-En GitHub abre **Actions → Android - Silent Murder**. Si el workflow termina en verde, abre su ejecución y descarga el artefacto **SilentMurder-Android-debug**. GitHub suele entregarlo en un ZIP que contiene el APK.
+En GitHub: **Actions → Android - Silent Murder → ejecución verde más reciente → artifact SilentMurder-v0.2-Android-debug**.
 
-La exportación es preliminar. Si aparece un error, revisar los logs antes de asumir que funciona.
+GitHub normalmente entrega un ZIP con el APK. Comprueba primero si Android permite actualizar la versión anterior; si dice «La aplicación no se instaló», conserva la versión previa y comparte el mensaje: puede tratarse de la firma debug. No desinstales la 0.1 sin guardar los datos que necesites.
 
-## Compatibilidad y actualizaciones
+## Próximo paso
 
-Configurado para Android horizontal y arquitectura arm64. El rendimiento de 30 FPS en Redmi 12 5G es un objetivo por probar. Para instalar futuras versiones encima de una misma app será imprescindible configurar una clave de firma estable: esta primera firma debug no está garantizada entre builds.
+0.3: fase de combate (arma visible y sistema de disparos). No implementarla hasta validar controles y estabilidad de la 0.2 en dispositivo.
 
-Consulta `docs/DIRECCION_DE_ARTE.md` y `docs/CRITERIOS_ACEPTACION.md`.
+## Criterios y pruebas
+
+Revisar `docs/CRITERIOS_ACEPTACION.md`.
