@@ -40,7 +40,7 @@ func _ready() -> void:
  _joystick_visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
  _surface.add_child(_joystick_visual)
 
- _status = _label("SILENT MURDER  /  ENTRENAMIENTO", Vector2(26,18), 22)
+ _status = _label("SILENT KILLER  /  ENTRENAMIENTO", Vector2(26,18), 22)
  var hint := _label("ALPHA 0.4  •  GUARDIAS Y SIGILO", Vector2(28,49), 14)
  hint.modulate = Color(.75,.83,.83)
  var crosshair := Label.new()
