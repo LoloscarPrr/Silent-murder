@@ -1,10 +1,12 @@
 extends CharacterBody3D
-## Silent Murder v0.2 — responsive analog movement, crouch collision,
+## Silent Murder v0.3 — responsive motion, aim and training pistol,
 ## articulated locomotion and obstacle-aware over-shoulder camera.
 
 signal status_changed(status: String)
+signal ammo_changed(magazine: int, reserve: int)
 
 const VISUAL_SCRIPT = preload("res://scripts/operative_visual.gd")
+const WEAPON_SCRIPT = preload("res://scripts/weapon_controller.gd")
 const WALK_SPEED := 3.75
 const SPRINT_SPEED := 6.2
 const CROUCH_SPEED := 1.85
@@ -30,6 +32,7 @@ var _rig: Node3D
 var _collider: CollisionShape3D
 var _capsule: CapsuleShape3D
 var _visual: Node3D
+var _weapon
 
 func _ready() -> void:
  name = "SilentMurder_Operative"
@@ -38,7 +41,14 @@ func _ready() -> void:
  _visual = VISUAL_SCRIPT.new()
  add_child(_visual)
  _make_camera()
- status_changed.emit("Movimiento mejorado • Alpha 0.2")
+ _weapon = WEAPON_SCRIPT.new()
+ _weapon.operative = self
+ _weapon.camera = _camera
+ _weapon.visual = _visual
+ _weapon.ammo_updated.connect(_on_ammo_updated)
+ _weapon.shot_report.connect(_on_shot_report)
+ add_child(_weapon)
+ status_changed.emit("Pistola de entrenamiento • Alpha 0.3")
 
 func _physics_process(delta: float) -> void:
  rotation.y = lerp_angle(rotation.y,_desired_yaw,minf(1.0,TURN_SMOOTH*delta))
@@ -99,7 +109,24 @@ func toggle_aim() -> void:
  is_aiming = not is_aiming
  if is_aiming:
   is_sprinting = false
- status_changed.emit("Apuntando (arma en una fase futura)" if is_aiming else "Explorando")
+ status_changed.emit("Modo puntería" if is_aiming else "Explorando")
+
+func set_fire_held(held: bool) -> void:
+ if _weapon != null:
+  _weapon.set_trigger_held(held)
+
+func reload_weapon() -> void:
+ if _weapon != null:
+  _weapon.request_reload()
+
+func get_ammo_label() -> String:
+ return _weapon.get_ammo_label() if _weapon != null else "-- / --"
+
+func _on_ammo_updated(magazine: int, reserve: int) -> void:
+ ammo_changed.emit(magazine,reserve)
+
+func _on_shot_report(message: String) -> void:
+ status_changed.emit(message)
 
 func _make_collision() -> void:
  _capsule = CapsuleShape3D.new()
