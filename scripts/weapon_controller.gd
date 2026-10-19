@@ -13,7 +13,7 @@ const RANGE := 95.0
 
 var operative: CharacterBody3D
 var camera: Camera3D
-var visual: Node3D
+var visual
 var magazine := MAG_CAPACITY
 var reserve := START_RESERVE
 var shots_fired := 0
@@ -55,7 +55,6 @@ func request_reload() -> void:
  if _reload_left > 0.0 or magazine >= MAG_CAPACITY or reserve <= 0:
   return
  _reload_left = RELOAD_DURATION
- _trigger_held = false
  shot_report.emit("Recargando...")
 
 func get_ammo_label() -> String:
