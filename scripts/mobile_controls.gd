@@ -10,6 +10,8 @@ var _surface: Control
 var _joystick_visual: Control
 var _status: Label
 var _crosshair: Label
+var _fps_label: Label
+var _fps_accumulator := 0.0
 
 func _ready() -> void:
  _surface = Control.new()
@@ -63,6 +65,12 @@ func _surface_changed() -> void:
   _joystick_center = Vector2(_surface.size.x*.125,_surface.size.y*.76)
   _joystick_knob = _joystick_center
  _redraw_joystick()
+
+func _process(delta: float) -> void:
+ _fps_accumulator += delta
+ if _fps_accumulator >= .5 and _fps_label != null:
+  _fps_accumulator = 0.0
+  _fps_label.text = "%d FPS" % Engine.get_frames_per_second()
 
 func _input(event: InputEvent) -> void:
  if operative == null:
