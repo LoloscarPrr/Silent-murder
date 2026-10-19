@@ -1,9 +1,10 @@
 extends Node3D
-## Alpha 0.3: a lightweight hit-scan training pistol.
+## Alpha 0.4: hit-scan pistol with sound events for nearby guards.
 ## Runs the physics ray from screen center in _physics_process for safe queries.
 
 signal ammo_updated(magazine: int, reserve: int)
 signal shot_report(message: String)
+signal gunshot_at(origin: Vector3, radius: float)
 
 const MAG_CAPACITY := 12
 const START_RESERVE := 48
@@ -72,6 +73,8 @@ func _fire_now() -> void:
  shots_fired += 1
  ammo_updated.emit(magazine,reserve)
  _flash_left = .075
+ # Silenced shots are not completely inaudible within the depot.
+ gunshot_at.emit(operative.global_position,9.0)
 
  if camera == null or operative == null:
   return
@@ -88,7 +91,7 @@ func _fire_now() -> void:
  if not ray_hit.is_empty():
   hit_end = ray_hit["position"]
   var collider: Object = ray_hit["collider"]
-  if collider != null and collider.is_in_group("training_targets") and collider.has_method("receive_shot"):
+  if collider != null and collider.has_method("receive_shot"):
    did_hit_target = collider.receive_shot(ray_hit["position"],ray_hit["normal"])
  if did_hit_target:
   hits += 1
