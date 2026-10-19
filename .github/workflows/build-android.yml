@@ -90,17 +90,28 @@ jobs:
             exit 1
           fi
 
+      - name: Verify guard AI, line of sight, hearing and damage
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path . --quit-after 1800 res://tests/guard_ai_test.tscn 2>&1 | tee /tmp/silent-murder-ai.log
+          grep -Fq 'GUARD_AI_TEST_PASS' /tmp/silent-murder-ai.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-murder-ai.log; then
+            echo "Guard AI test failed."
+            exit 1
+          fi
+
       - name: Export Android debug APK
         run: |
           set -e
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/SilentMurder_v0.3_debug.apk
-          test -s build/SilentMurder_v0.3_debug.apk
+          godot --headless --path . --export-debug "Android" build/SilentMurder_v0.4_debug.apk
+          test -s build/SilentMurder_v0.4_debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SilentMurder-v0.3-Android-debug
-          path: build/SilentMurder_v0.3_debug.apk
+          name: SilentMurder-v0.4-Android-debug
+          path: build/SilentMurder_v0.4_debug.apk
           if-no-files-found: error
           retention-days: 30
