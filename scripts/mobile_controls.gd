@@ -23,12 +23,12 @@ func _ready() -> void:
  _joystick_visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
  _surface.add_child(_joystick_visual)
  _status = Label.new()
- _status.text = "SILENT MURDER // Prueba de movimiento"
+ _status.text = "SILENT MURDER  /  MOVIMIENTO"
  _status.position = Vector2(26,23)
  _status.add_theme_font_size_override("font_size",22)
  _surface.add_child(_status)
  var hint := Label.new()
- hint.text = "FASE 0.1  •  SIN COMBATE"
+ hint.text = "ALPHA 0.2  •  PRUEBA DE CONTROL Y CAMARA"
  hint.position = Vector2(28,55)
  hint.modulate = Color(.72,.82,.8)
  hint.add_theme_font_size_override("font_size",15)
@@ -43,6 +43,16 @@ func _ready() -> void:
  _button("CORRER",Vector2(.88,.83),"sprint")
  _button("APUNTAR",Vector2(.88,.58),"aim")
  _button("INFO",Vector2(.93,.06),"info")
+ _fps_label = Label.new()
+ _fps_label.name = "FrameRate"
+ _fps_label.text = "-- FPS"
+ _fps_label.anchor_left = .65
+ _fps_label.anchor_right = .65
+ _fps_label.anchor_top = .03
+ _fps_label.anchor_bottom = .03
+ _fps_label.add_theme_font_size_override("font_size",19)
+ _fps_label.modulate = Color(.83,.90,.82)
+ _surface.add_child(_fps_label)
  if operative != null:
   operative.status_changed.connect(_set_status)
  _surface.resized.connect(_surface_changed)
@@ -115,7 +125,7 @@ func _button(caption: String,anchor: Vector2,action: String) -> void:
  if action == "aim":
   b.pressed.connect(func() -> void: operative.toggle_aim())
  if action == "info":
-  b.pressed.connect(func() -> void: _status.text = "Movimiento + cámara: fase 0.1")
+  b.pressed.connect(func() -> void: _status.text = "Alpha 0.2: caminar, correr, sigilo, apuntar y camara")
  if action == "sprint":
   b.button_down.connect(func() -> void: operative.is_sprinting = true)
   b.button_up.connect(func() -> void: operative.is_sprinting = false)
