@@ -1,5 +1,5 @@
 extends Node3D
-## Silent Murder v0.1: a self-contained 3D industrial blockout.
+## Silent Murder v0.2: blockout environment with smoother 3D character.
 
 const PLAYER_SCRIPT = preload("res://scripts/player_controller.gd")
 const UI_SCRIPT = preload("res://scripts/mobile_controls.gd")
