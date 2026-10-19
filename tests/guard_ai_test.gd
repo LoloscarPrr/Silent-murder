@@ -16,7 +16,7 @@ func _ready() -> void:
  guard = GUARD.new()
  guard.player = player
  guard.position = Vector3(0,.1,0)
- guard.waypoints = [Vector3(0,.1,0),Vector3(0,.1,1.5)]
+ guard.waypoints.assign([Vector3(0,.1,0),Vector3(0,.1,1.5)])
  add_child(guard)
  call_deferred("_exercise")
 
