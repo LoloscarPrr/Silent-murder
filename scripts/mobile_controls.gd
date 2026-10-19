@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Silent Murder 0.4 — same multitouch with stealth/guard combat HUD.
+## Silent Killer 0.5 — multitouch, objective interaction and mission result screen.
 ## The HUD buttons are visual only. ScreenTouch.index controls every action:
 ## finger 0 may move, finger 1 look, finger 2 sprint, finger 3 aim/crouch.
 
@@ -8,6 +8,12 @@ const JOYSTICK_RADIUS := 78.0
 const DEAD_ZONE := 0.09
 
 var operative
+var mission_manager
+var _mission_state := ""
+var _end_overlay: ColorRect
+var _result_title: Label
+var _result_subtitle: Label
+var _mission_label: Label
 var _roles: Dictionary = {} # touch index -> "move", "look", "sprint", "aim", "crouch", "info" or "idle"
 var _move_touch := -1
 var _look_touch := -1
@@ -40,8 +46,8 @@ func _ready() -> void:
  _joystick_visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
  _surface.add_child(_joystick_visual)
 
- _status = _label("SILENT KILLER  /  ENTRENAMIENTO", Vector2(26,18), 22)
- var hint := _label("ALPHA 0.4  •  GUARDIAS Y SIGILO", Vector2(28,49), 14)
+ _status = _label("SILENT KILLER  /  NOCHE CERO", Vector2(26,18), 22)
+ var hint := _label("ALPHA 0.5  •  OPERACION NOCHE CERO", Vector2(28,49), 14)
  hint.modulate = Color(.75,.83,.83)
  var crosshair := Label.new()
  crosshair.text = "+"
@@ -83,6 +89,12 @@ func _ready() -> void:
  _add_button("CORRER","sprint",Vector2(.90,.84))
  _add_button("APUNTAR","aim",Vector2(.90,.57))
  _add_button("INFO","info",Vector2(.93,.12))
+ _add_button("INTERACTUAR","interact",Vector2(.63,.79))
+ _buttons["interact"].visible = false
+
+ _mission_label = _label("RECUPERAR EXPEDIENTE",Vector2(28,153),17)
+ _mission_label.modulate = Color(.45,.85,1.0)
+ _make_result_overlay()
 
  if operative != null:
   operative.status_changed.connect(_set_status)
@@ -119,11 +131,17 @@ func _layout() -> void:
  for action in _buttons:
   var button: Button = _buttons[action]
   var at: Vector2 = button.get_meta("anchor_position")
-  var width := 108.0 * _scale
-  var height := 72.0 * _scale
+  var width := (230.0 if action == "restart" else (142.0 if action == "interact" else 108.0)) * _scale
+  var height := (80.0 if action == "restart" else 72.0) * _scale
   button.position = Vector2(view.x * at.x - width*.5,view.y * at.y - height*.5)
   button.size = Vector2(width,height)
   button.add_theme_font_size_override("font_size",int(17.0*_scale))
+ if _end_overlay != null:
+  _end_overlay.size = view
+  _result_title.position = Vector2(view.x * .5 - 260.0 * _scale,view.y * .34)
+  _result_title.size = Vector2(520.0 * _scale,76.0 * _scale)
+  _result_subtitle.position = Vector2(view.x * .5 - 260.0 * _scale,view.y * .49)
+  _result_subtitle.size = Vector2(520.0 * _scale,80.0 * _scale)
  if _move_touch == -1:
   _joystick_center = Vector2(view.x*.13,view.y*.76)
   _joystick_knob = _joystick_center
@@ -152,6 +170,10 @@ func _input(event: InputEvent) -> void:
   operative.apply_look((event as InputEventMouseMotion).relative,false)
 
 func _press(index: int, at: Vector2) -> void:
+ if _mission_state != "":
+  if _find_button(at) == "restart":
+   get_tree().reload_current_scene()
+  return
  if _roles.has(index):
   _release(index)
  # Buttons take precedence over the look area, but only within their actual rects.
@@ -166,6 +188,9 @@ func _press(index: int, at: Vector2) -> void:
     operative.set_fire_held(true)
    "reload":
     operative.reload_weapon()
+   "interact":
+    if mission_manager != null:
+     mission_manager.interact()
    "crouch":
     operative.toggle_crouch()
     operative.is_sprinting = _action_held("sprint")
@@ -225,9 +250,9 @@ func _release(index: int) -> void:
 
 func _find_button(at: Vector2) -> String:
  # Topmost buttons first (overlap resolved deterministically).
- for action in ["info","reload","fire","aim","crouch","sprint"]:
+ for action in (["restart"] if _mission_state != "" else ["interact","info","reload","fire","aim","crouch","sprint"]):
   var button: Button = _buttons[action]
-  if button.get_global_rect().has_point(at):
+  if button.visible and button.get_global_rect().has_point(at):
    return action
  return ""
 
@@ -283,6 +308,58 @@ func set_alert_status(state: String) -> void:
    _alert_label.modulate = Color(1.0,.73,.26)
   _:
    _alert_label.modulate = Color(.63,.93,.73)
+
+func set_mission_status(value: String) -> void:
+ if _mission_label != null:
+  _mission_label.text = value
+
+func set_interaction_available(enabled: bool,caption: String) -> void:
+ if _buttons.has("interact"):
+  var button: Button = _buttons["interact"]
+  button.visible = enabled and _mission_state == ""
+  if caption != "":
+   button.text = caption
+
+func _make_result_overlay() -> void:
+ _end_overlay = ColorRect.new()
+ _end_overlay.name = "MissionResultBackdrop"
+ _end_overlay.color = Color(.015,.022,.031,.83)
+ _end_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ _end_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ _end_overlay.visible = false
+ _surface.add_child(_end_overlay)
+
+ _result_title = Label.new()
+ _result_title.add_theme_font_size_override("font_size",34)
+ _result_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+ _result_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ _surface.add_child(_result_title)
+
+ _result_subtitle = Label.new()
+ _result_subtitle.add_theme_font_size_override("font_size",20)
+ _result_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+ _result_subtitle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ _surface.add_child(_result_subtitle)
+
+ _add_button("REINTENTAR","restart",Vector2(.5,.72))
+ _buttons["restart"].visible = false
+ _result_title.visible = false
+ _result_subtitle.visible = false
+
+func show_mission_result(success: bool) -> void:
+ if _mission_state != "":
+  return
+ _reset_touches()
+ _mission_state = "success" if success else "failure"
+ _end_overlay.visible = true
+ _result_title.visible = true
+ _result_subtitle.visible = true
+ _result_title.text = "CONTRATO COMPLETADO" if success else "OPERACION FALLIDA"
+ _result_title.modulate = Color(.48,1.0,.65) if success else Color(1.0,.48,.45)
+ _result_subtitle.text = "Expediente recuperado. Extraccion confirmada." if success else "El operativo fue neutralizado. Intenta otra ruta."
+ _buttons["restart"].visible = true
+ _buttons["restart"].text = "NUEVA PARTIDA" if success else "REINTENTAR"
+ _layout()
 
 func _set_status(message: String) -> void:
  if _status != null:
