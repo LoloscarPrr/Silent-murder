@@ -73,7 +73,7 @@ func _exercise() -> void:
  guard.reset_after_player_defeat()
  assert(guard.state == guard.PATROL,"Guard remained alerted after defeat reset")
 
- var hit_point := guard.global_position + Vector3.UP
+ var hit_point: Vector3 = guard.global_position + Vector3.UP
  for i in range(3):
   assert(guard.receive_shot(hit_point,Vector3.BACK),"Guard ignored a valid hit")
  assert(guard.is_disabled,"Guard not disabled after three hits")
