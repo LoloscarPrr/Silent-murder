@@ -68,17 +68,28 @@ jobs:
             exit 1
           fi
 
+      - name: Verify independent multi-finger input
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path . --quit-after 160 res://tests/multitouch_test.tscn 2>&1 | tee /tmp/silent-murder-touch.log
+          grep -Fq 'MULTITOUCH_TEST_PASS' /tmp/silent-murder-touch.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-murder-touch.log; then
+            echo "Multi-finger test failed."
+            exit 1
+          fi
+
       - name: Export Android debug APK
         run: |
           set -e
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/SilentMurder_v0.2_debug.apk
-          test -s build/SilentMurder_v0.2_debug.apk
+          godot --headless --path . --export-debug "Android" build/SilentMurder_v0.2.1_debug.apk
+          test -s build/SilentMurder_v0.2.1_debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SilentMurder-v0.2-Android-debug
-          path: build/SilentMurder_v0.2_debug.apk
+          name: SilentMurder-v0.2.1-Android-debug
+          path: build/SilentMurder_v0.2.1_debug.apk
           if-no-files-found: error
           retention-days: 30
