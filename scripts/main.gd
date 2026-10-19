@@ -59,7 +59,7 @@ func _build_depot() -> void:
   var x := -13.0 + float(i) * 4.2
   _solid("Floor stripe %d" % i,Vector3(x,.013,10.2),Vector3(1.8,.02,.12),accent,false)
 
-func _solid(label: String, at: Vector3, dimensions: Vector3, mat: StandardMaterial3D, collidable := true) -> void:
+func _solid(label: String, at: Vector3, dimensions: Vector3, mat: StandardMaterial3D, collidable: bool = true) -> void:
  var mesh := BoxMesh.new()
  mesh.size = dimensions
  var visual := MeshInstance3D.new()
