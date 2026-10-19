@@ -1,36 +1,47 @@
 # SILENT MURDER
 
-Videojuego original de sigilo y acción 3D para Android. Godot 4.3 y GDScript.
+Prototipo Android original de acción y sigilo 3D en **Godot 4.3 / GDScript**.
 
-## Alpha 0.2.1 — multitouch independiente
+## Alpha 0.3 — polígono de entrenamiento
 
-- **Dedo izquierdo** en la mitad inferior izquierda: joystick analógico, camina o cambia dirección.
-- **Otro dedo** en la derecha: deslizar para girar la cámara mientras te mueves.
-- **Dedo adicional en CORRER**: mantén pulsado y sigue moviéndote/mirando.
-- **APUNTAR**: toca para activar o desactivar zoom y postura (todavía sin armas).
-- **AGACHAR**: toca para alternar postura de sigilo, con colisión reducida.
-- La entrada se identifica por el índice de cada dedo. Levantar uno no interrumpe los demás.
-- Desactivada la emulación táctil del ratón para evitar duplicar eventos.
-- Los botones son superficies visuales; sus acciones son procesadas por un único gestor multitáctil.
-- Al minimizar la app se liberan los botones sostenidos y se centra el joystick.
-- Escalado del HUD para distintas resoluciones y contador de FPS.
-- Prueba automática de cuatro dedos en GitHub Actions (escena en `tests/multitouch_test.tscn`).
+Primera iteración con disparos reales y blancos estacionarios, no humanos. Conserva el depósito 3D y los controles multitouch de la 0.2.1.
 
-La cámara, el nivel industrial y el protagonista articulado procedural de la 0.2 se mantienen.
+- Pistola de entrenamiento provisional con supresor visual y destello de boca.
+- Disparos por **raycast** desde el centro de la cámara; efecto luminoso breve del cañón al punto de impacto.
+- Cargador de 12 balas, 48 de reserva, 1,3 segundos de recarga.
+- Disparo sostenido con cadencia limitada, independiente de caminar y mirar.
+- Cuatro blancos en el depósito. Cada uno soporta **tres impactos** antes de quedar desactivado.
+- Marcador de blancos abatidos, contador de munición y FPS.
+- Botones táctiles adicionales **DISPARAR** (mantener) y **RECARGAR** (tocar).
+- Se mantiene el apuntado con cámara cercana, carrera, postura agachada y los identificadores independientes de cada dedo.
+- Prueba automática de disparo, impactos, recarga y multitouch, además de la prueba de escena y la anterior de multitouch.
 
-**Esta versión es todavía una demo técnica:** no hay pistola funcional, enemigos, IA ni misión.
+### Controles Android
 
-## Exportación Android sin PC
+| Acción | Control |
+|---|---|
+| Mover | Joystick táctil izquierdo |
+| Girar cámara | Deslizar libremente a la derecha sin ocupar botones |
+| Correr | Mantener CORRER |
+| Sigilo | Tocar AGACHAR |
+| Apuntar | Tocar APUNTAR (alternar) |
+| Disparar | Mantener DISPARAR |
+| Recargar | Tocar RECARGAR |
 
-La rama `main` genera APK en GitHub Actions: **Actions → Android - Silent Murder → última ejecución verde → SilentMurder-v0.2.1-Android-debug**.
+En esta Alpha no hay enemigos, IA, bajas humanas, contratos ni campaña; los blancos son placas de entrenamiento.
 
-Archivo firmado para depuración, `com.loloscarprr.silentmurder`, `versionCode=3`.
-La actualización encima de la 0.2 exige que ambas APK utilicen la misma firma. Si Android rechaza la actualización, revisaremos el certificado antes de sugerir desinstalar.
+## Compilar sin PC
 
-## Dirección artística
+[GitHub Actions](https://github.com/LoloscarPrr/Silent-murder/actions) → ejecución más reciente verde de **Android - Silent Murder** → artefacto `SilentMurder-v0.3-Android-debug`.
 
-Asesino elegante + equipamiento táctico discreto. Assets y código originales, sin reutilizar materiales protegidos de Contract Killer 2.
+La exportación usa Android arm64 y package `com.loloscarprr.silentmurder` con versionCode 4. Las APK de prueba solo se actualizan directamente si mantienen el mismo certificado de firma.
 
-## Próxima fase
+## Línea de producción
 
-Tras validación manual del multitouch en Redmi 12 5G, considerar la 0.3 con arma visible, apuntado y disparo; se mantendrán los identificadores de dedos para que disparar tampoco interrumpa movimiento o cámara.
+- 0.1: motor, entorno 3D, cámara y control básico.
+- 0.2: locomoción procedimental, sigilo, cámara anticolisión.
+- 0.2.1: multitouch con contactos independientes.
+- **0.3:** disparos, munición, recarga y blancos estacionarios.
+- 0.4 propuesta: estados básicos de guardias y reacción ante disparos, luego evaluaremos audio, animaciones y objetivos de misión.
+
+Los elementos gráficos son provisionales y originales. No se reutilizan archivos ni personajes de Contract Killer 2.
