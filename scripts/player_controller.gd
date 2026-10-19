@@ -1,5 +1,5 @@
 extends CharacterBody3D
-## Silent Murder v0.4 — tactical movement, pistol and player survivability,
+## Silent Killer v0.5 — tactical movement, combat and mission control,
 ## articulated locomotion and obstacle-aware over-shoulder camera.
 
 signal status_changed(status: String)
@@ -24,6 +24,7 @@ const STANDING_HEIGHT := 1.8
 const CROUCHED_HEIGHT := 1.20
 
 var health := MAX_HEALTH
+var controls_locked := false
 var _damage_grace := 0.0
 var _spawn_point := Vector3.ZERO
 var move_input := Vector2.ZERO
@@ -42,7 +43,7 @@ var _visual: Node3D
 var _weapon
 
 func _ready() -> void:
- name = "SilentMurder_Operative"
+ name = "SilentKiller_Operative"
  _spawn_point = global_position
  _desired_yaw = rotation.y
  _make_collision()
@@ -57,10 +58,13 @@ func _ready() -> void:
  _weapon.gunshot_at.connect(_on_weapon_fired)
  _weapon.shot_report.connect(_on_shot_report)
  add_child(_weapon)
- status_changed.emit("Infiltración táctica • Alpha 0.4")
+ status_changed.emit("OPERACIÓN NOCHE CERO • Alpha 0.5")
  health_changed.emit(health,MAX_HEALTH)
 
 func _physics_process(delta: float) -> void:
+ if controls_locked:
+  velocity = Vector3.ZERO
+  return
  _damage_grace = maxf(0.0,_damage_grace-delta)
  rotation.y = lerp_angle(rotation.y,_desired_yaw,minf(1.0,TURN_SMOOTH*delta))
  _current_pitch = lerpf(_current_pitch,_desired_pitch,minf(1.0,10.0*delta))
