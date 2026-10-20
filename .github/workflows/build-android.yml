@@ -138,17 +138,39 @@ jobs:
             exit 1
           fi
 
+      - name: Verify alert, stealth gating, stable melee UI and transient messages
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path . --quit-after 1100 res://tests/quality_fix_test.tscn 2>&1 | tee /tmp/silent-killer-quality.log
+          grep -Fq 'QUALITY_FIX_TEST_PASS' /tmp/silent-killer-quality.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-quality.log; then
+            echo "Quality regression test failed."
+            exit 1
+          fi
+
+      - name: Verify muzzle cover prevents camera-only shots
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path . --quit-after 900 res://tests/shot_cover_test.tscn 2>&1 | tee /tmp/silent-killer-muzzle.log
+          grep -Fq 'SHOT_COVER_TEST_PASS' /tmp/silent-killer-muzzle.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-muzzle.log; then
+            echo "Muzzle cover test failed."
+            exit 1
+          fi
+
       - name: Export Android debug APK
         run: |
           set -e
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/SilentKiller_v0.5.2_debug.apk
-          test -s build/SilentKiller_v0.5.2_debug.apk
+          godot --headless --path . --export-debug "Android" build/SilentKiller_v0.5.3_debug.apk
+          test -s build/SilentKiller_v0.5.3_debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SilentKiller-v0.5.2-Android-debug
-          path: build/SilentKiller_v0.5.2_debug.apk
+          name: SilentKiller-v0.5.3-Android-debug
+          path: build/SilentKiller_v0.5.3_debug.apk
           if-no-files-found: error
           retention-days: 30
