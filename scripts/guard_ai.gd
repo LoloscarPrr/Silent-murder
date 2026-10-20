@@ -271,7 +271,7 @@ func _next_route_point(delta: float,objective: Vector3) -> Vector3:
  _route_refresh -= delta
  var goal_changed := _route_goal.distance_to(objective) > .85
  if goal_changed or _route_refresh <= 0.0 or _route.is_empty():
-  _route = navigation.get_path(global_position,objective)
+  _route = navigation.calculate_route(global_position,objective)
   _route_index = 0
   _route_goal = objective
   _route_refresh = 1.05
