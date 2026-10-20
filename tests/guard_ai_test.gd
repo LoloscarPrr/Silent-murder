@@ -7,6 +7,7 @@ const GUARD = preload("res://scripts/guard_ai.gd")
 
 var player
 var guard
+var death_events := 0
 
 func _ready() -> void:
  _floor()
@@ -66,12 +67,21 @@ func _exercise() -> void:
  player._damage_grace = 0.0
  player.receive_enemy_damage(7)
  assert(player.health == hp_after - 7,"Player damage accounting incorrect")
+ player.player_defeated.connect(func() -> void: death_events += 1)
+ var defeat_position: Vector3 = player.global_position
  player._damage_grace = 0.0
  player.receive_enemy_damage(150)
- assert(player.health == player.MAX_HEALTH,"Player did not respawn at full health")
+ assert(player.health == 0,"Defeat must preserve 0 HP, not respawn at full health")
+ assert(player.controls_locked,"Defeated player can still move or fire")
+ assert(player.global_position.is_equal_approx(defeat_position),"Defeat teleported the player")
+ assert(death_events == 1,"Defeat notification must occur exactly once")
+ player._damage_grace = 0.0
+ player.receive_enemy_damage(150)
+ assert(death_events == 1,"Repeated damage emitted duplicate defeat")
+ assert(player.health == 0,"Repeated damage changed zero HP")
  assert(guard.state == guard.ALERT,"Test setup changed guard unexpectedly")
  guard.reset_after_player_defeat()
- assert(guard.state == guard.PATROL,"Guard remained alerted after defeat reset")
+ assert(guard.state == guard.PATROL,"Guard did not return to patrol in standalone test")
 
  var hit_point: Vector3 = guard.global_position + Vector3.UP
  for i in range(3):
@@ -79,5 +89,5 @@ func _exercise() -> void:
  assert(guard.is_disabled,"Guard not disabled after three hits")
  assert(guard.collision_layer == 0,"Disabled guard still blocks gunfire")
  assert(not guard.receive_shot(hit_point,Vector3.BACK),"Disabled guard accepted extra hit")
- print("GUARD_AI_TEST_PASS: LOS / cover / hearing / alert / enemy damage / respawn / disable")
+ print("GUARD_AI_TEST_PASS: LOS / cover / hearing / alert / damage / terminal defeat / disable")
  get_tree().quit(0)
