@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Silent Killer 0.5.2 — dynamic melee button and independent touch roles.
+## Silent Killer 0.5.3 — stable melee, independent alarm and transient event toast.
 ## The HUD buttons are visual only. ScreenTouch.index controls every action:
 ## finger 0 may move, finger 1 look, finger 2 sprint, finger 3 aim/crouch.
 
@@ -27,6 +27,8 @@ var _surface: Control
 var _joystick_visual: Control
 var _buttons: Dictionary = {} # action name -> Button used only for drawing
 var _status: Label
+var _event_label: Label
+var _event_seconds := 0.0
 var _fps_label: Label
 var _ammo_label: Label
 var _training_label: Label
@@ -50,7 +52,10 @@ func _ready() -> void:
  _surface.add_child(_joystick_visual)
 
  _status = _label("SILENT KILLER  /  NOCHE CERO", Vector2(26,18), 22)
- var hint := _label("ALPHA 0.5.2  •  OPERACION NOCHE CERO", Vector2(28,49), 14)
+ _event_label = _label("", Vector2(28,170),18)
+ _event_label.modulate = Color(.94,.85,.61)
+ _event_label.visible = false
+ var hint := _label("ALPHA 0.5.3  •  OPERACION NOCHE CERO", Vector2(28,49), 14)
  hint.modulate = Color(.75,.83,.83)
  var crosshair := Label.new()
  crosshair.text = "+"
@@ -87,8 +92,10 @@ func _ready() -> void:
  _alert_label.anchor_bottom = .04
  _alert_label.modulate = Color(.63,.93,.73)
 
- _add_button("GOLPEAR","melee",Vector2(.63,.54))
- _buttons["melee"].visible = false
+ _add_button("CUERPO A CUERPO","melee",Vector2(.63,.54))
+ _buttons["melee"].visible = true
+ _buttons["melee"].disabled = true
+ _buttons["melee"].modulate = Color(.63,.68,.70,.48)
  _add_button("DISPARAR","fire",Vector2(.79,.41))
  _add_button("RECARGAR","reload",Vector2(.91,.35))
  _add_button("AGACHAR","crouch",Vector2(.79,.72))
@@ -177,6 +184,10 @@ func _layout() -> void:
  _redraw()
 
 func _process(delta: float) -> void:
+ if _event_seconds > 0.0:
+  _event_seconds = maxf(0.0,_event_seconds-delta)
+  if _event_seconds <= 0.0 and _event_label != null:
+   _event_label.visible = false
  _fps_elapsed += delta
  if _fps_elapsed >= .5:
   _fps_elapsed = 0.0
@@ -283,7 +294,7 @@ func _find_button(at: Vector2) -> String:
  # Topmost buttons first (overlap resolved deterministically).
  for action in (["restart"] if _mission_state != "" else ["interact","melee","info","reload","fire","aim","crouch","sprint"]):
   var button: Button = _buttons[action]
-  if button.visible and button.get_global_rect().has_point(at):
+  if button.visible and not button.disabled and button.get_global_rect().has_point(at):
    return action
  return ""
 
@@ -295,7 +306,13 @@ func _action_held(action: String) -> bool:
 
 func _refresh_button(action: String) -> void:
  var button: Button = _buttons[action]
- button.modulate = Color(1.0,.84,.59) if _action_held(action) else Color(1.0,1.0,1.0)
+ if action == "melee":
+  if button.disabled:
+   button.modulate = Color(.63,.68,.70,.48)
+  else:
+   button.modulate = Color(1.0,.84,.59) if _action_held(action) else (Color(.53,.95,.73) if button.text == "REDUCIR" else Color(1.0,.82,.57))
+ else:
+  button.modulate = Color(1.0,.84,.59) if _action_held(action) else Color(1.0,1.0,1.0)
 
 func _update_move(at: Vector2) -> void:
  var radius := JOYSTICK_RADIUS * _scale
@@ -331,7 +348,7 @@ func set_guard_progress(cleared: int,total: int) -> void:
 func set_alert_status(state: String) -> void:
  if _alert_label == null:
   return
- _alert_label.text = "ESTADO %s" % state
+ _alert_label.text = "ALARMA: %s" % state
  match state:
   "ALERTA":
    _alert_label.modulate = Color(1.0,.30,.26)
@@ -343,10 +360,10 @@ func set_alert_status(state: String) -> void:
 func set_melee_available(available: bool,caption: String) -> void:
  if _buttons.has("melee"):
   var button: Button = _buttons["melee"]
-  button.visible = available and _mission_state == ""
-  if caption != "":
-   button.text = caption
-   button.modulate = Color(.53,.95,.73) if caption == "REDUCIR" else Color(1.0,.82,.57)
+  button.visible = _mission_state == ""
+  button.disabled = not available
+  button.text = caption if caption != "" else "CUERPO A CUERPO"
+  _refresh_button("melee")
 
 func set_mission_status(value: String) -> void:
  if _mission_label != null:
@@ -417,10 +434,14 @@ func show_mission_result(success: bool) -> void:
  _result_detail.text = "OBJETIVO: COMPLETADO  /  SALIDA: SEGURA" if success else "VIDA: 0  /  ESTADO: FINALIZADO"
  _buttons["restart"].visible = true
  _buttons["restart"].text = "NUEVA PARTIDA" if success else "REINTENTAR"
+ _buttons["melee"].visible = false
  _layout()
 func _set_status(message: String) -> void:
- if _status != null:
-  _status.text = message
+ # Keep the game title fixed; momentary actions never overwrite the header.
+ if _event_label != null and message != "":
+  _event_label.text = message
+  _event_label.visible = _mission_state == ""
+  _event_seconds = 1.8
 
 func _redraw() -> void:
  if _joystick_visual != null:
