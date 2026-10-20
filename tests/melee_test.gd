@@ -38,7 +38,7 @@ func _exercise() -> void:
  # Separate fingers can hold the virtual joystick and tap stealth action.
  var size: Vector2 = get_viewport().get_visible_rect().size
  hud._press(10,Vector2(size.x*.13,size.y*.76))
- var take_down := hud._buttons["melee"].get_global_rect().get_center()
+ var take_down: Vector2 = hud._buttons["melee"].get_global_rect().get_center()
  hud._press(22,take_down)
  hud._release(22)
  assert(rear.is_disabled,"Stealth takedown failed")
