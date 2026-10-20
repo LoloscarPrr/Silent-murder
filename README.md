@@ -1,42 +1,35 @@
 # SILENT KILLER
 
-Juego 3D de sigilo y acción original para Android, Godot 4.3 / GDScript. Repositorio actual: `LoloscarPrr/Silent-murder` (todavía no se ha renombrado el repositorio a `Silent-Killer`).
+Juego de acción y sigilo 3D original para Android, realizado con Godot 4.3 / GDScript.
 
-## Alpha 0.5.1 — pulido del contrato y de la interfaz
+## Alpha 0.5.2 — combate cuerpo a cuerpo y reducción sigilosa
 
-Actualización de **Operación Noche Cero**, que ya permite recuperar el expediente y escapar por la zona de extracción o fallar si los guardias eliminan al protagonista.
+Video de prueba del usuario confirmó que ya era posible aproximarse a guardias, pero faltaba neutralizarlos sin disparar.
 
-### Correcciones de la 0.5.1
+### Qué hay de nuevo
 
-- **Derrota correcta:** la salud permanece en `0/100`. Se eliminó la reaparición automática con salud completa que aparecía debajo de la pantalla de fracaso.
-- **Un único evento de derrota:** nuevos impactos no duplican el resultado ni cambian los puntos de salud una vez terminado el contrato.
-- **Controles bloqueados:** caminar, mirar o disparar no deberían continuar durante las pantallas finales.
-- **Panel de victoria/fracaso:** tarjeta oscura de alto contraste, título y resumen legibles, botón grande de REINTENTAR o NUEVA PARTIDA con márgenes dentro de la tarjeta.
-- **HUD de misión:** objetivo resaltado, vida y guardias más fáciles de leer; se oculta el contador de blancos de entrenamiento, pues no forma parte del contrato.
-- **Sin romper lo existente:** expediente azul, extracción verde, patrullas con estados de alerta, pistola y multitouch se mantienen.
-- **Menos builds redundantes:** GitHub Actions usa `concurrency` para cancelar ejecuciones obsoletas en la misma rama.
+- **REDUCIR:** acercarte a menos de 1,9 metros por detrás de un guardia que no esté en alerta roja. Un toque ejecuta una eliminación sigilosa y no consume balas.
+- **GOLPEAR:** cuando un guardia está de frente o ya te ha descubierto, un golpe cuerpo a cuerpo reduce 1 punto de sus 3 de salud; tres golpes lo neutralizan.
+- **Sin ataques a través de paredes:** un raycast verifica que no haya cobertura entre el operativo y el guardia.
+- **Sin spam:** cooldown de 0,75 segundos para los golpes y el remate.
+- **Reacción:** una pelea abierta provoca alerta en el guardia y los más cercanos pueden escuchar el forcejeo.
+- **Efectos visuales provisionales:** gesto de ataque con brazos articulados y caída procedural del guardia al ser neutralizado. No hay gore.
+- **Botón contextual táctil:** aparece solo si existe un guardia accesible y alcanzable. El multitouch existente sigue funcionando al moverse o girar la cámara.
+- **Misión intacta:** recuperar el expediente, alcanzar la baliza de extracción, victoria y derrota. Las reducciones cuentan en el HUD de guardias.
 
-### Cómo jugar
+### Limitaciones visuales
 
-1. Entra al depósito y busca el terminal azul al noreste.
-2. Acércate y pulsa **RECUPERAR**.
-3. Cruza hacia la baliza verde del suroeste.
-4. Pulsa **EXTRAER** para completar el contrato.
-5. Si pierdes, se mostrará **VIDA 0 / 100**, **OPERACIÓN FALLIDA** y **REINTENTAR**.
+Las animaciones aún son procedimentales con modelos geométricos y no hay sincronización completa de dos personajes con animación de captura. El objetivo es validar distancia, orientación, funcionamiento y FPS en el Redmi 12 5G antes de crear un sistema de remates cinematográficos.
 
-Neutralizar a los guardias no es obligatorio. Es posible intentar completar la misión en sigilo.
+### Android
 
-### Compilación Android
-
-- Package ID preservado: `com.loloscarprr.silentmurder`.
-- Versión: `0.5.1` / versionCode **7**, posterior a la 0.5.0.
-- Debug APK arm64, orientado a actualizar la versión anterior si el certificado de firma coincide.
-- Workflow **Android - Silent Killer**, artifact `SilentKiller-v0.5.1-Android-debug`.
+- `com.loloscarprr.silentmurder` conserva el ID de la aplicación para actualizar sin desinstalar.
+- `versionCode=8`, `versionName=0.5.2`.
+- Build Android arm64 / horizontal.
+- [GitHub Actions](https://github.com/LoloscarPrr/Silent-murder/actions) genera `SilentKiller-v0.5.2-Android-debug`.
 
 ### Pruebas automáticas
 
-El workflow verifica la escena, control multitáctil, disparos y recarga, percepción de guardias, misión de infiltración/extracción, tarjeta de victoria, derrota con salud cero y botón REINTENTAR.
+Antes de exportar, CI comprueba: arranque, multitouch, armas y recarga, IA y visión de guardias, misión y extracción, derrota a 0 HP, interacción de REDUCIR por la espalda, golpes frontales, cooldown, paredes y contador de eliminaciones.
 
-### Pendiente
-
-Optimización para estabilizar FPS en dispositivos reales, mejorar las rutas y coberturas de guardias, nuevos modelos 3D y un HUD artístico definitivo. Esta versión sigue siendo un prototipo funcional.
+**Repositorio actual:** `LoloscarPrr/Silent-murder`, a la espera de que el propietario lo renombre a `Silent-Killer`.
