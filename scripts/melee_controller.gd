@@ -1,5 +1,5 @@
 extends Node
-## Alpha 0.5.2 — contextual melee with line-of-sight, front strikes and rear stealth.
+## Alpha 0.5.3 — stealth requires a truly unaware patrolling guard.
 ## No ammunition or automatic attacks. Player must press the contextual button.
 
 signal availability_changed(available: bool, label: String)
@@ -92,7 +92,9 @@ func _unobstructed(guard: CharacterBody3D) -> bool:
  return not hit.is_empty() and hit["collider"] == guard
 
 func _is_unaware_from_behind(guard: CharacterBody3D) -> bool:
- if guard.state == guard.ALERT:
+ # Investigation and searching are NOT safe opportunities for an instant takedown.
+ # Likewise, the guard cannot have retained a substantial partial detection.
+ if guard.state != guard.PATROL or guard.detection > 0.05:
   return false
  var toward_player: Vector3 = player.global_position-guard.global_position
  toward_player.y = 0.0
