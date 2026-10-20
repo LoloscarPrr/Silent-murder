@@ -1,5 +1,5 @@
 extends CharacterBody3D
-## Silent Killer v0.5 — tactical movement, combat and mission control,
+## Silent Killer v0.5.1 — terminal defeat is not a respawn,
 ## articulated locomotion and obstacle-aware over-shoulder camera.
 
 signal status_changed(status: String)
@@ -26,7 +26,6 @@ const CROUCHED_HEIGHT := 1.20
 var health := MAX_HEALTH
 var controls_locked := false
 var _damage_grace := 0.0
-var _spawn_point := Vector3.ZERO
 var move_input := Vector2.ZERO
 var is_sprinting := false
 var is_crouching := false
@@ -44,7 +43,6 @@ var _weapon
 
 func _ready() -> void:
  name = "SilentKiller_Operative"
- _spawn_point = global_position
  _desired_yaw = rotation.y
  _make_collision()
  _visual = VISUAL_SCRIPT.new()
@@ -58,7 +56,7 @@ func _ready() -> void:
  _weapon.gunshot_at.connect(_on_weapon_fired)
  _weapon.shot_report.connect(_on_shot_report)
  add_child(_weapon)
- status_changed.emit("OPERACIÓN NOCHE CERO • Alpha 0.5")
+ status_changed.emit("OPERACIÓN NOCHE CERO • Alpha 0.5.1")
  health_changed.emit(health,MAX_HEALTH)
 
 func _physics_process(delta: float) -> void:
@@ -138,29 +136,29 @@ func get_ammo_label() -> String:
  return _weapon.get_ammo_label() if _weapon != null else "-- / --"
 
 func receive_enemy_damage(amount: int) -> void:
- if _damage_grace > 0.0 or amount <= 0:
+ if controls_locked or health <= 0 or _damage_grace > 0.0 or amount <= 0:
   return
  health = maxi(0,health-amount)
  _damage_grace = .48
  health_changed.emit(health,MAX_HEALTH)
  if health == 0:
-  _respawn_player()
+  _on_defeated()
  else:
   status_changed.emit("Bajo fuego: -%d HP" % amount)
 
-func _respawn_player() -> void:
- health = MAX_HEALTH
- global_position = _spawn_point
+func _on_defeated() -> void:
+ # Keep health at zero until the retry button reloads the entire mission.
+ # Emit only once even if two guards hit on the same physics frame.
+ if controls_locked:
+  return
+ controls_locked = true
  velocity = Vector3.ZERO
  is_sprinting = false
- is_crouching = false
  is_aiming = false
  move_input = Vector2.ZERO
- _desired_yaw = 0.0
- _damage_grace = 3.0
+ set_fire_held(false)
+ status_changed.emit("Operativo neutralizado")
  player_defeated.emit()
- health_changed.emit(health,MAX_HEALTH)
- status_changed.emit("Operativo neutralizado: reaparición segura")
 
 func _on_weapon_fired(origin: Vector3,radius: float) -> void:
  weapon_fired.emit(origin,radius)
