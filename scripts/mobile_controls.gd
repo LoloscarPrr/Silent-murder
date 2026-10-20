@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Silent Killer 0.5.1 — readable mission HUD and clear terminal result screen.
+## Silent Killer 0.5.2 — dynamic melee button and independent touch roles.
 ## The HUD buttons are visual only. ScreenTouch.index controls every action:
 ## finger 0 may move, finger 1 look, finger 2 sprint, finger 3 aim/crouch.
 
@@ -50,7 +50,7 @@ func _ready() -> void:
  _surface.add_child(_joystick_visual)
 
  _status = _label("SILENT KILLER  /  NOCHE CERO", Vector2(26,18), 22)
- var hint := _label("ALPHA 0.5.1  •  OPERACION NOCHE CERO", Vector2(28,49), 14)
+ var hint := _label("ALPHA 0.5.2  •  OPERACION NOCHE CERO", Vector2(28,49), 14)
  hint.modulate = Color(.75,.83,.83)
  var crosshair := Label.new()
  crosshair.text = "+"
@@ -87,6 +87,8 @@ func _ready() -> void:
  _alert_label.anchor_bottom = .04
  _alert_label.modulate = Color(.63,.93,.73)
 
+ _add_button("GOLPEAR","melee",Vector2(.63,.54))
+ _buttons["melee"].visible = false
  _add_button("DISPARAR","fire",Vector2(.79,.41))
  _add_button("RECARGAR","reload",Vector2(.91,.35))
  _add_button("AGACHAR","crouch",Vector2(.79,.72))
@@ -106,6 +108,7 @@ func _ready() -> void:
  if operative != null:
   operative.status_changed.connect(_set_status)
   operative.ammo_changed.connect(_on_ammo_changed)
+  operative.melee_availability_changed.connect(set_melee_available)
   _ammo_label.text = operative.get_ammo_label()
  _surface.resized.connect(_layout)
  call_deferred("_layout")
@@ -217,6 +220,8 @@ func _press(index: int, at: Vector2) -> void:
    "interact":
     if mission_manager != null:
      mission_manager.interact()
+   "melee":
+    operative.perform_melee()
    "crouch":
     operative.toggle_crouch()
     operative.is_sprinting = _action_held("sprint")
@@ -276,7 +281,7 @@ func _release(index: int) -> void:
 
 func _find_button(at: Vector2) -> String:
  # Topmost buttons first (overlap resolved deterministically).
- for action in (["restart"] if _mission_state != "" else ["interact","info","reload","fire","aim","crouch","sprint"]):
+ for action in (["restart"] if _mission_state != "" else ["interact","melee","info","reload","fire","aim","crouch","sprint"]):
   var button: Button = _buttons[action]
   if button.visible and button.get_global_rect().has_point(at):
    return action
@@ -334,6 +339,14 @@ func set_alert_status(state: String) -> void:
    _alert_label.modulate = Color(1.0,.73,.26)
   _:
    _alert_label.modulate = Color(.63,.93,.73)
+
+func set_melee_available(available: bool,caption: String) -> void:
+ if _buttons.has("melee"):
+  var button: Button = _buttons["melee"]
+  button.visible = available and _mission_state == ""
+  if caption != "":
+   button.text = caption
+   button.modulate = Color(.53,.95,.73) if caption == "REDUCIR" else Color(1.0,.82,.57)
 
 func set_mission_status(value: String) -> void:
  if _mission_label != null:
