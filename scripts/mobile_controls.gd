@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Silent Killer 0.5 — multitouch, objective interaction and mission result screen.
+## Silent Killer 0.5.1 — readable mission HUD and clear terminal result screen.
 ## The HUD buttons are visual only. ScreenTouch.index controls every action:
 ## finger 0 may move, finger 1 look, finger 2 sprint, finger 3 aim/crouch.
 
@@ -11,8 +11,11 @@ var operative
 var mission_manager
 var _mission_state := ""
 var _end_overlay: ColorRect
+var _result_panel: Panel
+var _result_kicker: Label
 var _result_title: Label
 var _result_subtitle: Label
+var _result_detail: Label
 var _mission_label: Label
 var _roles: Dictionary = {} # touch index -> "move", "look", "sprint", "aim", "crouch", "info" or "idle"
 var _move_touch := -1
@@ -47,7 +50,7 @@ func _ready() -> void:
  _surface.add_child(_joystick_visual)
 
  _status = _label("SILENT KILLER  /  NOCHE CERO", Vector2(26,18), 22)
- var hint := _label("ALPHA 0.5  •  OPERACION NOCHE CERO", Vector2(28,49), 14)
+ var hint := _label("ALPHA 0.5.1  •  OPERACION NOCHE CERO", Vector2(28,49), 14)
  hint.modulate = Color(.75,.83,.83)
  var crosshair := Label.new()
  crosshair.text = "+"
@@ -72,9 +75,10 @@ func _ready() -> void:
  _ammo_label.modulate = Color(1.0,.85,.62)
  _training_label = _label("BLANCOS 0 / 4",Vector2(28,79),17)
  _training_label.modulate = Color(.82,.88,.76)
- _guards_label = _label("GUARDIAS 0 / 3",Vector2(28,102),17)
+ _training_label.visible = false  # Training targets remain optional, not mission objectives.
+ _guards_label = _label("GUARDIAS 0 / 3",Vector2(28,86),17)
  _guards_label.modulate = Color(.79,.89,1.0)
- _health_label = _label("VIDA 100 / 100",Vector2(28,126),18)
+ _health_label = _label("VIDA 100 / 100",Vector2(28,110),18)
  _health_label.modulate = Color(.57,.98,.71)
  _alert_label = _label("ESTADO PATRULLA",Vector2.ZERO,17)
  _alert_label.anchor_left = .39
@@ -92,8 +96,11 @@ func _ready() -> void:
  _add_button("INTERACTUAR","interact",Vector2(.63,.79))
  _buttons["interact"].visible = false
 
- _mission_label = _label("RECUPERAR EXPEDIENTE",Vector2(28,153),17)
- _mission_label.modulate = Color(.45,.85,1.0)
+ _mission_label = _label("RECUPERAR EXPEDIENTE",Vector2(28,142),18)
+ _mission_label.modulate = Color(.52,.90,1.0)
+ _mission_label.add_theme_color_override("font_shadow_color",Color(.0,.0,.0,.9))
+ _mission_label.add_theme_constant_override("shadow_offset_x",1)
+ _mission_label.add_theme_constant_override("shadow_offset_y",2)
  _make_result_overlay()
 
  if operative != null:
@@ -128,20 +135,39 @@ func _layout() -> void:
   return
  var view := _surface.size
  _scale = clampf(minf(view.x / 1280.0,view.y / 720.0),.8,1.45)
+ var card_width := minf(view.x*.77,740.0*_scale)
+ var card_height := minf(view.y*.76,420.0*_scale)
+ var card_origin := Vector2((view.x-card_width)*.5,(view.y-card_height)*.5)
+ if _end_overlay != null:
+  _end_overlay.size = view
+ if _result_panel != null:
+  _result_panel.position = card_origin
+  _result_panel.size = Vector2(card_width,card_height)
+  var side := 30.0*_scale
+  var label_width := card_width-side*2.0
+  _result_kicker.position = Vector2(side,card_height*.085)
+  _result_kicker.size = Vector2(label_width,30.0*_scale)
+  _result_title.position = Vector2(side,card_height*.20)
+  _result_title.size = Vector2(label_width,75.0*_scale)
+  _result_subtitle.position = Vector2(side,card_height*.43)
+  _result_subtitle.size = Vector2(label_width,74.0*_scale)
+  _result_detail.position = Vector2(side,card_height*.63)
+  _result_detail.size = Vector2(label_width,45.0*_scale)
+  _result_kicker.add_theme_font_size_override("font_size",int(14.0*_scale))
+  _result_title.add_theme_font_size_override("font_size",int(32.0*_scale))
+  _result_subtitle.add_theme_font_size_override("font_size",int(19.0*_scale))
+  _result_detail.add_theme_font_size_override("font_size",int(15.0*_scale))
  for action in _buttons:
   var button: Button = _buttons[action]
   var at: Vector2 = button.get_meta("anchor_position")
   var width := (230.0 if action == "restart" else (142.0 if action == "interact" else 108.0)) * _scale
-  var height := (80.0 if action == "restart" else 72.0) * _scale
-  button.position = Vector2(view.x * at.x - width*.5,view.y * at.y - height*.5)
+  var height := (68.0 if action == "restart" else 72.0) * _scale
+  if action == "restart":
+   button.position = Vector2(view.x*.5-width*.5,card_origin.y+card_height*.855-height*.5)
+  else:
+   button.position = Vector2(view.x*at.x-width*.5,view.y*at.y-height*.5)
   button.size = Vector2(width,height)
   button.add_theme_font_size_override("font_size",int(17.0*_scale))
- if _end_overlay != null:
-  _end_overlay.size = view
-  _result_title.position = Vector2(view.x * .5 - 260.0 * _scale,view.y * .34)
-  _result_title.size = Vector2(520.0 * _scale,76.0 * _scale)
-  _result_subtitle.position = Vector2(view.x * .5 - 260.0 * _scale,view.y * .49)
-  _result_subtitle.size = Vector2(520.0 * _scale,80.0 * _scale)
  if _move_touch == -1:
   _joystick_center = Vector2(view.x*.13,view.y*.76)
   _joystick_knob = _joystick_center
@@ -323,28 +349,47 @@ func set_interaction_available(enabled: bool,caption: String) -> void:
 func _make_result_overlay() -> void:
  _end_overlay = ColorRect.new()
  _end_overlay.name = "MissionResultBackdrop"
- _end_overlay.color = Color(.015,.022,.031,.83)
+ _end_overlay.color = Color(.012,.017,.023,.86)
  _end_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  _end_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
  _end_overlay.visible = false
  _surface.add_child(_end_overlay)
 
- _result_title = Label.new()
- _result_title.add_theme_font_size_override("font_size",34)
- _result_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
- _result_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
- _surface.add_child(_result_title)
+ _result_panel = Panel.new()
+ _result_panel.name = "ContractResultPanel"
+ _result_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ var panel_style := StyleBoxFlat.new()
+ panel_style.bg_color = Color(.065,.083,.096,.97)
+ panel_style.border_color = Color(.25,.35,.39,.95)
+ panel_style.set_border_width_all(2)
+ panel_style.set_corner_radius_all(16)
+ _result_panel.add_theme_stylebox_override("panel",panel_style)
+ _result_panel.visible = false
+ _surface.add_child(_result_panel)
 
- _result_subtitle = Label.new()
- _result_subtitle.add_theme_font_size_override("font_size",20)
- _result_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
- _result_subtitle.mouse_filter = Control.MOUSE_FILTER_IGNORE
- _surface.add_child(_result_subtitle)
+ _result_kicker = _result_label("OPERACION NOCHE CERO",15)
+ _result_kicker.modulate = Color(.62,.78,.83)
+
+ _result_title = _result_label("",32)
+ _result_subtitle = _result_label("",19)
+ _result_subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ _result_subtitle.modulate = Color(.93,.96,.95)
+
+ _result_detail = _result_label("",15)
+ _result_detail.modulate = Color(.63,.72,.75)
 
  _add_button("REINTENTAR","restart",Vector2(.5,.72))
  _buttons["restart"].visible = false
- _result_title.visible = false
- _result_subtitle.visible = false
+
+func _result_label(caption: String,font_size: int) -> Label:
+ var label := Label.new()
+ label.text = caption
+ label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+ label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+ label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ label.add_theme_font_size_override("font_size",font_size)
+ _result_panel.add_child(label)
+ return label
 
 func show_mission_result(success: bool) -> void:
  if _mission_state != "":
@@ -352,15 +397,14 @@ func show_mission_result(success: bool) -> void:
  _reset_touches()
  _mission_state = "success" if success else "failure"
  _end_overlay.visible = true
- _result_title.visible = true
- _result_subtitle.visible = true
+ _result_panel.visible = true
  _result_title.text = "CONTRATO COMPLETADO" if success else "OPERACION FALLIDA"
- _result_title.modulate = Color(.48,1.0,.65) if success else Color(1.0,.48,.45)
- _result_subtitle.text = "Expediente recuperado. Extraccion confirmada." if success else "El operativo fue neutralizado. Intenta otra ruta."
+ _result_title.modulate = Color(.46,.97,.67) if success else Color(1.0,.43,.43)
+ _result_subtitle.text = "Expediente recuperado. Extraccion confirmada." if success else "Operativo neutralizado. El contrato no fue completado."
+ _result_detail.text = "OBJETIVO: COMPLETADO  /  SALIDA: SEGURA" if success else "VIDA: 0  /  ESTADO: FINALIZADO"
  _buttons["restart"].visible = true
  _buttons["restart"].text = "NUEVA PARTIDA" if success else "REINTENTAR"
  _layout()
-
 func _set_status(message: String) -> void:
  if _status != null:
   _status.text = message
