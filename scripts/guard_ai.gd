@@ -1,5 +1,5 @@
 extends CharacterBody3D
-## Silent Murder v0.4 — lightweight guard finite-state AI.
+## Silent Killer 0.5.2 — guard AI with melee disable and collapse animation.
 ## States: patrol -> suspicious/investigate -> alert -> search -> patrol.
 ## Every sight test uses physics LOS; hearing reacts to shots but not through telepathy.
 
@@ -35,6 +35,7 @@ var _investigate_timer := 0.0
 var _lost_timer := 0.0
 var _fire_timer := 0.7
 var _patrol_pause := 0.0
+var _visual_root: Node3D
 var _indicator: MeshInstance3D
 var _torso: MeshInstance3D
 var _left_leg: MeshInstance3D
@@ -158,20 +159,52 @@ func receive_shot(_point: Vector3,_normal: Vector3) -> bool:
   return false
  health -= 1
  if health <= 0:
-  is_disabled = true
-  collision_layer = 0
-  collision_mask = 0
-  velocity = Vector3.ZERO
-  set_physics_process(false)
-  _tint.albedo_color = Color(.18,.21,.22)
-  _torso.rotation.z = deg_to_rad(38.0)
-  _indicator.visible = false
-  guard_disabled.emit(self)
+  _disable_guard()
  else:
-  detection = 1.0
-  _last_known = player.global_position if player != null else global_position
-  _switch(ALERT)
+  _react_to_hit()
  return true
+
+func receive_melee_strike() -> bool:
+ # Frontal melee needs three separate, cooldown-limited hits.
+ if is_disabled:
+  return false
+ health -= 1
+ if health <= 0:
+  _disable_guard()
+ else:
+  _react_to_hit()
+ return true
+
+func receive_takedown() -> bool:
+ # One silent action from outside the guard's field of view.
+ if is_disabled:
+  return false
+ health = 0
+ _disable_guard()
+ return true
+
+func _react_to_hit() -> void:
+ detection = 1.0
+ _last_known = player.global_position if player != null else global_position
+ _switch(ALERT)
+
+func _disable_guard() -> void:
+ if is_disabled:
+  return
+ is_disabled = true
+ collision_layer = 0
+ collision_mask = 0
+ velocity = Vector3.ZERO
+ set_physics_process(false)
+ _tint.albedo_color = Color(.18,.21,.22)
+ _indicator.visible = false
+ if _visual_root != null:
+  var collapse := create_tween()
+  collapse.set_trans(Tween.TRANS_SINE)
+  collapse.set_ease(Tween.EASE_OUT)
+  collapse.tween_property(_visual_root,"rotation:x",1.22,.38)
+  collapse.parallel().tween_property(_visual_root,"position:y",-.12,.38)
+ guard_disabled.emit(self)
 
 func reset_after_player_defeat() -> void:
  if is_disabled:
@@ -242,14 +275,17 @@ func _build_body() -> void:
  var armor := _state_color(Color(.12,.16,.18))
  var dark := _state_color(Color(.044,.054,.063))
  _tint = fabric
- _torso = _mesh_box(self,"GuardJacket",Vector3(0,1.29,0),Vector3(.54,.64,.34),fabric)
- _mesh_box(self,"LightVest",Vector3(0,1.36,-.19),Vector3(.38,.46,.055),armor)
- _mesh_box(self,"Head",Vector3(0,1.82,0),Vector3(.31,.30,.31),dark)
- _mesh_box(self,"LeftArm",Vector3(-.36,1.3,0),Vector3(.16,.67,.19),fabric)
- _mesh_box(self,"RightArm",Vector3(.36,1.3,0),Vector3(.16,.67,.19),fabric)
- _left_leg = _mesh_box(self,"LeftLeg",Vector3(-.16,.50,0),Vector3(.23,.93,.22),armor)
- _right_leg = _mesh_box(self,"RightLeg",Vector3(.16,.50,0),Vector3(.23,.93,.22),armor)
- _indicator = _mesh_box(self,"AwarenessIndicator",Vector3(0,2.18,0),Vector3(.18,.12,.18),_state_color(Color(.26,.73,.48)))
+ _visual_root = Node3D.new()
+ _visual_root.name = "GuardVisualRoot"
+ add_child(_visual_root)
+ _torso = _mesh_box(_visual_root,"GuardJacket",Vector3(0,1.29,0),Vector3(.54,.64,.34),fabric)
+ _mesh_box(_visual_root,"LightVest",Vector3(0,1.36,-.19),Vector3(.38,.46,.055),armor)
+ _mesh_box(_visual_root,"Head",Vector3(0,1.82,0),Vector3(.31,.30,.31),dark)
+ _mesh_box(_visual_root,"LeftArm",Vector3(-.36,1.3,0),Vector3(.16,.67,.19),fabric)
+ _mesh_box(_visual_root,"RightArm",Vector3(.36,1.3,0),Vector3(.16,.67,.19),fabric)
+ _left_leg = _mesh_box(_visual_root,"LeftLeg",Vector3(-.16,.50,0),Vector3(.23,.93,.22),armor)
+ _right_leg = _mesh_box(_visual_root,"RightLeg",Vector3(.16,.50,0),Vector3(.23,.93,.22),armor)
+ _indicator = _mesh_box(_visual_root,"AwarenessIndicator",Vector3(0,2.18,0),Vector3(.18,.12,.18),_state_color(Color(.26,.73,.48)))
 
 func _mesh_box(parent: Node3D,label: String,at: Vector3,scale_size: Vector3,mat: Material) -> MeshInstance3D:
  var mesh := BoxMesh.new()
