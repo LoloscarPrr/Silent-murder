@@ -1,5 +1,5 @@
 extends CharacterBody3D
-## Silent Killer 0.5.2 — guard AI with melee disable and collapse animation.
+## Silent Killer 0.6 — obstacle-aware guard patrol, investigation and pursuit.
 ## States: patrol -> suspicious/investigate -> alert -> search -> patrol.
 ## Every sight test uses physics LOS; hearing reacts to shots but not through telepathy.
 
@@ -21,6 +21,7 @@ const SHOT_DAMAGE := 7
 const MAX_HP := 3
 
 var player: CharacterBody3D
+var navigation  # optional A* map; independent guard tests can run without the warehouse
 var waypoints: Array[Vector3] = []
 var state := PATROL
 var health := MAX_HP
@@ -35,6 +36,13 @@ var _investigate_timer := 0.0
 var _lost_timer := 0.0
 var _fire_timer := 0.7
 var _patrol_pause := 0.0
+var _route: Array[Vector3] = []
+var _route_index := 0
+var _route_goal := Vector3(999,0,999)
+var _route_refresh := 0.0
+var _stuck_sample := 0.0
+var _stuck_origin := Vector3.ZERO
+var replans := 0
 var _visual_root: Node3D
 var _indicator: MeshInstance3D
 var _torso: MeshInstance3D
@@ -49,6 +57,7 @@ func _ready() -> void:
  collision_layer = 1
  collision_mask = 1
  _build_body()
+ _stuck_origin = global_position
 
 func _physics_process(delta: float) -> void:
  if is_disabled or player == null or not is_instance_valid(player):
@@ -225,7 +234,8 @@ func _shoot_player() -> void:
   player.receive_enemy_damage(SHOT_DAMAGE)
 
 func _move_guard(delta: float,target: Vector3,speed: float) -> void:
- var delta_position := target-global_position
+ var route_target := _next_route_point(delta,target) if speed > 0.0 else global_position
+ var delta_position := route_target-global_position
  delta_position.y = 0.0
  var heading := Vector3.ZERO
  if delta_position.length() > .28 and speed > 0.0:
@@ -242,15 +252,46 @@ func _move_guard(delta: float,target: Vector3,speed: float) -> void:
  else:
   velocity.y = -.1
  move_and_slide()
+ _stuck_sample += delta
+ if _stuck_sample >= .8:
+  var distance_moved := Vector2(global_position.x-_stuck_origin.x,global_position.z-_stuck_origin.z).length()
+  if speed > 0.1 and _horizontal_distance(target) > .90 and distance_moved < .11:
+   _route_refresh = 0.0
+   _route.clear()
+  _stuck_origin = global_position
+  _stuck_sample = 0.0
  _anim_time += delta*5.6
  var amount := minf(1.0,Vector2(velocity.x,velocity.z).length()/WALK_SPEED)
  _left_leg.rotation.x = sin(_anim_time)*.3*amount
  _right_leg.rotation.x = -sin(_anim_time)*.3*amount
 
+func _next_route_point(delta: float,objective: Vector3) -> Vector3:
+ if navigation == null:
+  return objective
+ _route_refresh -= delta
+ var goal_changed := _route_goal.distance_to(objective) > .85
+ if goal_changed or _route_refresh <= 0.0 or _route.is_empty():
+  _route = navigation.get_path(global_position,objective)
+  _route_index = 0
+  _route_goal = objective
+  _route_refresh = 1.05
+  replans += 1
+ if _route.is_empty():
+  return global_position
+ while _route_index < _route.size() and _horizontal_distance(_route[_route_index]) < .43:
+  _route_index += 1
+ if _route_index < _route.size():
+  return _route[_route_index]
+ if navigation.line_clear(global_position,objective):
+  return objective
+ return global_position
+
 func _switch(next_state: String) -> void:
  if state == next_state:
   return
  state = next_state
+ _route.clear()
+ _route_refresh = 0.0
  match state:
   PATROL:
    _indicator.material_override = _state_color(Color(.26,.73,.48))
