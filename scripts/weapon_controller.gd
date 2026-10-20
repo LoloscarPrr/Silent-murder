@@ -1,5 +1,5 @@
 extends Node3D
-## Alpha 0.4: hit-scan pistol with sound events for nearby guards.
+## Alpha 0.5.3: two-stage aiming with authoritative muzzle ray.
 ## Runs the physics ray from screen center in _physics_process for safe queries.
 
 signal ammo_updated(magazine: int, reserve: int)
@@ -78,27 +78,48 @@ func _fire_now() -> void:
 
  if camera == null or operative == null:
   return
- var screen_center := camera.get_viewport().get_visible_rect().size * .5
- var origin := camera.project_ray_origin(screen_center)
- var direction := camera.project_ray_normal(screen_center).normalized()
- var end := origin + direction * RANGE
- var query := PhysicsRayQueryParameters3D.create(origin,end)
- query.exclude = [operative.get_rid()]
- query.collision_mask = 1
- var ray_hit := get_world_3d().direct_space_state.intersect_ray(query)
- var hit_end := end
+ var result := resolve_shot_path()
+ if result.is_empty():
+  return
+ var impact: Dictionary = result["impact"]
  var did_hit_target := false
- if not ray_hit.is_empty():
-  hit_end = ray_hit["position"]
-  var collider: Object = ray_hit["collider"]
+ if not impact.is_empty():
+  var collider: Object = impact["collider"]
   if collider != null and collider.has_method("receive_shot"):
-   did_hit_target = collider.receive_shot(ray_hit["position"],ray_hit["normal"])
+   did_hit_target = collider.receive_shot(impact["position"],impact["normal"])
  if did_hit_target:
   hits += 1
   shot_report.emit("Impacto confirmado")
  else:
   shot_report.emit("Disparo")
- _draw_tracer(_muzzle.global_position if _muzzle != null else origin,hit_end)
+ _draw_tracer(result["muzzle"],result["end"])
+
+func resolve_shot_path() -> Dictionary:
+ # The camera provides an aim POINT, never the authoritative bullet collision.
+ # A second ray from the real muzzle prevents shooting around cover/corners.
+ if camera == null or operative == null or _muzzle == null:
+  return {}
+ var center: Vector2 = camera.get_viewport().get_visible_rect().size * .5
+ var camera_origin: Vector3 = camera.project_ray_origin(center)
+ var camera_end: Vector3 = camera_origin + camera.project_ray_normal(center).normalized()*RANGE
+ var aim_query := PhysicsRayQueryParameters3D.create(camera_origin,camera_end)
+ aim_query.exclude = [operative.get_rid()]
+ aim_query.collision_mask = 1
+ var camera_hit := get_world_3d().direct_space_state.intersect_ray(aim_query)
+ var aim_point: Vector3 = camera_hit["position"] if not camera_hit.is_empty() else camera_end
+ var muzzle_pos: Vector3 = _muzzle.global_position
+ var path: Vector3 = aim_point-muzzle_pos
+ if path.length_squared() < 0.0001:
+  return {"muzzle":muzzle_pos,"end":muzzle_pos,"impact":{}}
+ var direction := path.normalized()
+ # Extend slightly beyond the surface so targets that touch the aim point are hit.
+ var shot_end := aim_point+direction*.20
+ var shot_query := PhysicsRayQueryParameters3D.create(muzzle_pos,shot_end)
+ shot_query.exclude = [operative.get_rid()]
+ shot_query.collision_mask = 1
+ var real_hit := get_world_3d().direct_space_state.intersect_ray(shot_query)
+ var end: Vector3 = real_hit["position"] if not real_hit.is_empty() else shot_end
+ return {"muzzle":muzzle_pos,"end":end,"impact":real_hit,"camera_hit":camera_hit}
 
 func _draw_tracer(start_point: Vector3,end_point: Vector3) -> void:
  var trace_mesh := ImmediateMesh.new()
