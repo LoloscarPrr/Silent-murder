@@ -1,5 +1,5 @@
 extends CharacterBody3D
-## Silent Killer v0.5.1 — terminal defeat is not a respawn,
+## Silent Killer v0.5.2 — firearms, contextual melee and stealth takedowns,
 ## articulated locomotion and obstacle-aware over-shoulder camera.
 
 signal status_changed(status: String)
@@ -7,9 +7,11 @@ signal ammo_changed(magazine: int, reserve: int)
 signal health_changed(current: int, maximum: int)
 signal player_defeated() 
 signal weapon_fired(origin: Vector3, radius: float)
+signal melee_availability_changed(available: bool, label: String)
 
 const VISUAL_SCRIPT = preload("res://scripts/operative_visual.gd")
 const WEAPON_SCRIPT = preload("res://scripts/weapon_controller.gd")
+const MELEE_SCRIPT = preload("res://scripts/melee_controller.gd")
 const WALK_SPEED := 3.75
 const SPRINT_SPEED := 6.2
 const CROUCH_SPEED := 1.85
@@ -40,6 +42,7 @@ var _collider: CollisionShape3D
 var _capsule: CapsuleShape3D
 var _visual: Node3D
 var _weapon
+var _melee
 
 func _ready() -> void:
  name = "SilentKiller_Operative"
@@ -56,7 +59,13 @@ func _ready() -> void:
  _weapon.gunshot_at.connect(_on_weapon_fired)
  _weapon.shot_report.connect(_on_shot_report)
  add_child(_weapon)
- status_changed.emit("OPERACIÓN NOCHE CERO • Alpha 0.5.1")
+ _melee = MELEE_SCRIPT.new()
+ _melee.player = self
+ _melee.availability_changed.connect(_on_melee_available)
+ _melee.attack_message.connect(_on_melee_message)
+ _melee.attack_performed.connect(_on_melee_animation)
+ add_child(_melee)
+ status_changed.emit("OPERACIÓN NOCHE CERO • Alpha 0.5.2")
  health_changed.emit(health,MAX_HEALTH)
 
 func _physics_process(delta: float) -> void:
@@ -127,6 +136,21 @@ func toggle_aim() -> void:
 func set_fire_held(held: bool) -> void:
  if _weapon != null:
   _weapon.set_trigger_held(held)
+
+func perform_melee() -> bool:
+ if controls_locked or _melee == null:
+  return false
+ return _melee.try_attack()
+
+func _on_melee_available(available: bool,label: String) -> void:
+ melee_availability_changed.emit(available,label)
+
+func _on_melee_message(message: String) -> void:
+ status_changed.emit(message)
+
+func _on_melee_animation(stealth: bool) -> void:
+ if _visual != null:
+  _visual.play_melee_animation(stealth)
 
 func reload_weapon() -> void:
  if _weapon != null:
