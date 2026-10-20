@@ -1,41 +1,42 @@
 # SILENT KILLER
 
-Videojuego original de sigilo y combate 3D para Android, creado con Godot 4.3 y GDScript.
+Juego 3D de sigilo y acción original para Android, Godot 4.3 / GDScript. Repositorio actual: `LoloscarPrr/Silent-murder` (todavía no se ha renombrado el repositorio a `Silent-Killer`).
 
-**Repositorio actual:** `LoloscarPrr/Silent-murder` (renombrable por el propietario a `Silent-Killer`).
+## Alpha 0.5.1 — pulido del contrato y de la interfaz
 
-## Alpha 0.5 — Operación Noche Cero
+Actualización de **Operación Noche Cero**, que ya permite recuperar el expediente y escapar por la zona de extracción o fallar si los guardias eliminan al protagonista.
 
-Primera misión completa en el depósito industrial. No es necesario derrotar a todos los guardias:
+### Correcciones de la 0.5.1
 
-1. **Infiltrarte** en el depósito y acercarte a la terminal azul, en el sector noreste.
-2. Cuando aparezca **RECUPERAR**, pulsarlo para asegurar el expediente protegido.
-3. La zona de extracción del extremo suroeste se iluminará en verde.
-4. Llegar a la baliza verde y pulsar **EXTRAER** para completar el contrato.
+- **Derrota correcta:** la salud permanece en `0/100`. Se eliminó la reaparición automática con salud completa que aparecía debajo de la pantalla de fracaso.
+- **Un único evento de derrota:** nuevos impactos no duplican el resultado ni cambian los puntos de salud una vez terminado el contrato.
+- **Controles bloqueados:** caminar, mirar o disparar no deberían continuar durante las pantallas finales.
+- **Panel de victoria/fracaso:** tarjeta oscura de alto contraste, título y resumen legibles, botón grande de REINTENTAR o NUEVA PARTIDA con márgenes dentro de la tarjeta.
+- **HUD de misión:** objetivo resaltado, vida y guardias más fáciles de leer; se oculta el contador de blancos de entrenamiento, pues no forma parte del contrato.
+- **Sin romper lo existente:** expediente azul, extracción verde, patrullas con estados de alerta, pistola y multitouch se mantienen.
+- **Menos builds redundantes:** GitHub Actions usa `concurrency` para cancelar ejecuciones obsoletas en la misma rama.
 
-La pantalla muestra la distancia aproximada hasta el siguiente objetivo y el estado de misión. La terminal y la extracción se activan solamente por proximidad: no puede recogerse el expediente desde lejos ni extraer antes de cumplir el objetivo.
+### Cómo jugar
 
-Si los guardias neutralizan al protagonista, la misión falla y aparece **REINTENTAR**. Al tener éxito aparece **NUEVA PARTIDA**. Ambos reinician la escena.
+1. Entra al depósito y busca el terminal azul al noreste.
+2. Acércate y pulsa **RECUPERAR**.
+3. Cruza hacia la baliza verde del suroeste.
+4. Pulsa **EXTRAER** para completar el contrato.
+5. Si pierdes, se mostrará **VIDA 0 / 100**, **OPERACIÓN FALLIDA** y **REINTENTAR**.
 
-### Se mantiene de 0.4
+Neutralizar a los guardias no es obligatorio. Es posible intentar completar la misión en sigilo.
 
-- Tres guardias con patrulla, sospecha (amarillo), alerta (rojo), línea de visión y reacción al sonido.
-- Sigilo agachado, carrera, visión de cámara, pistola de 12 balas y recarga.
-- Controles multitouch independientes para movimiento, cámara y disparo.
-- Vida del jugador, HUD de munición, guardias, blancos de entrenamiento y FPS.
-- Los guardias y las placas de entrenamiento siguen siendo prototipos geométricos.
+### Compilación Android
 
-### Alcance y límites
+- Package ID preservado: `com.loloscarprr.silentmurder`.
+- Versión: `0.5.1` / versionCode **7**, posterior a la 0.5.0.
+- Debug APK arm64, orientado a actualizar la versión anterior si el certificado de firma coincide.
+- Workflow **Android - Silent Killer**, artifact `SilentKiller-v0.5.1-Android-debug`.
 
-Es un primer ciclo de juego, no una campaña ni un escenario artístico terminado. No hay aún menús de selección de misión, narrativa cinemática, navegación con NavMesh, cobertura táctica avanzada ni modelado humanoide riggeado. Los guardias conservan sus rutas prototipo y pueden atascarse ante determinadas cajas.
+### Pruebas automáticas
 
-### Android
+El workflow verifica la escena, control multitáctil, disparos y recarga, percepción de guardias, misión de infiltración/extracción, tarjeta de victoria, derrota con salud cero y botón REINTENTAR.
 
-- `com.loloscarprr.silentmurder` se conserva para permitir actualización de la app existente.
-- versionCode **6** y versión **0.5.0**.
-- Godot 4.3 / Android arm64 / orientación horizontal.
-- GitHub Actions: `Android - Silent Killer`, artifact `SilentKiller-v0.5-Android-debug`. Las actualizaciones requieren firma digital idéntica.
+### Pendiente
 
-### Pruebas CI
-
-El workflow ejecuta pruebas de arranque, multitouch, disparos/recarga, guardias con cobertura y el ciclo de la misión (sin extracción prematura, expediente, extracción, victoria y derrota). La experiencia final se valida en el dispositivo.
+Optimización para estabilizar FPS en dispositivos reales, mejorar las rutas y coberturas de guardias, nuevos modelos 3D y un HUD artístico definitivo. Esta versión sigue siendo un prototipo funcional.
