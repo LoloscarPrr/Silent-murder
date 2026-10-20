@@ -1,5 +1,5 @@
 extends Node3D
-## Silent Murder 0.2: lightweight articulated stand-in.
+## Silent Killer 0.5.2: procedural locomotion with melee strike / takedown poses.
 ## Uses only Godot primitives. A rigged humanoid asset will replace it later.
 
 var _time := 0.0
@@ -7,6 +7,8 @@ var _walk_blend := 0.0
 var _crouch_blend := 0.0
 var _aim_blend := 0.0
 var _sprint_blend := 0.0
+var _melee_left := 0.0
+var _melee_stealth := false
 
 var torso: Node3D
 var head: Node3D
@@ -23,7 +25,12 @@ func _ready() -> void:
  name = "Operative_Articulated_Prototype"
  _build()
 
+func play_melee_animation(stealth: bool) -> void:
+ _melee_left = .36 if stealth else .28
+ _melee_stealth = stealth
+
 func animate_pose(delta: float, movement: float, strafing: float, crouched: bool, aiming: bool, running: bool) -> void:
+ _melee_left = maxf(0.0,_melee_left-delta)
  var f := clampf(movement, 0.0, 1.0)
  _walk_blend = move_toward(_walk_blend, f, delta * 5.5)
  _crouch_blend = move_toward(_crouch_blend, 1.0 if crouched else 0.0, delta * 5.0)
@@ -51,6 +58,21 @@ func animate_pose(delta: float, movement: float, strafing: float, crouched: bool
  elbow_right.rotation.x = lerpf(elbow_right.rotation.x, -0.11 - _aim_blend * 0.80, minf(1.0,delta * 9.0))
  var breath := sin(Time.get_ticks_msec() * 0.0026) * 0.003
  torso.position.y = 1.23 + breath + absf(sin(_time)) * _walk_blend * 0.012
+ if _melee_left > 0.0:
+  var duration := .36 if _melee_stealth else .28
+  var phase := 1.0 - _melee_left / duration
+  var punch := sin(PI*phase)
+  if _melee_stealth:
+   shoulder_left.rotation.x = -0.85*punch
+   shoulder_right.rotation.x = -1.12*punch
+   elbow_left.rotation.x = -1.15*punch
+   torso.rotation.x -= .19*punch
+  else:
+   shoulder_right.rotation.x = -1.45*punch
+   elbow_right.rotation.x = -.82*punch
+   torso.rotation.y = -.18*punch
+ else:
+  torso.rotation.y = lerpf(torso.rotation.y,0.0,minf(1.0,delta*12.0))
 
 func _build() -> void:
  var suit := _mat(Color(0.095,0.112,0.125))
