@@ -1,13 +1,15 @@
 extends Node3D
-## Silent Killer v0.5: Noche Cero contract with patrol guards and extraction.
+## Silent Killer v0.6: Noche Cero mission with obstacle-aware guard routing.
 
 const PLAYER_SCRIPT = preload("res://scripts/player_controller.gd")
 const UI_SCRIPT = preload("res://scripts/mobile_controls.gd")
 const TARGET_SCRIPT = preload("res://scripts/training_target.gd")
 const GUARD_SCRIPT = preload("res://scripts/guard_ai.gd")
 const MISSION_SCRIPT = preload("res://scripts/mission_manager.gd")
+const NAVIGATION_SCRIPT = preload("res://scripts/grid_navigation.gd")
 var _player: CharacterBody3D
 var _level: Node3D
+var _navigation
 var _targets_total := 0
 var _targets_disabled := 0
 var _guards_total := 0
@@ -18,10 +20,14 @@ var _mission
 
 func _ready() -> void:
  _make_environment()
+ _navigation = NAVIGATION_SCRIPT.new()
+ _navigation.name = "WarehouseRouteGrid"
+ add_child(_navigation)
  _level = Node3D.new()
  _level.name = "Depot_Blockout_00"
  add_child(_level)
  _build_depot()
+ _navigation.build()
  _build_practice_range()
  _player = PLAYER_SCRIPT.new()
  _player.position = Vector3(0.0, 0.18, 9.0)
@@ -52,6 +58,7 @@ func _spawn_guards() -> void:
  for i in range(paths.size()):
   var guard := GUARD_SCRIPT.new()
   guard.player = _player
+  guard.navigation = _navigation
   guard.position = paths[i][0]
   guard.waypoints.assign(paths[i])
   guard.name = "Guard_%02d" % (i + 1)
@@ -180,6 +187,8 @@ func _solid(label: String, at: Vector3, dimensions: Vector3, mat: StandardMateri
   static_body.add_child(visual)
   static_body.add_child(collider)
   _level.add_child(static_body)
+  if _navigation != null:
+   _navigation.add_obstacle(at,dimensions)
  else:
   _level.add_child(visual)
 
