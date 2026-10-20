@@ -24,7 +24,7 @@ func _test() -> void:
  var start := Vector3(-10,.15,-7)
  var goal := Vector3(-2,.15,-7)
  assert(not navigation.line_clear(start,goal),"Rack must obstruct straight line")
- var route: Array[Vector3] = navigation.get_path(start,goal)
+ var route: Array[Vector3] = navigation.calculate_route(start,goal)
  assert(route.size() >= 2,"A* did not find a multi-point detour")
  var prior: Vector3 = start
  var detour := false
@@ -37,7 +37,7 @@ func _test() -> void:
  assert(prior.distance_to(goal) < .75,"Route did not reach target")
  # Repeated planning returns deterministic, obstacle-safe paths.
  for iteration in range(10):
-  var repeat: Array[Vector3] = navigation.get_path(start,goal)
+  var repeat: Array[Vector3] = navigation.calculate_route(start,goal)
   assert(repeat.size() >= 2,"Replan failed")
   var previous: Vector3 = start
   for step in repeat:
