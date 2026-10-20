@@ -33,7 +33,7 @@ func build() -> void:
     _grid.set_point_solid(cell,true)
  _built = true
 
-func get_path(from: Vector3,to: Vector3) -> Array[Vector3]:
+func calculate_route(from: Vector3,to: Vector3) -> Array[Vector3]:
  var empty: Array[Vector3] = []
  if not _built:
   build()
