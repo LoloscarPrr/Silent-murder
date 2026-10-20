@@ -64,7 +64,13 @@ func _test_contract() -> void:
  assert(mission.state == mission.SUCCESS,"Mission did not complete")
  assert(player.controls_locked,"Player remains controllable after success")
  assert(hud._mission_state == "success","Mission result screen missing")
+ assert(hud._result_panel.visible,"Victory card missing")
+ assert(hud._result_detail.text.contains("COMPLETADO"),"Victory result details incomplete")
  assert(hud._buttons["restart"].visible,"Restart action not available")
+ var result_card: Rect2 = hud._result_panel.get_global_rect()
+ var restart_center: Vector2 = hud._buttons["restart"].get_global_rect().get_center()
+ assert(result_card.has_point(restart_center),"New game button outside result card")
+ assert(hud._find_button(restart_center) == "restart","New game button does not accept input")
  for guard in game._guards:
   assert(not guard.is_physics_processing(),"Combat guard stayed active after victory")
  assert(not mission.interact(),"Mission may not complete twice")
