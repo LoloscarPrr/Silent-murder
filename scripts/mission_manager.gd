@@ -101,8 +101,8 @@ func _update_ui() -> void:
  ])
  hud.set_interaction_available(distance <= INTERACT_RADIUS,
   "RECUPERAR" if state == INFILTRATE else "EXTRAER")
- if state == EXTRACT:
-  hud.set_alert_status("OBJETIVO ASEGURADO")
+ # Objective progression is only shown in the mission objective label.
+ # Never overwrite the independent guards' alarm state.
 
 func _horizontal_distance(point: Vector3) -> float:
  if player == null:
