@@ -127,17 +127,28 @@ jobs:
             exit 1
           fi
 
+      - name: Verify melee takedowns, frontal hits and touch controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path . --quit-after 900 res://tests/melee_test.tscn 2>&1 | tee /tmp/silent-killer-melee.log
+          grep -Fq 'MELEE_TEST_PASS' /tmp/silent-killer-melee.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-melee.log; then
+            echo "Melee test failed."
+            exit 1
+          fi
+
       - name: Export Android debug APK
         run: |
           set -e
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/SilentKiller_v0.5.1_debug.apk
-          test -s build/SilentKiller_v0.5.1_debug.apk
+          godot --headless --path . --export-debug "Android" build/SilentKiller_v0.5.2_debug.apk
+          test -s build/SilentKiller_v0.5.2_debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SilentKiller-v0.5.1-Android-debug
-          path: build/SilentKiller_v0.5.1_debug.apk
+          name: SilentKiller-v0.5.2-Android-debug
+          path: build/SilentKiller_v0.5.2_debug.apk
           if-no-files-found: error
           retention-days: 30
