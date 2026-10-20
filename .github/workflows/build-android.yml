@@ -12,7 +12,7 @@ on:
       - '.github/workflows/build-android.yml'
 
 concurrency:
-  group: silent-killer-android-${{ github.ref }}
+  group: silent-killer-stabilization-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
