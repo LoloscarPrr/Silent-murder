@@ -66,7 +66,8 @@ def bevel_cube(name, location, size, mat, bone, bevel=0.025):
         mod = ob.modifiers.new("Soft garment corners", "BEVEL")
         mod.width = bevel
         mod.segments = 2
-        mod.affect = "EDGES" if hasattr(mod, "affect") else None
+        if hasattr(mod, "affect"):
+            mod.affect = "EDGES"
         bpy.context.view_layer.objects.active = ob
         bpy.ops.object.modifier_apply(modifier=mod.name)
     ob.data.materials.append(mat)
