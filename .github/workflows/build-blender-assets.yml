@@ -1,0 +1,68 @@
+name: 3D Assets - Blender
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/blender/**'
+      - '.github/workflows/build-blender-assets.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-el-cuervo:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Blender
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender
+          blender --version | head -3
+
+      - name: Generate editable character and Godot model
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/blender
+          blender --background --factory-startup --python tools/blender/build_el_cuervo.py -- --output out/blender 2>&1 | tee blender-build.log
+          grep -q 'SILENT_KILLER_BLENDER_EXPORT_OK' blender-build.log
+          test -s out/blender/El_Cuervo_v0_1.blend
+          test -s out/blender/El_Cuervo_v0_1.glb
+
+      - name: Check that GLB contains editable mesh and skeletal rig
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import struct
+          path = pathlib.Path("out/blender/El_Cuervo_v0_1.glb")
+          b = path.read_bytes()
+          magic, version, length = struct.unpack_from("<4sII", b, 0)
+          assert magic == b"glTF" and version == 2 and length == len(b), "Invalid GLB v2 header"
+          chunk_length, chunk_type = struct.unpack_from("<II", b, 12)
+          assert chunk_type == 0x4e4f534a, "GLB has no JSON first chunk"
+          gltf = json.loads(b[20:20 + chunk_length].decode("utf-8"))
+          assert len(gltf.get("meshes", [])) >= 10, "Missing 3D body parts"
+          skins = gltf.get("skins", [])
+          assert skins, "Exported model has no bone rig/skin"
+          assert len(skins[0].get("joints", [])) >= 10, "Export missing body bones"
+          assert len(gltf.get("materials", [])) >= 3, "Exported materials missing"
+          print("BLENDER_ASSET_TEST_PASS:",len(gltf["meshes"]),"meshes,",len(skins[0]["joints"]),"bones")
+          PY
+
+      - name: Upload editable Blender and Godot GLB
+        uses: actions/upload-artifact@v4
+        with:
+          name: SilentKiller-ElCuervo-3D-v0.1
+          path: |
+            out/blender/El_Cuervo_v0_1.blend
+            out/blender/El_Cuervo_v0_1.glb
+          if-no-files-found: error
+          retention-days: 30
