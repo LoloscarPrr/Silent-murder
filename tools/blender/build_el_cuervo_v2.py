@@ -181,8 +181,8 @@ loft("Head sculpt / brow cheek jaw",[
 
 # Eye line is on the front (-Y). Brows, eyes and cheek folds are modest.
 for sign,side in ((-1,"R"),(1,"L")):
-    ellipsoid("Ear "+side,(sign*.131,.012,1.754),(.027,.044,.058),skin,"Head",16,10)
-    ellipsoid("Ear inner "+side,(sign*.151,-.011,1.755),(.010,.026,.033),shadow,"Head",12,8)
+    ellipsoid("Ear "+side,(sign*.131,.014,1.754),(.014,.025,.045),skin,"Head",16,10)
+    ellipsoid("Ear inner "+side,(sign*.143,-.009,1.754),(.004,.014,.024),shadow,"Head",12,8)
     ellipsoid("Eye sclera "+side,(sign*.059,-.126,1.778),(.032,.010,.012),eyes,"Head",16,10)
     ellipsoid("Eye iris "+side,(sign*.060,-.135,1.777),(.013,.004,.012),iris,"Head",12,8)
     curve_tube("Upper eyelid "+side,[
@@ -191,15 +191,15 @@ for sign,side in ((-1,"R"),(1,"L")):
     curve_tube("Defined eyebrow "+side,[
        (sign*.023,-.128,1.813),(sign*.059,-.140,1.818),
        (sign*.099,-.120,1.812)],.008,hair,"Head")
-    ellipsoid("Cheek structure "+side,(sign*.082,-.097,1.723),(.050,.025,.034),skin,"Head",14,9)
+    # Cheekbones are already formed by the tapered face mesh; no protruding spheres.
     curve_tube("Jaw shadow "+side,[
        (sign*.117,-.073,1.718),(sign*.094,-.088,1.674),
        (sign*.045,-.067,1.652)],.003,shadow,"Head")
 loft("Nose bridge",[(0,-.130,1.812,.021,.019),
  (0,-.139,1.774,.022,.025),(0,-.154,1.736,.025,.024)],skin,"Head",16)
-ellipsoid("Nose tip",(0,-.163,1.725),(.030,.026,.018),skin,"Head",16,9)
+ellipsoid("Nose tip",(0,-.159,1.728),(.023,.017,.014),skin,"Head",16,9)
 for sign in (-1,1):
-    ellipsoid("Nostril "+str(sign),(sign*.020,-.177,1.717),(.007,.004,.006),shadow,"Head",10,6)
+    ellipsoid("Nostril "+str(sign),(sign*.016,-.171,1.716),(.005,.003,.004),shadow,"Head",10,6)
 curve_tube("Lip shadow",[(-.039,-.109,1.686),(0,-.122,1.683),(.039,-.109,1.686)],.003,shadow,"Head")
 ellipsoid("Chin detail",(0,-.084,1.663),(.037,.013,.013),skin,"Head",14,8)
 
@@ -210,8 +210,8 @@ loft("Fitted hair cap",[(0,.003,1.888,.067,.078),
 for i in range(8):
     x=-.103+i*.029
     curve_tube("Hair silhouette strand %02d"%i,[
-      (x,.0,1.883),(x*.98,-.095,1.866),(x*.87,-.127,1.836)],
-      .005,hair,"Head",3)
+      (x,.0,1.876),(x*.98,-.091,1.863),(x*.87,-.126,1.842)],
+      .0028,hair,"Head",3)
 
 # Slim arms hang by the sides; reduced shoulder pads prevent Roblox proportions.
 for sign,side in ((1,"L"),(-1,"R")):
@@ -223,19 +223,19 @@ for sign,side in ((1,"L"),(-1,"R")):
     foot="Foot."+side
     x=sign*.305
     loft("Natural jacket upper arm "+side,[
-      (x,.028,1.516,.105,.114),(sign*.337,.026,1.436,.103,.114),
-      (sign*.357,.012,1.321,.086,.093),(sign*.362,.005,1.250,.080,.085)],jacket,upper,18)
+      (x,.028,1.516,.088,.101),(sign*.337,.026,1.436,.085,.102),
+      (sign*.357,.012,1.321,.078,.084),(sign*.362,.005,1.250,.075,.081)],jacket,upper,18)
     loft("Fitted forearm "+side,[
       (sign*.364,.008,1.257,.079,.085),(sign*.373,-.007,1.162,.078,.076),
       (sign*.383,-.021,1.063,.060,.063),(sign*.391,-.032,1.018,.058,.061)],shirt,lower,18)
-    box("Low-profile elbow reinforcement "+side,(sign*.369,-.079,1.257),(.114,.022,.104),plate,lower,.015)
+    box("Low-profile elbow reinforcement "+side,(sign*.369,-.079,1.257),(.083,.012,.082),jacket,lower,.010)
     curve_tube("Sleeve forearm seam "+side,[
       (sign*.313,-.061,1.208),(sign*.324,-.060,1.145),
       (sign*.334,-.049,1.080)],.006,thread,lower)
     loft("Gloved wrist "+side,[
       (sign*.392,-.036,1.036,.057,.062),
       (sign*.397,-.040,.992,.065,.066)],black,hand,16)
-    ellipsoid("Gloved palm "+side,(sign*.398,-.046,.945),(.071,.046,.082),black,hand,16,12)
+    ellipsoid("Gloved palm "+side,(sign*.398,-.046,.945),(.059,.036,.077),black,hand,16,12)
     # Four distinct gloved fingers and a thumb, each meshes skinned to the hand bone.
     for finger in range(4):
         fx=sign*(.354+finger*.027)
@@ -263,21 +263,21 @@ for sign,side in ((1,"L"),(-1,"R")):
     ellipsoid("Slim tactical boot upper "+side,(sign*.151,-.002,.173),
               (.106,.106,.151),black,foot,16,12)
     ellipsoid("Boot sculpted toe "+side,(sign*.151,-.102,.079),
-              (.118,.192,.078),rubber,foot,18,12)
-    box("Boot sole "+side,(sign*.151,-.086,.034),(.245,.360,.046),rubber,foot,.017)
+              (.099,.149,.064),rubber,foot,18,12)
+    box("Boot sole "+side,(sign*.151,-.086,.034),(.210,.300,.035),rubber,foot,.014)
     for t in range(3):
         curve_tube("Boot laces "+side+" "+str(t),[
           (sign*.11,-.115,.225-t*.046),
           (sign*.151,-.126,.219-t*.046),
           (sign*.19,-.114,.225-t*.046)],.004,thread,foot)
-    ellipsoid("Minimal kneepad "+side,(sign*.141,-.105,.559),
-              (.082,.025,.063),plate,shin,16,8)
+    box("Flush knee reinforcement "+side,(sign*.141,-.101,.557),
+        (.118,.017,.093),trousers,shin,.013)
 
 # Belt mounted holster, secure radio and flexible wiring.
 box("Compact concealed pistol holster",(-.235,-.047,.946),(.071,.153,.222),black,"Hips",.022)
 box("Radio case",(.235,.014,1.098),(.056,.089,.131),metal,"Hips",.012)
 curve_tube("Radio antenna",[(.237,.011,1.166),(.248,.009,1.239)],.004,black,"Hips")
-box("Discrete wrist comms",(.397,-.093,1.055),(.111,.018,.055),plate,"Forearm.L",.010)
+box("Discrete wrist comms",(.397,-.093,1.055),(.085,.010,.038),black,"Forearm.L",.007)
 
 # 17+ bones. This first pass is skinned with rigid per-part weights.
 # Shoulder, knee and elbow meshes meet at joints; later pass: smooth weights and animations.
