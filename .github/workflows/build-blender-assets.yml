@@ -21,7 +21,7 @@ jobs:
       - name: Install Blender
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y blender python3-numpy
+          sudo apt-get install -y blender python3-numpy xvfb libegl1 libgl1-mesa-dri libglx-mesa0
           blender --version | head -3
 
       - name: Generate editable character and Godot model
@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p out/blender
-          blender --background --factory-startup --python tools/blender/build_el_cuervo_v2.py -- --output out/blender 2>&1 | tee blender-build.log
+          xvfb-run -a -s "-screen 0 1280x1024x24" blender --background --factory-startup --python tools/blender/build_el_cuervo_v2.py -- --output out/blender 2>&1 | tee blender-build.log
           grep -q 'EL_CUERVO_V2_EXPORT_OK' blender-build.log
           test -s out/blender/El_Cuervo_v2.blend
           test -s out/blender/El_Cuervo_v2.glb
