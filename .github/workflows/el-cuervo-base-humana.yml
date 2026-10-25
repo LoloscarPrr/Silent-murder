@@ -9,6 +9,10 @@ on:
       - 'tools/el_cuervo/**'
   workflow_dispatch:
 
+concurrency:
+  group: el-cuervo-base-humana-v1
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
