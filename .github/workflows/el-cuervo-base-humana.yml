@@ -1,0 +1,101 @@
+name: El Cuervo - base humana 3D CC0 (Blender real)
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - '.github/workflows/el-cuervo-base-humana.yml'
+      - 'tools/el_cuervo/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  production:
+    name: Blender 4.3 + validacion GLB y Godot 4.3
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Herramientas de sistema
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+      - name: Instalar Blender oficial 4.3.2
+        run: |
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy; assert bpy.app.version[:2]==(4,3); print("BLENDER_VERIFIED:",bpy.app.version_string)'
+      - name: Descargar la malla ORIGINAL CC0, nunca procedimental
+        run: |
+          mkdir -p /tmp/cuervo
+          curl -fL --retry 3 --connect-timeout 20 'https://www.innerscene.com/api/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/download' -o /tmp/cuervo/source_male_cc0.glb
+          python3 - <<'PY'
+          import struct,os
+          p='/tmp/cuervo/source_male_cc0.glb'
+          with open(p,'rb') as f: h=f.read(12)
+          magic,version,length=struct.unpack('<4sII',h)
+          assert magic==b'glTF' and version==2 and length==os.path.getsize(p), (magic,version,length)
+          print('Original GLB verificado',os.path.getsize(p),'bytes')
+          PY
+      - name: Generar malla editable y 6 renders en Blender
+        run: |
+          mkdir -p character_assets/el_cuervo/fase1
+          /tmp/blender-4.3/blender -b --factory-startup --python tools/el_cuervo/build.py -- --source /tmp/cuervo/source_male_cc0.glb --out character_assets/el_cuervo/fase1
+      - name: Reabrir BLEND y reimportar GLB para verificacion
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python tools/el_cuervo/verify.py -- --out character_assets/el_cuervo/fase1
+      - name: Comprobar importacion real en Godot 4.3 headless
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/cuervo/godot.zip
+          unzip -q /tmp/cuervo/godot.zip -d /tmp/cuervo/godot
+          chmod +x /tmp/cuervo/godot/Godot_v4.3-stable_linux.x86_64
+          mkdir -p /tmp/cuervo/godot_qa
+          cp character_assets/el_cuervo/fase1/El_Cuervo_Base_Humana_v1.glb /tmp/cuervo/godot_qa/
+          printf '[application]\nconfig/name="El Cuervo QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo/godot_qa/project.godot
+          /tmp/cuervo/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo/godot_qa --editor --import --quit
+          test -d /tmp/cuervo/godot_qa/.godot/imported
+          python3 - <<'PY'
+          import json
+          p='character_assets/el_cuervo/fase1/El_Cuervo_Verificacion.json'
+          d=json.load(open(p))
+          d['godot_4_3_import_verified']=True
+          json.dump(d,open(p,'w'),ensure_ascii=False,indent=2)
+          PY
+      - name: Procedencia y licencia
+        run: |
+          cat > character_assets/el_cuervo/fase1/PROCEDENCIA_LICENCIA.md <<'EOF'
+          # El Cuervo — Fase 1
+          - Fuente concreta: Innerscene, Male Base Mesh - 3D Person, Rigged A-pose.
+          - URL original: https://www.innerscene.com/tools/library/3d-parts/male-base-mesh-3d-person-rigged-a-pose-380e6d89
+          - Base declarada por el autor: recursos MakeHuman CC0, publicados por Innerscene bajo CC0.
+          - Licencia declarada: CC0 1.0; modificación y uso comercial autorizados.
+          - Fecha de consulta: 2026-10-25.
+          - Archivo original GLB obtenido de la API pública de descarga del mismo elemento.
+          - Herramienta: Blender oficial 4.3.2 (reimportación y exportación glTF), Godot 4.3 estable (prueba de importación).
+          - No usar otros recursos comunitarios sin comprobar por separado sus licencias.
+          - Sin indumentaria, armamento ni uso de assets comerciales de John Wick.
+          - El modelo conserva la topología original. La optimización específica para Android queda pendiente de pruebas gráficas y LOD.
+          - La comprobación automática del esqueleto NO sustituye una inspección manual de deformaciones y expresiones.
+          EOF
+      - name: Publicar archivos individuales a la RAMA de producción
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add character_assets/el_cuervo/fase1
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): export audited El Cuervo human base v1'
+            git push origin HEAD:feature/el-cuervo-base-humana-v1
+          fi
+      - name: Respaldo adicional en artefacto de GitHub Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Base_Humana_v1
+          path: character_assets/el_cuervo/fase1/
+          if-no-files-found: error
+          retention-days: 30
