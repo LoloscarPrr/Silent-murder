@@ -60,6 +60,8 @@ jobs:
           printf '[application]\nconfig/name="El Cuervo QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo/godot_qa/project.godot
           /tmp/cuervo/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo/godot_qa --editor --import --quit
           test -d /tmp/cuervo/godot_qa/.godot/imported
+          cp tools/el_cuervo/verify_godot.gd /tmp/cuervo/godot_qa/verify_godot.gd
+          /tmp/cuervo/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo/godot_qa --script res://verify_godot.gd
           python3 - <<'PY'
           import json
           p='character_assets/el_cuervo/fase1/El_Cuervo_Verificacion.json'
