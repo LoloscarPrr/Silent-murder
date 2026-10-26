@@ -27,7 +27,19 @@ assert bm and ba
 bpy.ops.wm.read_factory_settings(use_empty=True)
 print("VERIFY_AFTER_FACTORY_RESET",[(o.name,o.type) for o in bpy.context.scene.objects],flush=True)
 bpy.ops.import_scene.gltf(filepath=glb)
-meshes=[o for o in bpy.context.scene.objects if o.type=="MESH"]
+# El JSON glTF define la escena exportada. Blender puede crear helpers al importar;
+# esos objetos no son parte del GLB si no tienen un nodo de malla glTF.
+source_mesh_nodes=[n for n in raw_json.get("nodes",[]) if "mesh" in n]
+assert len(source_mesh_nodes)>=1
+expected_mesh_names={n["name"] for n in source_mesh_nodes}
+assert not any("icosphere" in s.lower() for s in expected_mesh_names), "GLB exportado incluye una Icosphere, no permitido"
+assert len(raw_json.get("scenes",[]))>=1 and len(raw_json["scenes"][0]["nodes"])>=1
+all_imported_meshes=[o for o in bpy.context.scene.objects if o.type=="MESH"]
+meshes=[o for o in all_imported_meshes if o.name in expected_mesh_names]
+import_side_effects=[o.name for o in all_imported_meshes if o.name not in expected_mesh_names]
+print("VERIFY_UNREFERENCED_IMPORT_OBJECTS",import_side_effects,flush=True)
+assert {o.name for o in meshes}==expected_mesh_names, "No coinciden los nodos de malla reales del GLB con los importados"
+assert all(n.get("skin") is not None for n in source_mesh_nodes), "Mallas sin skinning en el GLB exportado"
 arms=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
 assert meshes and arms
 bpy.context.view_layer.update()
@@ -43,6 +55,6 @@ v=sum(len(o.data.vertices) for o in meshes)
 t=sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in meshes)
 nb=sum(len(a.data.bones) for a in arms)
 assert v>1000 and t>2000 and nb>0
-d={"blend_opened":True,"glb_binary_structure_valid":True,"glb_reimported_in_blender":True,"glb_height_m":height,"glb_triangles":t,"glb_vertices":v,"glb_bones":nb,"glb_materials":len(set(m.name for o in meshes for m in o.data.materials if m)),"godot_4_3_import_verified":False,"artistic_human_review_approved":False}
+d={"blend_opened":True,"glb_binary_structure_valid":True,"glb_reimported_in_blender":True,"glb_height_m":height,"glb_mesh_nodes":[n["name"] for n in source_mesh_nodes],"blender_import_extra_objects":import_side_effects,"glb_triangles":t,"glb_vertices":v,"glb_bones":nb,"glb_materials":len(set(m.name for o in meshes for m in o.data.materials if m)),"godot_4_3_import_verified":False,"artistic_human_review_approved":False}
 with open(os.path.join(out,"El_Cuervo_Verificacion.json"),"w") as f:json.dump(d,f,indent=2)
 print("CUERVO_VERIFICATION_COMPLETED",json.dumps(d))
