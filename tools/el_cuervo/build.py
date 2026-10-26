@@ -25,10 +25,18 @@ basename="El_Cuervo_Base_Humana_v1"
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=os.path.abspath(src))
 imported=list(bpy.context.scene.objects)
-meshes=[o for o in imported if o.type=="MESH"]
 arms=[o for o in imported if o.type=="ARMATURE"]
-assert meshes, "La fuente no contiene mallas"
 assert arms, "La fuente no contiene armature"
+# La fuente incluye una Icosphere aislada para visualización. NO es anatomía.
+# Solo conservamos los objetos de malla enlazados efectivamente al esqueleto.
+mesh_candidates=[o for o in imported if o.type=="MESH"]
+meshes=[o for o in mesh_candidates if (o.parent in arms or any(mod.type=="ARMATURE" and mod.object in arms for mod in o.modifiers))]
+excluded=[o for o in mesh_candidates if o not in meshes]
+for o in excluded:
+    print("EXCLUDED_SOURCE_HELPER",o.name,"verts",len(o.data.vertices),"reason","not skinned or parented to human rig",flush=True)
+    bpy.data.objects.remove(o,do_unlink=True)
+imported=list(bpy.context.scene.objects)
+assert meshes, "La fuente no contiene malla humana unida al esqueleto"
 roots=[o for o in imported if o.parent is None]
 assert roots, "No se encontraron raices de jerarquia"
 
@@ -84,6 +92,7 @@ def poly_stats():
 
 stats=poly_stats()
 stats["original_import_height_m"]=round(initial_height,5)
+stats["source_helpers_excluded"]=[o.name for o in excluded]
 stats["scale_factor_applied"]=round(scale,6)
 rig_tests=[]
 for arm in arms:
