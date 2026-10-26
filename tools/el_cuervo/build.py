@@ -224,6 +224,7 @@ for obj in imported:
     obj.select_set(True)
 bpy.context.view_layer.objects.active=meshes[0]
 glb_path=os.path.join(out,basename+".glb")
+print("EXPORT_SOURCE_OBJECTS",[(o.name,o.type,o.select_get()) for o in bpy.context.scene.objects],flush=True)
 bpy.ops.export_scene.gltf(
     filepath=glb_path, export_format="GLB",use_selection=True,
     export_materials="EXPORT",export_yup=True
