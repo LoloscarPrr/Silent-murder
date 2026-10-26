@@ -32,6 +32,7 @@ assert arms, "La fuente no contiene armature"
 mesh_candidates=[o for o in imported if o.type=="MESH"]
 meshes=[o for o in mesh_candidates if (o.parent in arms or any(mod.type=="ARMATURE" and mod.object in arms for mod in o.modifiers))]
 excluded=[o for o in mesh_candidates if o not in meshes]
+excluded_names=[o.name for o in excluded]
 for o in excluded:
     print("EXCLUDED_SOURCE_HELPER",o.name,"verts",len(o.data.vertices),"reason","not skinned or parented to human rig",flush=True)
     bpy.data.objects.remove(o,do_unlink=True)
@@ -92,7 +93,7 @@ def poly_stats():
 
 stats=poly_stats()
 stats["original_import_height_m"]=round(initial_height,5)
-stats["source_helpers_excluded"]=[o.name for o in excluded]
+stats["source_helpers_excluded"]=excluded_names
 stats["scale_factor_applied"]=round(scale,6)
 rig_tests=[]
 for arm in arms:
