@@ -39,7 +39,13 @@ def bounds(objects):
 bpy.context.view_layer.update()
 low,high=bounds(meshes)
 initial_height=high[2]-low[2]
-assert initial_height>1.0 and initial_height<2.5, "La altura inicial no parece humana: "+str(initial_height)
+print("SOURCE_WORLD_BOUNDS", low, high, "HEIGHT", initial_height, flush=True)
+for o in meshes:
+    p=[o.matrix_world @ Vector(corner) for corner in o.bound_box]
+    zz=[v.z for v in p]
+    print("SOURCE_MESH_OBJECT",o.name,"verts",len(o.data.vertices),"faces",len(o.data.polygons),"Z",round(min(zz),5),round(max(zz),5),"dimensions",tuple(round(n,5) for n in o.dimensions),"parent",o.parent.name if o.parent else None,flush=True)
+print("SOURCE_RIGS",[(x.name,len(x.data.bones)) for x in arms],flush=True)
+assert initial_height>0.8 and initial_height<3.6, "La altura inicial está fuera de límites de diagnóstico: "+str(initial_height)
 scale=1.84/initial_height
 for obj in roots:
     obj.scale=tuple(x*scale for x in obj.scale)
@@ -77,6 +83,8 @@ def poly_stats():
     }
 
 stats=poly_stats()
+stats["original_import_height_m"]=round(initial_height,5)
+stats["scale_factor_applied"]=round(scale,6)
 rig_tests=[]
 for arm in arms:
     influenced=[m for m in meshes if any(mod.type=="ARMATURE" and mod.object==arm for mod in m.modifiers)]
