@@ -1,0 +1,12 @@
+# El Cuervo — Fase 1
+- Fuente concreta: Innerscene, Male Base Mesh - 3D Person, Rigged A-pose.
+- URL original: https://www.innerscene.com/tools/library/3d-parts/male-base-mesh-3d-person-rigged-a-pose-380e6d89
+- Base declarada por el autor: recursos MakeHuman CC0, publicados por Innerscene bajo CC0.
+- Licencia declarada: CC0 1.0; modificación y uso comercial autorizados.
+- Fecha de consulta: 2026-10-25.
+- Archivo original GLB obtenido de la API pública de descarga del mismo elemento.
+- Herramienta: Blender oficial 4.3.2 (reimportación y exportación glTF), Godot 4.3 estable (prueba de importación).
+- No usar otros recursos comunitarios sin comprobar por separado sus licencias.
+- Sin indumentaria, armamento ni uso de assets comerciales de John Wick.
+- El modelo conserva la topología original. La optimización específica para Android queda pendiente de pruebas gráficas y LOD.
+- La comprobación automática del esqueleto NO sustituye una inspección manual de deformaciones y expresiones.
