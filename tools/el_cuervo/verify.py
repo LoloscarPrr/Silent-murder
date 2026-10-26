@@ -13,11 +13,19 @@ with open(glb,"rb") as f:
     h=f.read(12)
 magic,version,length=struct.unpack("<4sII",h)
 assert magic==b"glTF" and version==2 and length==os.path.getsize(glb)
+with open(glb,"rb") as q:
+    q.seek(12)
+    jsonlen,kind=struct.unpack("<I4s",q.read(8))
+    assert kind==b"JSON"
+    raw_json=json.loads(q.read(jsonlen).decode("utf-8"))
+print("VERIFY_GLB_JSON_NODES",[(x.get("name"),x.get("mesh")) for x in raw_json.get("nodes",[])],flush=True)
+print("VERIFY_GLB_JSON_SCENES",raw_json.get("scenes"),flush=True)
 bpy.ops.wm.open_mainfile(filepath=blend)
 bm=[o for o in bpy.data.objects if o.type=="MESH" and o.name.startswith("AUDITORIA")==False]
 ba=[o for o in bpy.data.objects if o.type=="ARMATURE"]
 assert bm and ba
 bpy.ops.wm.read_factory_settings(use_empty=True)
+print("VERIFY_AFTER_FACTORY_RESET",[(o.name,o.type) for o in bpy.context.scene.objects],flush=True)
 bpy.ops.import_scene.gltf(filepath=glb)
 meshes=[o for o in bpy.context.scene.objects if o.type=="MESH"]
 arms=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
