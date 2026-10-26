@@ -7,10 +7,16 @@ on:
     paths:
       - '.github/workflows/el-cuervo-base-humana.yml'
       - 'tools/el_cuervo/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/el-cuervo-base-humana.yml'
+      - 'tools/el_cuervo/**'
   workflow_dispatch:
 
 concurrency:
-  group: el-cuervo-base-humana-v1
+  group: el-cuervo-base-humana-v1-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -25,6 +31,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
+          ref: feature/el-cuervo-base-humana-v1
       - name: Herramientas de sistema
         run: |
           sudo apt-get update -qq
@@ -90,6 +97,7 @@ jobs:
           - La comprobación automática del esqueleto NO sustituye una inspección manual de deformaciones y expresiones.
           EOF
       - name: Publicar archivos individuales a la RAMA de producción
+        if: github.event_name == 'push'
         run: |
           git config user.name 'El Cuervo Production Bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
