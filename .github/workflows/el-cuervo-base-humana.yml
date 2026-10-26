@@ -57,10 +57,10 @@ jobs:
       - name: Generar malla editable y 6 renders en Blender
         run: |
           mkdir -p character_assets/el_cuervo/fase1
-          /tmp/blender-4.3/blender -b --factory-startup --python tools/el_cuervo/build.py -- --source /tmp/cuervo/source_male_cc0.glb --out character_assets/el_cuervo/fase1
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python tools/el_cuervo/build.py -- --source /tmp/cuervo/source_male_cc0.glb --out character_assets/el_cuervo/fase1
       - name: Reabrir BLEND y reimportar GLB para verificacion
         run: |
-          /tmp/blender-4.3/blender -b --factory-startup --python tools/el_cuervo/verify.py -- --out character_assets/el_cuervo/fase1
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python tools/el_cuervo/verify.py -- --out character_assets/el_cuervo/fase1
       - name: Comprobar importacion real en Godot 4.3 headless
         run: |
           curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/cuervo/godot.zip
