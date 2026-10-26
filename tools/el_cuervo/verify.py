@@ -23,6 +23,10 @@ meshes=[o for o in bpy.context.scene.objects if o.type=="MESH"]
 arms=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
 assert meshes and arms
 bpy.context.view_layer.update()
+for o in meshes:
+    corners=[o.matrix_world @ Vector(p) for p in o.bound_box]
+    print("VERIFY_MESH",o.name,"verts",len(o.data.vertices),"height",max(q.z for q in corners)-min(q.z for q in corners),"min_z",min(q.z for q in corners),"max_z",max(q.z for q in corners),"parent",o.parent.name if o.parent else None,flush=True)
+print("VERIFY_ALL_OBJECTS",[(o.name,o.type) for o in bpy.context.scene.objects],flush=True)
 pts=[o.matrix_world @ Vector(corner) for o in meshes for corner in o.bound_box]
 minz=min(p.z for p in pts); maxz=max(p.z for p in pts)
 height=maxz-minz
