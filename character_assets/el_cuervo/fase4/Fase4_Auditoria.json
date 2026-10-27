@@ -18,7 +18,8 @@
   "suit_shoulder_shrink_max": 0.11,
   "suit_waist_shrink_max": 0.065,
   "suit_material_darkening_applied": true,
-  "outfit_intent": "dark charcoal shirt, matte black jacket; original UVs retained",
+  "outfit_intent": "matte black jacket and distinctly darker graphite shirt; authored UV atlas retained",
+  "shirt_faces_recolored_using_original_UV": 737,
   "shoe_original_obj": "clothes/toigo_ankle_boots_male/boots_ankle_male.obj",
   "shoe_original_triangles": 4120,
   "shoe_fitted_bounds": {
@@ -46,24 +47,38 @@
     {
       "bone": "upperarm01.L",
       "axis": "Z",
-      "radians": 0.55,
-      "score": 0.29261,
+      "radians": -0.5,
+      "score": 0.81023,
       "elbow_world": [
-        0.277464896440506,
-        -0.014128736220300198,
-        1.443084716796875
-      ]
+        0.21900570392608643,
+        -0.024253282696008682,
+        1.398983120918274
+      ],
+      "wrist_world": [
+        0.2963983714580536,
+        -0.14406482875347137,
+        1.1239078044891357
+      ],
+      "wrist_drop_m": 0.3481,
+      "wrist_spread_from_center_m": 0.2964
     },
     {
       "bone": "upperarm01.R",
       "axis": "Z",
-      "radians": -0.55,
-      "score": 0.29261,
+      "radians": 0.5,
+      "score": 0.81023,
       "elbow_world": [
-        -0.277464896440506,
-        -0.014128739014267921,
-        1.443084716796875
-      ]
+        -0.21900568902492523,
+        -0.02425328642129898,
+        1.398983120918274
+      ],
+      "wrist_world": [
+        -0.2963983714580536,
+        -0.14406482875347137,
+        1.1239078044891357
+      ],
+      "wrist_drop_m": 0.3481,
+      "wrist_spread_from_center_m": 0.2964
     }
   ],
   "exported_mesh_nodes": [
