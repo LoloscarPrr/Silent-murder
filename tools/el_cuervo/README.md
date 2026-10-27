@@ -1,4 +1,4 @@
-# El Cuervo — base humana profesional (Fase 1)
+# El Cuervo — producción 3D (Fases 1–3)
 
 Esta rama es un área de producción **aislada del juego**: no altera la escena jugable ni la APK existente.
 
@@ -17,3 +17,11 @@ Abre la carpeta `character_assets/el_cuervo/fase1/` de esta rama en GitHub cuand
 
 ## Auditoría
 Un archivo generado y una compilación verde no aprueban la anatomía, la calidad del rig ni el rendimiento en un dispositivo. Son obligatorias las inspecciones frontales, laterales, posteriores, de manos, hombros, rostro y pruebas reales en Android antes de reemplazar el personaje del juego.
+
+
+## Situación de producción (27-10-2026)
+- **Fase 1:** base humana BLEND/GLB generada y reimportada en Blender/Godot 4.3. La anatomía base fue aceptada por el usuario como punto de partida, **no como personaje terminado**.
+- **Fase 2:** inspección de poses y [LOD40 experimental](../../character_assets/el_cuervo/fase2/Fase2_Auditoria.json) producido: 43.625 triángulos frente a 109.064 originales. La prueba de muñeca y vistas de manos no quedaron resueltas; la evaluación visual y FPS Android siguen pendientes.
+- **Fase 3:** [PLAN_VESTUARIO_FASE3.md](PLAN_VESTUARIO_FASE3.md) es el plan de producción modular para blazer, camisa, pantalón, botines y accesorios. **Es documentación de trabajo; no implica que las prendas ya estén modeladas.**
+
+El siguiente hito verificable es producir y revisar el bloque geométrico **blazer + camisa** en un archivo BLEND independiente, sin reemplazar el personaje jugable ni alterar la APK.
