@@ -98,6 +98,45 @@ def improve_fit(obj):
     obj.data.update()
     bpy.context.view_layer.update()
 
+
+def remove_tie_component(obj):
+    """Remove isolated tie geometry from the suit3 source; retain modelled shirt.
+    Only accepts a narrow, central, detached mesh island in the upper chest.
+    This is real topology editing; not a primitive replacement or a texture fake.
+    """
+    b=bmesh.new()
+    b.from_mesh(obj.data)
+    visited=set()
+    deletes=[]
+    matches=[]
+    for first in b.faces:
+        if first in visited: continue
+        group=[]
+        stack=[first]
+        while stack:
+            face=stack.pop()
+            if face in visited:continue
+            visited.add(face)
+            group.append(face)
+            for v in face.verts:
+                for neighbor in v.link_faces:
+                    if neighbor not in visited:stack.append(neighbor)
+        if len(group)<200:continue
+        points=[obj.matrix_world@v.co for face in group for v in face.verts]
+        left=min(p.x for p in points);right=max(p.x for p in points)
+        bot=min(p.z for p in points);top=max(p.z for p in points)
+        if right-left<.15 and 1.30<bot<1.56 and top<1.75 and len(group)>280:
+            deletes.extend(group)
+            matches.append(dict(faces=len(group),bounds=[left,right,bot,top]))
+    assert len(matches)==1,("Expected exactly one detached tie island",matches)
+    bmesh.ops.delete(b,geom=deletes,context="FACES")
+    bmesh.ops.delete(b,geom=[v for v in b.verts if not v.link_faces],context="VERTS")
+    b.to_mesh(obj.data)
+    b.free()
+    obj.data.update()
+    print("DETACHED_TIE_REMOVED",matches,flush=True)
+    return matches
+
 def make_visible_skin():
     """Keep head, distal hands and feet from the real MakeHuman body.
     Preserve the FULL untouched reference body, hidden in BLEND; do not
@@ -211,6 +250,10 @@ for label,filepath in picked:
     assert ntris>2000 and ntris<250000,(label,ntris)
     f=fit(meshes)
     for mesh in meshes: improve_fit(mesh)
+    removed_ties=[]
+    if label=="toigo_male_suit_3":
+        for mesh in meshes:
+            removed_ties+=remove_tie_component(mesh)
     visible=make_visible_skin()
     textures=[]
     for j,obj in enumerate(meshes):
@@ -240,6 +283,7 @@ for label,filepath in picked:
        original_uv_atlas=textures,fitted_bounds=f,
        armature_bones=len(arm.data.bones),body_base_preserved=True,
        masked_hidden_skin=True,clothing_arm_and_collar_fit_adjusted=True,
+       removed_tie_mesh_islands=removed_ties,
        body_visible_triangles=sum(count_triangles(x) for x in visible),
        skinning_method="nearest-source-vertex trial, visually unapproved",
        artistic_approval=False,android_fps_tested=False,
