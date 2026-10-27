@@ -4,7 +4,7 @@ WIP technical preview, not an artist-approved final player model.
 Blender 4.3:
   blender -b --python tools/el_cuervo/fase4_refine.py -- --blend <approved_fase3_suit.blend> --shoes <official_shoes01_CC0.zip> --out <output>
 """
-import bpy,bmesh,os,sys,json,zipfile,hashlib,math,struct
+import bpy,bmesh,os,sys,json,zipfile,hashlib,math,struct,statistics
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.kdtree import KDTree
 
@@ -101,7 +101,48 @@ for mat in materials:
     if not applied and bsdf:
         bsdf.inputs["Base Color"].default_value=(.07,.077,.092,1)
 stats["suit_material_darkening_applied"]=applied
-stats["outfit_intent"]="dark charcoal shirt, matte black jacket; original UVs retained"
+stats["outfit_intent"]="matte black jacket and distinctly darker graphite shirt; authored UV atlas retained"
+
+# Classify ORIGINAL CC0 garment faces using their authored UV atlas.
+# The shirt/collar region is bright in the atlas and at the upper central
+# torso in 3D. Assign those EXISTING faces a separate dark shirt material,
+# rather than creating a fake planar shirt or flattening the original texture.
+import numpy as np
+shirt_faces=0
+shirt= bpy.data.materials.new("Cuervo_Camisa_Negra_Grafito")
+shirt.use_nodes=True
+bs=shirt.node_tree.nodes.get("Principled BSDF")
+bs.inputs["Base Color"].default_value=(.029,.033,.041,1.0)
+bs.inputs["Roughness"].default_value=.88
+bs.inputs["Metallic"].default_value=0.0
+suit.data.materials.append(shirt)
+shirt_slot=len(suit.data.materials)-1
+teximg=next((n.image for m in materials if m.use_nodes
+             for n in m.node_tree.nodes if n.type=="TEX_IMAGE" and n.image),None)
+assert teximg is not None,"Original CC0 suit UV image not found"
+uvlayer=suit.data.uv_layers.active
+assert uvlayer is not None,"Suits source has no UV atlas"
+ww,hh=teximg.size
+texarr=np.asarray(teximg.pixels[:],dtype=np.float32).reshape((hh,ww,4))
+for poly in suit.data.polygons:
+    coords=[suit.matrix_world@suit.data.vertices[i].co for i in poly.vertices]
+    worldp=sum(coords,Vector())/len(coords)
+    if worldp.z<lo.z+1.28 or abs(worldp.x-cx)>.25:continue
+    lightness=[]
+    for loop_index in poly.loop_indices:
+        uv=uvlayer.data[loop_index].uv
+        ix=max(0,min(ww-1,int(uv.x*(ww-1))))
+        iy=max(0,min(hh-1,int(uv.y*(hh-1))))
+        rgb=texarr[iy,ix,:3]
+        lightness.append(float(np.mean(rgb)))
+    if lightness and statistics.median(lightness)>.30:
+        poly.material_index=shirt_slot
+        shirt_faces+=1
+del texarr
+assert 50<shirt_faces<4500,("shirt atlas classification unreliable",shirt_faces)
+stats["shirt_faces_recolored_using_original_UV"]=shirt_faces
+print("DARK_SHIRT_REAL_FACES",shirt_faces,flush=True)
+
 
 # Shoes source: same MakeHuman CC0 author as original suit, true OBJ meshes.
 target="toigo_ankle_boots_male"
@@ -228,25 +269,36 @@ def pose_sample(max_angle=.55):
         old[key]=(pb.rotation_mode,pb.rotation_quaternion.copy(),pb.rotation_euler.copy())
         pb.rotation_mode="QUATERNION"
         initial=pb.rotation_quaternion.copy()
-        initial_y=(arm.matrix_world@pb.tail).y
-        side_sign=-1 if side=="L" else 1
+        forearm=arm.pose.bones.get("lowerarm01."+side)
+        assert forearm,"Missing forearm to validate the actual wrist"
         best=None
         for axis in ["X","Y","Z"]:
             av={"X":Vector((1,0,0)),"Y":Vector((0,1,0)),"Z":Vector((0,0,1))}[axis]
-            for k in [-.55,-.40,-.26,-.13,.13,.26,.40,.55]:
+            for k in [-.80,-.65,-.50,-.35,-.20,-.10,.0,.10,.20,.35,.50,.65,.80]:
                 pb.rotation_quaternion=Quaternion(av,k)@initial
                 bpy.context.view_layer.update()
                 shoulder=arm.matrix_world@pb.head
+                wrist=arm.matrix_world@forearm.tail
                 elbow=arm.matrix_world@pb.tail
-                spread=abs(elbow.x-cx)
-                # Natural down-ish arm, maintaining elbow outside torso.
-                error=abs(spread-.31)*3.0+abs(elbow.y-cy)*.7+abs((shoulder.z-elbow.z)-.24)*.4+abs(k)*.03
+                spread=abs(wrist.x-cx)
+                drop=shoulder.z-wrist.z
+                # Optimize the WHOLE limb, not merely the elbow. The last
+                # implementation mistakenly preferred T-pose, because
+                # it checked elbow X alone and ignored the wrist height.
+                error=abs(spread-.32)*4.0+abs(drop-.52)*4.0+abs(wrist.y-cy)*.7+abs(k)*.05
+                if drop<.28:error+=2.0
                 if best is None or error<best[0]:
-                    best=(error,axis,k,tuple(elbow))
+                    best=(error,axis,k,tuple(elbow),tuple(wrist),drop,spread)
         assert best
         pb.rotation_quaternion=Quaternion({"X":Vector((1,0,0)),"Y":Vector((0,1,0)),"Z":Vector((0,0,1))}[best[1]],best[2])@initial
         bpy.context.view_layer.update()
-        trial.append({"bone":key,"axis":best[1],"radians":best[2],"score":round(best[0],5),"elbow_world":best[3]})
+        wrist=arm.matrix_world@forearm.tail
+        shoulder=arm.matrix_world@pb.head
+        assert (shoulder.z-wrist.z)>.27,("arm still horizontal",side,best)
+        trial.append({"bone":key,"axis":best[1],"radians":best[2],
+                      "score":round(best[0],5),"elbow_world":best[3],
+                      "wrist_world":best[4],"wrist_drop_m":round(best[5],4),
+                      "wrist_spread_from_center_m":round(best[6],4)})
     return trial,old
 
 cam=scene.camera
