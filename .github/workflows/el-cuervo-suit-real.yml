@@ -119,13 +119,24 @@ jobs:
         run: |
           git config user.name 'El Cuervo Production Bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find character_assets/el_cuervo/fase3_prenda_real -name '*.blend1' -delete
           git add character_assets/el_cuervo/fase3_prenda_real
           if ! git diff --cached --quiet; then
             git commit -m 'assets(character): genuine authored MakeHuman CC0 tailored suit WIP alternatives'
-            git pull --rebase origin feature/el-cuervo-base-humana-v1
-            git push origin HEAD:feature/el-cuervo-base-humana-v1
+            for attempt in 1 2 3 4 5; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then
+                echo "Suit meshes committed after attempt $attempt"
+                exit 0
+              fi
+              git rebase --abort || true
+              sleep 4
+            done
+            echo "ERROR: failed to publish despite push retries"
+            exit 1
           fi
       - name: Paquete de vistas y archivos editables
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: El_Cuervo_Trajes_CC0_Reales
