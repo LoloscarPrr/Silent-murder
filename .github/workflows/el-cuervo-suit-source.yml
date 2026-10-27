@@ -1,0 +1,58 @@
+name: El Cuervo - auditoria de traje real MakeHuman CC0
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/inspect_cc0_suits.py'
+      - '.github/workflows/el-cuervo-suit-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-suit-source
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    name: Descargar fuente CC0 y medir mallas de prendas reales
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          ref: feature/el-cuervo-base-humana-v1
+      - name: Descargar archivo de MakeHuman Community (fuente oficial)
+        run: |
+          curl -fL --retry 3 --connect-timeout 20 --max-time 240 'https://files2.makehumancommunity.org/asset_packs/suits01/suits01_cc0.zip' -o /tmp/suits01_cc0.zip
+          python3 - <<'PY'
+          import zipfile,os
+          p='/tmp/suits01_cc0.zip'
+          assert zipfile.is_zipfile(p)
+          print("CC0_ARCHIVE_DOWNLOADED",os.path.getsize(p),flush=True)
+          PY
+      - name: Inventario de meshes y materiales originales
+        run: |
+          python3 tools/el_cuervo/inspect_cc0_suits.py /tmp/suits01_cc0.zip character_assets/el_cuervo/fase3_prenda_real
+      - name: Guardar inventario en rama de produccion
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add character_assets/el_cuervo/fase3_prenda_real/AUDITORIA_PAQUETE_TRAJES.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'audit(character): inspect real MakeHuman CC0 suit garment meshes'
+            git pull --rebase origin feature/el-cuervo-base-humana-v1
+            git push origin HEAD:feature/el-cuervo-base-humana-v1
+          fi
+      - name: Inventario descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Auditoria_CC0_Trajes
+          path: character_assets/el_cuervo/fase3_prenda_real/
+          if-no-files-found: error
+          retention-days: 30
