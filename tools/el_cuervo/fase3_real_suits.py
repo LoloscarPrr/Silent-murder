@@ -2,7 +2,7 @@
 Blender 4.3: blender -b --python ... -- --blend verified.blend --zip suits01_cc0.zip --out folder
 Candidates are separate WIP studies. No automatic artistic approval; no game integration.
 """
-import bpy,sys,os,json,zipfile,struct,hashlib
+import bpy,bmesh,sys,os,json,zipfile,struct,hashlib,math
 from mathutils import Vector,Matrix
 from mathutils.kdtree import KDTree
 def arg(name):
@@ -64,6 +64,70 @@ def fit(objects):
     bpy.context.view_layer.update()
     nlo,nhi=bounds(objects)
     return dict(source_dimensions=list(dim),scale=[sx,sy,sz],fitted_min=list(nlo),fitted_max=list(nhi))
+
+def improve_fit(obj):
+    """Non-destructively refine an existing ARTIST-AUTHORED suit mesh, not generate tubes.
+    MakeHuman clothing sleeves rest slightly higher/wider than this particular rig.
+    A graded 13-degree sleeve rotation plus collar lowering realigns the garment.
+    Manual animation QA is still required.
+    """
+    mw=obj.matrix_world.copy(); inv=mw.inverted()
+    sh_z=low.z+height*.80
+    sh_x=.29
+    for v in obj.data.vertices:
+        pos=mw@v.co
+        orig=pos.copy()
+        zrel=pos.z-low.z
+        if zrel>1.50:
+            u=max(0,min(1,(zrel-1.50)/.22))
+            pos.z-=.100*(u*u*(3-2*u))
+        ax=abs(pos.x-center.x)
+        zrel=pos.z-low.z
+        if ax>.30 and .90<zrel<1.66:
+            t=max(0,min(1,(ax-.30)/.16))
+            t=t*t*(3-2*t)
+            side=1 if pos.x>=center.x else -1
+            dx=ax-sh_x
+            dz=pos.z-sh_z
+            a=.23
+            rx=sh_x+dx*math.cos(a)+dz*math.sin(a)
+            rz=sh_z-dx*math.sin(a)+dz*math.cos(a)
+            pos.x=center.x+side*((1-t)*ax+t*rx)
+            pos.z=(1-t)*pos.z+t*rz
+        v.co=inv@pos
+    obj.data.update()
+    bpy.context.view_layer.update()
+
+def make_visible_skin():
+    """Keep head, distal hands and feet from the real MakeHuman body.
+    Preserve the FULL untouched reference body, hidden in BLEND; do not
+    let unclothed torso/legs poke through a single-sided cloth shell.
+    """
+    visible=[]
+    for original in body:
+        copy=original.copy()
+        copy.data=original.data.copy()
+        copy.name="VisibleSkin_"+original.name
+        scene.collection.objects.link(copy)
+        meshbm=bmesh.new()
+        meshbm.from_mesh(copy.data)
+        def exposed(vertex):
+            world=copy.matrix_world@vertex.co
+            zz=world.z-low.z
+            xx=abs(world.x-center.x)
+            return zz>1.52 or (xx>.49 and .68<zz<1.51) or zz<.13
+        deleted=[face for face in meshbm.faces if not all(exposed(v) for v in face.verts)]
+        bmesh.ops.delete(meshbm,geom=deleted,context="FACES")
+        bmesh.ops.delete(meshbm,geom=[v for v in meshbm.verts if not v.link_faces],context="VERTS")
+        meshbm.to_mesh(copy.data)
+        meshbm.free()
+        copy.data.update()
+        visible.append(copy)
+        original.hide_render=True
+    bpy.context.view_layer.update()
+    assert sum(count_triangles(x) for x in visible)>1000
+    return visible
+
 def colored_texture(ob,sourcefile,suit):
     # OBJ packs use MakeHuman MHMat atlases, usually not MTL. Load their actual UV texture.
     dirname=os.path.dirname(sourcefile)
@@ -146,6 +210,8 @@ for label,filepath in picked:
     ntris=sum(count_triangles(o) for o in meshes)
     assert ntris>2000 and ntris<250000,(label,ntris)
     f=fit(meshes)
+    for mesh in meshes: improve_fit(mesh)
+    visible=make_visible_skin()
     textures=[]
     for j,obj in enumerate(meshes):
         obj.name="CC0_"+label+"_"+str(j)
@@ -161,7 +227,7 @@ for label,filepath in picked:
     blend=os.path.join(out,"El_Cuervo_"+label+"_TRAJE_REAL_WIP.blend")
     bpy.ops.wm.save_as_mainfile(filepath=blend)
     bpy.ops.object.select_all(action="DESELECT")
-    for obj in body+meshes+[arm]:obj.select_set(True)
+    for obj in visible+meshes+[arm]:obj.select_set(True)
     bpy.context.view_layer.objects.active=arm
     glb=os.path.join(out,"El_Cuervo_"+label+"_TRAJE_REAL_WIP.glb")
     bpy.ops.export_scene.gltf(filepath=glb,export_format="GLB",use_selection=True,
@@ -173,11 +239,14 @@ for label,filepath in picked:
        original_mesh_triangles=ntris,mesh_count=len(meshes),
        original_uv_atlas=textures,fitted_bounds=f,
        armature_bones=len(arm.data.bones),body_base_preserved=True,
+       masked_hidden_skin=True,clothing_arm_and_collar_fit_adjusted=True,
+       body_visible_triangles=sum(count_triangles(x) for x in visible),
        skinning_method="nearest-source-vertex trial, visually unapproved",
        artistic_approval=False,android_fps_tested=False,
        blend=os.path.basename(blend),glb=os.path.basename(glb)))
-    for obj in imported:
+    for obj in imported+visible:
         bpy.data.objects.remove(obj,do_unlink=True)
+    for original in body: original.hide_render=False
     bpy.context.view_layer.update()
 with open(archive,"rb") as f:sha=hashlib.sha256(f.read()).hexdigest()
 report=dict(source="MakeHuman Community CC0, suits01, Margaret Toigo",
