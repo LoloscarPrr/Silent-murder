@@ -36,6 +36,20 @@
       },
       "armature_bones": 163,
       "body_base_preserved": true,
+      "masked_hidden_skin": true,
+      "clothing_arm_and_collar_fit_adjusted": true,
+      "removed_tie_mesh_islands": [
+        {
+          "faces": 616,
+          "bounds": [
+            -0.03822566568851471,
+            0.029061462730169296,
+            1.4336546659469604,
+            1.5847444534301758
+          ]
+        }
+      ],
+      "body_visible_triangles": 80924,
       "skinning_method": "nearest-source-vertex trial, visually unapproved",
       "artistic_approval": false,
       "android_fps_tested": false,
@@ -74,6 +88,10 @@
       },
       "armature_bones": 163,
       "body_base_preserved": true,
+      "masked_hidden_skin": true,
+      "clothing_arm_and_collar_fit_adjusted": true,
+      "removed_tie_mesh_islands": [],
+      "body_visible_triangles": 80924,
       "skinning_method": "nearest-source-vertex trial, visually unapproved",
       "artistic_approval": false,
       "android_fps_tested": false,
