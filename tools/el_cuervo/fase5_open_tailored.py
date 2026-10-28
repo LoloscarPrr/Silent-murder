@@ -70,79 +70,118 @@ for first in bm.faces:
     components.append({"faces":group,"verts":verts,"count":len(group),
       "x":(mn.x+mx.x)*.5,"y":(mn.y+mx.y)*.5,"z":(mn.z+mx.z)*.5,
       "bounds_min":mn,"bounds_max":mx})
-def pick_front(c):
-    return (c["count"]>500 and abs(c["x"]-cx)<.23 and
-        c["bounds_min"].z<lo.z+1.07 and
-        c["bounds_max"].z>lo.z+1.50 and
-        c["y"]<cy+.08)
-front=[c for c in components if pick_front(c)]
-assert len(front)==2,("Could not isolate both authentic jacket front panels",
-   [(c["count"],round(c["x"],3),round(c["y"],3),round(c["bounds_min"].z,3),round(c["bounds_max"].z,3)) for c in sorted(components,key=lambda x:-x["count"])[:12]])
-assert front[0]["x"]*front[1]["x"]<0,("Front panels must be left/right",front[0]["x"],front[1]["x"])
+# Source garment is ONE 4k-face connected coat (front/back/sleeves).
+# Its authored shirt and trousers are separate islands, while the jacket
+# panels are NOT separate components. Tailor them regionally by geometric
+# position; do not mistake material boundaries for disconnected meshes.
+main=max(components,key=lambda c:c["count"])
+assert main["count"]>3000,("Source coat topology unexpected",main["count"])
+report["original_coat_component_faces"]=main["count"]
+report["source_component_count"]=len(components)
+report["source_top_component_face_counts"]=sorted((c["count"] for c in components),reverse=True)[:10]
 
-# Unbutton the true left/right jacket panels; retain lapels, pockets, and hems.
-# Create a wide open charcoal shirt area (> 18 cm) under the jacket. At upper
-# chest taper the opening naturally into existing V-shaped lapels.
-modcount=0
-for comp in front:
-    side=1 if comp["x"]>cx else -1
-    for v in comp["verts"]:
-        p=matrix@v.co
-        ax=abs(p.x-cx)
-        z=p.z-lo.z
-        # front opening at waist and abdomen, taper under lapels
-        height_factor=(1-smooth(1.31,1.55,z))
-        proximity=(1-smooth(.045,.24,ax))
-        shift=(.155*proximity+.022)*height_factor
-        p.x+=side*shift
-        # tailored waist below pecs; upper back and shoulders preserved
-        waist=band(z,.91,1.05,1.34,1.46)*band(ax,.07,.16,.36,.52)
-        p.x=cx+(p.x-cx)*(1-.11*waist)
-        v.co=inverse@p
-        modcount+=1
-# Buttons are disconnected authored submeshes at the now empty centerline;
-# remove them, because closed buttons floating across the gap would be wrong.
+# Remove the central buttoned seam of the jacket in the stomach area, and
+# shift front-facing geometry to form a real jacket opening. The new shirt
+# derived from the original human mesh will become visible in this gap.
+# The source front is Y-negative (Blender camera direction).
+centerline_faces=[]
+for face in main["faces"]:
+    points=[matrix@v.co for v in face.verts]
+    mx=sum(p.x for p in points)/len(points)
+    my=sum(p.y for p in points)/len(points)
+    mz=sum(p.z for p in points)/len(points)-lo.z
+    close=any(p.x<cx-.008 for p in points) and any(p.x>cx+.008 for p in points)
+    if close and my<cy-.040 and .90<mz<1.38:
+        centerline_faces.append(face)
+if centerline_faces:
+    bmesh.ops.delete(bm,geom=centerline_faces,context="FACES")
+    main["verts"]={v for v in main["verts"] if v.is_valid}
+    main["faces"]=[f for f in main["faces"] if f.is_valid]
+
+leftcount=rightcount=0
+panel_samples={"L":[],"R":[]}
+for v in main["verts"]:
+    p=matrix@v.co
+    z=p.z-lo.z
+    ax=abs(p.x-cx)
+    # Front surface of coat, not back panels or shoulder seam.
+    frontness=1-smooth(cy-.13,cy+.045,p.y)
+    level=1-smooth(1.30,1.54,z)
+    proximity=1-smooth(.06,.30,ax)
+    # Min ~7cm and max ~17cm shift PER side in jacket opening.
+    strength=frontness*level*proximity
+    if strength<.005:continue
+    direction=1 if p.x>=cx else -1
+    displacement=direction*(.17*strength+.018*frontness*level)
+    p.x+=displacement
+    # Bring front panel down slightly, so blazer reads as open and flowing,
+    # not a rigid black rectangular chest.
+    p.z-=.018*strength
+    v.co=inverse@p
+    if direction>0:rightcount+=1
+    else:leftcount+=1
+    if .98<z<1.32 and .03<ax<.16 and frontness>.6:
+        panel_samples["R" if direction>0 else "L"].append((p.x,p.z))
+assert leftcount>110 and rightcount>110,("Not enough authentic garment front vertices",leftcount,rightcount)
+report["jacket_front_vertices_edited_left"]=leftcount
+report["jacket_front_vertices_edited_right"]=rightcount
+report["jacket_seam_faces_removed"]=len(centerline_faces)
+report["authored_front_panels_opened"]=True
+
+# Suit buttons are isolated authored meshes. Closed-front buttons must not
+# float in front of the newly open jacket.
 buttons=[]
 for c in components:
-    if c["count"]<200 and abs(c["x"]-cx)<.055 and c["y"]<cy-.05 and \
-      lo.z+1.05<c["z"]<lo.z+1.48 and c not in front:
+    if c is main:continue
+    if c["count"]<120 and abs(c["x"]-cx)<.056 and c["y"]<cy-.05 and \
+      lo.z+1.05<c["z"]<lo.z+1.48:
         buttons.extend(c["faces"])
 if buttons:
     bmesh.ops.delete(bm,geom=buttons,context="FACES")
     bmesh.ops.delete(bm,geom=[v for v in bm.verts if not v.link_faces],context="VERTS")
 
-# Tailor sleeve radius using existing armature bones, preserving garment seams.
-# These are authored sleeve components; changing only their silhouette.
-sleeve_components=[c for c in components if c["count"]>400 and
-   abs(c["x"]-cx)>.31 and c["bounds_max"].z>lo.z+1.45 and
-   c["bounds_min"].z<lo.z+1.22]
-assert len(sleeve_components)==2,("Missing independent authored sleeves",
-    [(c["count"],c["x"],c["z"]) for c in sorted(components,key=lambda x:-x["count"])[:12]])
-def nearest_seg(p,a,b):
-    d=b-a
-    t=max(0,min(1,(p-a).dot(d)/max(d.length_squared,1e-8)))
-    return a+t*d
+# Slender sleeve circumference by following the real human shoulder/elbow/
+# wrist bones. This preserves the source tailored sleeve topology, UV and
+# skin weights. Do not shrink jacket torso side panels into the arms.
 sleeve_changed=0
-for c in sleeve_components:
-    side="L" if c["x"]>cx else "R"
+sleeve_counts={"L":0,"R":0}
+for side in ("L","R"):
     upper=rig.pose.bones.get("upperarm01."+side)
     fore=rig.pose.bones.get("lowerarm01."+side)
     assert upper and fore,side
     shoulder=rig.matrix_world@upper.head
     elbow=rig.matrix_world@upper.tail
-    elbow2=rig.matrix_world@fore.head
     wrist=rig.matrix_world@fore.tail
-    path=[shoulder,elbow,elbow2,wrist]
-    for v in c["verts"]:
+    def nearest_seg(p,a,b):
+        d=b-a;t=max(0,min(1,(p-a).dot(d)/max(d.length_squared,1e-8)))
+        return a+t*d
+    sgn=1 if shoulder.x>cx else -1
+    for v in main["verts"]:
         p=matrix@v.co
-        q=min((nearest_seg(p,path[i],path[i+1]) for i in range(3)),
-              key=lambda v:(p-v).length_squared)
-        radial=p-q
-        # End cuffs remain close to wrist, while mid-sleeve fabric slimmed.
-        taper=.16*band((p.z-lo.z),1.02,1.12,1.49,1.61)
-        p=p-taper*radial
+        zz=p.z-lo.z
+        ax=abs(p.x-cx)
+        if (p.x-cx)*sgn<.0 or ax<.29 or not (1.05<zz<1.60):
+            continue
+        # Skip front/back sides of jacket torso; isolate sleeve by nearest
+        # bone-center radial distance and vertex world x.
+        q=min((nearest_seg(p,shoulder,elbow),
+               nearest_seg(p,elbow,wrist)),key=lambda q:(p-q).length_squared)
+        distance=(p-q).length
+        if distance>.22:continue
+        factor=.14*band(zz,1.05,1.17,1.44,1.56)
+        if factor<.008:continue
+        # Reduce padding/circumference; not limb length or hand positions.
+        p-=factor*(p-q)
         v.co=inverse@p
         sleeve_changed+=1
+        sleeve_counts[side]+=1
+assert sleeve_changed>150,("Sleeve fit was not applied",sleeve_counts)
+
+report["real_front_pattern_vertices_edited"]=leftcount+rightcount
+report["sleeve_real_vertices_edited"]=sleeve_changed
+report["sleeve_vertices_by_side"]=sleeve_counts
+report["open_blazer_gap_design_m"]=.25
+report["removed_button_faces"]=len(buttons)
 
 bm.to_mesh(suit.data); bm.free()
 suit.data.update()
