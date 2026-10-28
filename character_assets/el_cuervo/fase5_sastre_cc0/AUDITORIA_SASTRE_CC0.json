@@ -12,17 +12,18 @@
   "male_body_original_height_m": 1.8399999141693115,
   "male_body_original_unmodified": true,
   "rig_bones": 163,
-  "neckline_vertices_laid_down": 1357,
-  "shirt_faces_reassigned_to_graphite": 1051,
+  "removed_collar_tie_original_faces": 403,
+  "independent_shirt_triangles": 14603,
   "parts": [
     {
       "mesh": "Cuervo_Traje_MakeHumanElegante_CC0_1",
-      "vertices": 7613,
-      "skinned_vertices": 7613,
-      "triangles": 14956
+      "vertices": 7266,
+      "skinned_vertices": 7266,
+      "triangles": 14150
     }
   ],
   "exported_nodes": [
+    "Cuervo_Camisa_Anatomica_Grafito",
     "VisibleSkin_base_male_body",
     "VisibleSkin_base_male_body.high-poly",
     "Cuervo_Botin_CC0_1",
