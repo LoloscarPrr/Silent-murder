@@ -74,7 +74,7 @@ def pick_front(c):
     return (c["count"]>500 and abs(c["x"]-cx)<.23 and
         c["bounds_min"].z<lo.z+1.07 and
         c["bounds_max"].z>lo.z+1.50 and
-        c["y"]<cy-.045)
+        c["y"]<cy+.08)
 front=[c for c in components if pick_front(c)]
 assert len(front)==2,("Could not isolate both authentic jacket front panels",
    [(c["count"],round(c["x"],3),round(c["y"],3),round(c["bounds_min"].z,3),round(c["bounds_max"].z,3)) for c in sorted(components,key=lambda x:-x["count"])[:12]])
