@@ -37,7 +37,7 @@ jobs:
       - name: Descargar prenda CC0 original de MakeHuman
         run: |
           mkdir -p /tmp/mh_elegante
-          origin='https://free.downloads.tuxfamily.net/makehuman/assets/1.1/base/clothes/male_elegantsuit01'
+          origin='https://download.tuxfamily.org/makehuman/assets/1.2/base/clothes/male_elegantsuit01'
           curl -fL --retry 3 --connect-timeout 20 --max-time 180 \
             "$origin/male_elegantsuit01.obj" -o /tmp/mh_elegante/male_elegantsuit01.obj
           curl -fL --retry 3 --connect-timeout 20 --max-time 180 \
