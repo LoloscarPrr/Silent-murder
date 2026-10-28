@@ -12,6 +12,8 @@
   "male_body_original_height_m": 1.8399999141693115,
   "male_body_original_unmodified": true,
   "rig_bones": 163,
+  "neckline_vertices_laid_down": 1357,
+  "shirt_faces_reassigned_to_graphite": 1051,
   "parts": [
     {
       "mesh": "Cuervo_Traje_MakeHumanElegante_CC0_1",
