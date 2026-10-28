@@ -1,0 +1,144 @@
+name: El Cuervo - nuevo traje elegante CC0 (sin parches del traje anterior)
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/fase5_system_elegant.py'
+      - '.github/workflows/el-cuervo-fase5-sastre-cc0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-fase5-elegante-sistema
+  cancel-in-progress: true
+
+jobs:
+  new_tailoring:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    name: Blender 4.3 authentic MakeHuman elegante outfit candidate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Instalar Blender 4.3.2 original
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl unzip libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy;assert bpy.app.version[:2]==(4,3)'
+      - name: Descargar prenda CC0 original de MakeHuman
+        run: |
+          mkdir -p /tmp/mh_elegante
+          origin='https://free.downloads.tuxfamily.net/makehuman/assets/1.1/base/clothes/male_elegantsuit01'
+          curl -fL --retry 3 --connect-timeout 20 --max-time 180 \
+            "$origin/male_elegantsuit01.obj" -o /tmp/mh_elegante/male_elegantsuit01.obj
+          curl -fL --retry 3 --connect-timeout 20 --max-time 180 \
+            "$origin/male_elegantsuit01_diffuse.png" -o /tmp/mh_elegante/male_elegantsuit01_diffuse.png
+          python3 - <<'PY'
+          import os,struct,hashlib
+          a='/tmp/mh_elegante/male_elegantsuit01.obj'
+          b='/tmp/mh_elegante/male_elegantsuit01_diffuse.png'
+          assert os.path.getsize(a)>100000 and os.path.getsize(b)>10000
+          with open(b,'rb') as f:assert f.read(8)==b'\x89PNG\r\n\x1a\n'
+          with open(a,'rb') as f: assert b'v ' in f.read(8192)
+          for p in [a,b]:
+              with open(p,'rb') as f:sha=hashlib.sha256(f.read()).hexdigest()
+              print('SOURCE_CC0',p,sha,os.path.getsize(p))
+          PY
+      - name: Conservar cuerpo humano y las botas ya aprobadas como base técnica
+        run: |
+          test -s character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.blend
+          test -s character_assets/el_cuervo/fase1/El_Cuervo_Verificacion.json
+      - name: Adaptar outfit auténtico, transferir rig y renderizar estudio
+        run: |
+          mkdir -p character_assets/el_cuervo/fase5_sastre_cc0
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/fase5_system_elegant.py -- \
+            --blend character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.blend \
+            --obj /tmp/mh_elegante/male_elegantsuit01.obj \
+            --texture /tmp/mh_elegante/male_elegantsuit01_diffuse.png \
+            --out character_assets/el_cuervo/fase5_sastre_cc0
+      - name: Validar guardado BLEND y GLB, no aprobacion artistica
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,json,os
+          root="character_assets/el_cuervo/fase5_sastre_cc0"
+          j=json.load(open(os.path.join(root,"AUDITORIA_SASTRE_CC0.json")))
+          assert j["rig_bones"]==163 and j["male_body_original_unmodified"] is True
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.wm.open_mainfile(filepath=os.path.join(root,j["blender_file"]))
+          assert any(o.type=="MESH" and o.name.startswith("Cuervo_Traje_MakeHumanElegante_CC0") for o in bpy.context.scene.objects)
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=os.path.join(root,j["glb_file"]))
+          meshes=[o for o in bpy.context.scene.objects if o.type=="MESH"]
+          outfits=[o for o in meshes if o.name.startswith("Cuervo_Traje_MakeHumanElegante_CC0")]
+          bones=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
+          assert outfits and bones and sum(len(b.data.bones) for b in bones)>=160
+          assert all(any(m.type=="ARMATURE" for m in o.modifiers) for o in outfits)
+          print("NEW_REAL_CC0_SUIT_REIMPORT_VERIFIED",len(meshes))
+          '
+      - name: Validar GLB en Godot 4.3 temporal
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot /tmp/cuervo_sastre_qa
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          cp character_assets/el_cuervo/fase5_sastre_cc0/El_Cuervo_Sastre_CC0_NuevaBase_WIP.glb /tmp/cuervo_sastre_qa/
+          printf '[application]\nconfig/name="Cuervo Sastre QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_sastre_qa/project.godot
+          sed 's/El_Cuervo_Base_Humana_v1.glb/El_Cuervo_Sastre_CC0_NuevaBase_WIP.glb/' tools/el_cuervo/verify_godot.gd > /tmp/cuervo_sastre_qa/verify_godot.gd
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_sastre_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_sastre_qa --script res://verify_godot.gd
+          python3 - <<'PY'
+          import json
+          p='character_assets/el_cuervo/fase5_sastre_cc0/AUDITORIA_SASTRE_CC0.json'
+          data=json.load(open(p))
+          data['godot43_import_verified']=True
+          json.dump(data,open(p,'w'),ensure_ascii=False,indent=2)
+          PY
+      - name: Declarar procedencia y limites reales
+        run: |
+          cat > character_assets/el_cuervo/fase5_sastre_cc0/LEEME.md <<'EOF'
+          # El Cuervo - nuevo candidato CC0 MakeHuman male_elegantsuit01
+          Se reutiliza anatomia original MakeHuman (1,84m, 163 huesos).
+          Nuevo vestuario completo ORIGINAL de MakeHuman male_elegantsuit01,
+          fuente CC0: https://free.downloads.tuxfamily.net/makehuman/assets/1.1/base/clothes/male_elegantsuit01/
+          https://www.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html
+          No es una simulación AI ni un blazer construido a partir de tubos o
+          recortando y estirando el anterior. Calzado CC0 de fase4 conservado.
+          Esta version es un CANDIDATO sin aprobacion artistica:
+          calidad de skinning, clipping, rendimiento Android y materiales
+          necesitan inspección. Main y APK permanecen intactos.
+          EOF
+      - name: Guardar solo en rama de produccion con reintentos de concurrencia
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find character_assets/el_cuervo/fase5_sastre_cc0 -name '*.blend1' -delete
+          git add character_assets/el_cuervo/fase5_sastre_cc0
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): authentic fitted CC0 MakeHuman elegant suit alternative'
+            for i in 1 2 3 4 5 6; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then exit 0; fi
+              git rebase --abort || true
+              sleep 5
+            done
+            exit 1
+          fi
+      - name: Guardar y descargar renders y modelos verificables
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase5_Sastre_CC0_Alternativa
+          path: character_assets/el_cuervo/fase5_sastre_cc0/
+          if-no-files-found: warn
+          retention-days: 30
