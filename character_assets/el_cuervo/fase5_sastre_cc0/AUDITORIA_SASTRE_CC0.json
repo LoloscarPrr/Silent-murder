@@ -1,0 +1,41 @@
+{
+  "status": "WIP_NEW_CC0_SUIT_NOT_ART_APPROVED",
+  "source_asset": "MakeHuman official male_elegantsuit01 CC0",
+  "source_asset_url": "https://free.downloads.tuxfamily.net/makehuman/assets/1.1/base/clothes/male_elegantsuit01/",
+  "source_mesh_triangles": 14956,
+  "source_dimensions": [
+    10.528999328613281,
+    3.688101291656494,
+    14.771200180053711
+  ],
+  "uniform_scale_factor": 0.11162261013268618,
+  "male_body_original_height_m": 1.8399999141693115,
+  "male_body_original_unmodified": true,
+  "rig_bones": 163,
+  "parts": [
+    {
+      "mesh": "Cuervo_Traje_MakeHumanElegante_CC0_1",
+      "vertices": 7613,
+      "skinned_vertices": 7613,
+      "triangles": 14956
+    }
+  ],
+  "exported_nodes": [
+    "VisibleSkin_base_male_body",
+    "VisibleSkin_base_male_body.high-poly",
+    "Cuervo_Botin_CC0_1",
+    "Cuervo_Traje_MakeHumanElegante_CC0_1"
+  ],
+  "blender_file": "El_Cuervo_Sastre_CC0_NuevaBase_WIP.blend",
+  "glb_file": "El_Cuervo_Sastre_CC0_NuevaBase_WIP.glb",
+  "visual_review_approved": false,
+  "animation_approved": false,
+  "android_fps_tested": false,
+  "main_game_modified": false,
+  "warnings": [
+    "Fitting + skin weights automatically estimated, not manual sculpting",
+    "No guarantee of no intersections until visual QA",
+    "CC0 MakeHuman original body retained; boots retained from earlier suit"
+  ],
+  "godot43_import_verified": true
+}
