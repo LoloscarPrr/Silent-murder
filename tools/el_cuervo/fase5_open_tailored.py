@@ -186,8 +186,6 @@ report["removed_button_faces"]=len(buttons)
 bm.to_mesh(suit.data); bm.free()
 suit.data.update()
 assert leftcount>110 and rightcount>110 and sleeve_changed>150,(leftcount,rightcount,sleeve_changed)
-report["identified_front_panels"]=[{"faces":c["count"],"center_x":c["x"],"center_y":c["y"]} for c in front]
-report["real_front_pattern_vertices_edited"]=modcount
 report["sleeve_real_vertices_edited"]=sleeve_changed
 report["open_blazer_gap_design_m"]=.25
 report["removed_button_faces"]=len(buttons)
