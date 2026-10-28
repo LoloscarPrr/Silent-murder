@@ -1,0 +1,107 @@
+{
+  "source": "MakeHuman Community CC0, suits01, Margaret Toigo",
+  "source_url": "https://static.makehumancommunity.org/assets/assetpacks/suits01.html",
+  "archive_url": "https://files2.makehumancommunity.org/asset_packs/suits01/suits01_cc0.zip",
+  "sha256": "2b1d8676f3863b188e9eea98c1d8f234543d54c440e791d92b819f8ee1861f19",
+  "candidates": [
+    {
+      "name": "toigo_male_suit_3",
+      "original_obj": "clothes/toigo_male_suit_3/suit3.obj",
+      "original_mesh_triangles": 16250,
+      "mesh_count": 1,
+      "original_uv_atlas": [
+        "NewSuit3.png"
+      ],
+      "fitted_bounds": {
+        "source_dimensions": [
+          10.539600372314453,
+          3.889101028442383,
+          14.936800003051758
+        ],
+        "scale": [
+          0.12451357282022867,
+          0.14473648261725397,
+          0.11133575585942612
+        ],
+        "fitted_min": [
+          -0.6561616659164429,
+          -0.4299544394016266,
+          0.08499996364116669
+        ],
+        "fitted_max": [
+          0.6561616063117981,
+          0.13294033706188202,
+          1.747999906539917
+        ]
+      },
+      "armature_bones": 163,
+      "body_base_preserved": true,
+      "masked_hidden_skin": true,
+      "clothing_arm_and_collar_fit_adjusted": true,
+      "removed_tie_mesh_islands": [
+        {
+          "faces": 616,
+          "bounds": [
+            -0.03822566568851471,
+            0.029061462730169296,
+            1.4336546659469604,
+            1.5847444534301758
+          ]
+        }
+      ],
+      "body_visible_triangles": 80924,
+      "skinning_method": "nearest-source-vertex trial, visually unapproved",
+      "artistic_approval": false,
+      "android_fps_tested": false,
+      "blend": "El_Cuervo_toigo_male_suit_3_TRAJE_REAL_WIP.blend",
+      "glb": "El_Cuervo_toigo_male_suit_3_TRAJE_REAL_WIP.glb"
+    },
+    {
+      "name": "toigo_male_suit_tie_and_jacket",
+      "original_obj": "clothes/toigo_male_suit_tie_and_jacket/jacket_tie_pants.obj",
+      "original_mesh_triangles": 19202,
+      "mesh_count": 1,
+      "original_uv_atlas": [
+        "Suit-tie-Jacket-diff.png"
+      ],
+      "fitted_bounds": {
+        "source_dimensions": [
+          10.612199783325195,
+          3.894001007080078,
+          14.93649959564209
+        ],
+        "scale": [
+          0.12366175960203091,
+          0.14473939360128668,
+          0.11133799507791282
+        ],
+        "fitted_min": [
+          -0.6561616063117981,
+          -0.43031471967697144,
+          0.08499996364116669
+        ],
+        "fitted_max": [
+          0.6561616063117981,
+          0.13330058753490448,
+          1.7480000257492065
+        ]
+      },
+      "armature_bones": 163,
+      "body_base_preserved": true,
+      "masked_hidden_skin": true,
+      "clothing_arm_and_collar_fit_adjusted": true,
+      "removed_tie_mesh_islands": [],
+      "body_visible_triangles": 80924,
+      "skinning_method": "nearest-source-vertex trial, visually unapproved",
+      "artistic_approval": false,
+      "android_fps_tested": false,
+      "blend": "El_Cuervo_toigo_male_suit_tie_and_jacket_TRAJE_REAL_WIP.blend",
+      "glb": "El_Cuervo_toigo_male_suit_tie_and_jacket_TRAJE_REAL_WIP.glb"
+    }
+  ],
+  "artistic_approval": false,
+  "Android_performance_approved": false,
+  "game_or_APK_modified": false,
+  "warning": "Genuine authored garment OBJ, fitted approximately. WIP; requires anatomy and motion QC.",
+  "godot_4_3_both_variants_import_verified": true
+}
