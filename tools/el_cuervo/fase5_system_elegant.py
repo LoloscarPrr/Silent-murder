@@ -62,6 +62,31 @@ for i,o in enumerate(garments):
     for p in o.data.polygons:p.use_smooth=True
 bpy.context.view_layer.update()
 
+# The standard elegant suit has an excessively high standard shirt collar
+# on this particular 1.84m head. Move ONLY upper/central collar vertices
+# below the original human chin, while preserving shoulders and coat.
+# Anatomical repair is based on 3D garment coordinates, not an image edit.
+neck_vertices=0
+for cloth in garments:
+    M=cloth.matrix_world.copy()
+    inv=M.inverted()
+    for v in cloth.data.vertices:
+        p=M@v.co
+        z=p.z-lo.z
+        ax=abs(p.x-body_center.x)
+        if z<1.48 or ax>.235:continue
+        closeness=1-min(1,max(0,(ax-.15)/.085))
+        heightweight=max(0,min(1,(z-1.48)/.17))
+        heightweight=heightweight*heightweight*(3-2*heightweight)
+        adjust=.142*heightweight*closeness
+        if adjust>.005:
+            p.z-=adjust
+            v.co=inv@p
+            neck_vertices+=1
+    cloth.data.update()
+assert neck_vertices>70,("Tailored collar not found",neck_vertices)
+print("CC0_SUIT_COLLAR_REAL_VERTEX_REPAIR",neck_vertices,flush=True)
+
 # Textile PBR using actual MakeHuman texture and UV, multiplied dark enough
 # to turn formal shirt graphite and jacket matte black; original UVs retained.
 img=bpy.data.images.load(texture,check_existing=True)
@@ -82,10 +107,30 @@ mix.inputs[0].default_value=1
 mix.inputs[2].default_value=(.25,.26,.29,1)
 links.new(tex.outputs["Color"],mix.inputs[1])
 links.new(mix.outputs["Color"],base.inputs["Base Color"])
+graphite=bpy.data.materials.new("Cuervo_Camisa_Interior_Grafito")
+graphite.use_nodes=True
+cbs=graphite.node_tree.nodes.get("Principled BSDF")
+cbs.inputs["Base Color"].default_value=(.029,.031,.039,1)
+cbs.inputs["Roughness"].default_value=.93
+cbs.inputs["Metallic"].default_value=0
+shirt_faces=0
 for o in garments:
     assert o.data.uv_layers.active is not None,("no UV in original CC0 suit",o.name)
     o.data.materials.clear()
     o.data.materials.append(mat)
+    o.data.materials.append(graphite)
+    # Assign central collar and tie geometry graphite; no bright striped tie
+    # at mouth level. The authentic UVs remain in the main jacket.
+    for face in o.data.polygons:
+        positions=[o.matrix_world@o.data.vertices[i].co for i in face.vertices]
+        c=sum(positions,Vector())/len(positions)
+        if (abs(c.x-body_center.x)<.155 and
+                lo.z+1.39<c.z<lo.z+1.69 and
+                c.y<body_center.y+.07):
+            face.material_index=1
+            shirt_faces+=1
+assert shirt_faces>100,shirt_faces
+print("CC0_SHIRT_GRAPHITE_FACE_MATERIAL",shirt_faces,flush=True)
 
 # Skin original CC0 suit to the ORIGINAL 163-bone human. This is a transfer
 # starting point, not a professional manual rig guarantee.
@@ -192,6 +237,8 @@ result={"status":"WIP_NEW_CC0_SUIT_NOT_ART_APPROVED",
         "male_body_original_height_m":H,
         "male_body_original_unmodified":True,
         "rig_bones":len(rig.data.bones),
+        "neckline_vertices_laid_down":neck_vertices,
+        "shirt_faces_reassigned_to_graphite":shirt_faces,
         "parts":skin_stats,
         "exported_nodes":nodes,
         "blender_file":os.path.basename(blend),
