@@ -80,71 +80,60 @@ report["original_coat_component_faces"]=main["count"]
 report["source_component_count"]=len(components)
 report["source_top_component_face_counts"]=sorted((c["count"] for c in components),reverse=True)[:10]
 
-# Remove the central buttoned seam of the jacket in the stomach area, and
-# shift front-facing geometry to form a real jacket opening. The new shirt
-# derived from the original human mesh will become visible in this gap.
-# The source front is Y-negative (Blender camera direction).
-centerline_faces=[]
+# The source jacket is a single connected CC0 artist-modeled garment.
+# Do NOT translate central vertices (that creates a balloon/elastic front).
+# Instead physically open its *front fabric* by removing a tapered wedge of
+# front-facing authored jacket faces. The real, skinned shirt remains beneath.
+main=max(components,key=lambda c:c["count"])
+assert main["count"]>3000,("Expected authored CC0 jacket front/back",main["count"])
+report["original_coat_component_faces"]=main["count"]
+report["source_component_count"]=len(components)
+# Avoid removing the underlying artist-made collar or trousers: only
+# faces in the large jacket component.
+cutfaces=[]
+cut_left=cut_right=0
 for face in main["faces"]:
-    points=[matrix@v.co for v in face.verts]
-    mx=sum(p.x for p in points)/len(points)
-    my=sum(p.y for p in points)/len(points)
-    mz=sum(p.z for p in points)/len(points)-lo.z
-    close=any(p.x<cx-.008 for p in points) and any(p.x>cx+.008 for p in points)
-    if close and my<cy-.040 and .90<mz<1.38:
-        centerline_faces.append(face)
-if centerline_faces:
-    bmesh.ops.delete(bm,geom=centerline_faces,context="FACES")
-    main["verts"]={v for v in main["verts"] if v.is_valid}
-    main["faces"]=[f for f in main["faces"] if f.is_valid]
-
-leftcount=rightcount=0
-panel_samples={"L":[],"R":[]}
-for v in main["verts"]:
-    p=matrix@v.co
-    z=p.z-lo.z
-    ax=abs(p.x-cx)
-    # Front surface of coat, not back panels or shoulder seam.
-    frontness=1-smooth(cy-.13,cy+.045,p.y)
-    level=1-smooth(1.30,1.54,z)
-    proximity=1-smooth(.06,.30,ax)
-    # Min ~7cm and max ~17cm shift PER side in jacket opening.
-    strength=frontness*level*proximity
-    if strength<.005:continue
-    direction=1 if p.x>=cx else -1
-    displacement=direction*(.17*strength+.018*frontness*level)
-    p.x+=displacement
-    # Bring front panel down slightly, so blazer reads as open and flowing,
-    # not a rigid black rectangular chest.
-    p.z-=.018*strength
-    v.co=inverse@p
-    if direction>0:rightcount+=1
-    else:leftcount+=1
-    if .98<z<1.32 and .03<ax<.16 and frontness>.6:
-        panel_samples["R" if direction>0 else "L"].append((p.x,p.z))
-assert leftcount>110 and rightcount>110,("Not enough authentic garment front vertices",leftcount,rightcount)
-report["jacket_front_vertices_edited_left"]=leftcount
-report["jacket_front_vertices_edited_right"]=rightcount
-report["jacket_seam_faces_removed"]=len(centerline_faces)
+    p=[matrix@v.co for v in face.verts]
+    avg=sum(p,Vector())/len(p)
+    height=avg.z-lo.z
+    if not (1.00<height<1.51):
+        continue
+    # Source back wall is Y-positive. The true exterior jacket chest is
+    # front-facing negative-Y, measured independently from the real GLB.
+    if avg.y>=cy-.058:
+        continue
+    gap_half=.035+.135*(1-smooth(1.30,1.52,height))
+    if abs(avg.x-cx)<gap_half:
+        cutfaces.append(face)
+        if avg.x<cx:cut_left+=1
+        else:cut_right+=1
+assert cut_left>80 and cut_right>80,("Front coat wedge not found",cut_left,cut_right)
+bmesh.ops.delete(bm,geom=cutfaces,context="FACES")
 report["authored_front_panels_opened"]=True
-
-# Suit buttons are isolated authored meshes. Closed-front buttons must not
-# float in front of the newly open jacket.
-buttons=[]
+report["real_coat_faces_physically_removed"]=len(cutfaces)
+report["front_cut_faces_left"]=cut_left
+report["front_cut_faces_right"]=cut_right
+report["open_blazer_waist_gap_width_design_m"]=.34
+# Remove floating old centerline buttons. Buttons were modeled for a closed
+# garment and cannot be attached in the new open-front silhouette.
+buttonfaces=[]
 for c in components:
     if c is main:continue
-    if c["count"]<120 and abs(c["x"]-cx)<.056 and c["y"]<cy-.05 and \
-      lo.z+1.05<c["z"]<lo.z+1.48:
-        buttons.extend(c["faces"])
-if buttons:
-    bmesh.ops.delete(bm,geom=buttons,context="FACES")
-    bmesh.ops.delete(bm,geom=[v for v in bm.verts if not v.link_faces],context="VERTS")
+    if c["count"]<120 and abs(c["x"]-cx)<.07 and c["y"]<cy-.05 and \
+      lo.z+1.02<c["z"]<lo.z+1.49:
+        buttonfaces.extend(f for f in c["faces"] if f.is_valid)
+if buttonfaces:
+    bmesh.ops.delete(bm,geom=buttonfaces,context="FACES")
+bmesh.ops.delete(bm,geom=[v for v in bm.verts if v.is_valid and not v.link_faces],context="VERTS")
+report["closed_jacket_button_faces_removed"]=len(buttonfaces)
 
-# Slender sleeve circumference by following the real human shoulder/elbow/
-# wrist bones. This preserves the source tailored sleeve topology, UV and
-# skin weights. Do not shrink jacket torso side panels into the arms.
+# Narrow sewn sleeves around the original animated arm axis, retaining the
+# real CC0 sleeve edges and original skinning. No primitive-based sleeves.
 sleeve_changed=0
-sleeve_counts={"L":0,"R":0}
+sleeve_by_side={"L":0,"R":0}
+def nearest_seg(p,a,b):
+    d=b-a
+    return a+max(0,min(1,(p-a).dot(d)/max(1e-9,d.length_squared)))*d
 for side in ("L","R"):
     upper=rig.pose.bones.get("upperarm01."+side)
     fore=rig.pose.bones.get("lowerarm01."+side)
@@ -152,43 +141,30 @@ for side in ("L","R"):
     shoulder=rig.matrix_world@upper.head
     elbow=rig.matrix_world@upper.tail
     wrist=rig.matrix_world@fore.tail
-    def nearest_seg(p,a,b):
-        d=b-a;t=max(0,min(1,(p-a).dot(d)/max(d.length_squared,1e-8)))
-        return a+t*d
     sgn=1 if shoulder.x>cx else -1
     for v in main["verts"]:
+        if not v.is_valid:continue
         p=matrix@v.co
         zz=p.z-lo.z
         ax=abs(p.x-cx)
-        if (p.x-cx)*sgn<.0 or ax<.29 or not (1.05<zz<1.60):
+        if ((p.x-cx)*sgn<0 or ax<.33 or not(1.06<zz<1.59)):
             continue
-        # Skip front/back sides of jacket torso; isolate sleeve by nearest
-        # bone-center radial distance and vertex world x.
-        q=min((nearest_seg(p,shoulder,elbow),
-               nearest_seg(p,elbow,wrist)),key=lambda q:(p-q).length_squared)
-        distance=(p-q).length
-        if distance>.22:continue
-        factor=.14*band(zz,1.05,1.17,1.44,1.56)
-        if factor<.008:continue
-        # Reduce padding/circumference; not limb length or hand positions.
-        p-=factor*(p-q)
-        v.co=inverse@p
+        q=min((nearest_seg(p,shoulder,elbow),nearest_seg(p,elbow,wrist)),
+              key=lambda q:(p-q).length_squared)
+        radial=p-q
+        if radial.length>.19:continue
+        weight=.12*band(zz,1.06,1.19,1.46,1.56)
+        if weight<.01:continue
+        v.co=inverse@(p-weight*radial)
         sleeve_changed+=1
-        sleeve_counts[side]+=1
-assert sleeve_changed>150,("Sleeve fit was not applied",sleeve_counts)
-
-report["real_front_pattern_vertices_edited"]=leftcount+rightcount
-report["sleeve_real_vertices_edited"]=sleeve_changed
-report["sleeve_vertices_by_side"]=sleeve_counts
-report["open_blazer_gap_design_m"]=.25
-report["removed_button_faces"]=len(buttons)
+        sleeve_by_side[side]+=1
+assert sleeve_changed>100,("No sleeve geometry refined",sleeve_by_side)
+report["real_sleeve_vertices_refined"]=sleeve_changed
+report["sleeve_vertices_by_side"]=sleeve_by_side
 
 bm.to_mesh(suit.data); bm.free()
 suit.data.update()
-assert leftcount>110 and rightcount>110 and sleeve_changed>150,(leftcount,rightcount,sleeve_changed)
-report["sleeve_real_vertices_edited"]=sleeve_changed
-report["open_blazer_gap_design_m"]=.25
-report["removed_button_faces"]=len(buttons)
+assert cut_left>80 and cut_right>80 and sleeve_changed>100,(cut_left,cut_right,sleeve_changed)
 report["garment_original_triangles_after_tailoring"]=tris(suit)
 
 # Independent realistic black shirt on exact wearer torso topology (CC0 skinned
