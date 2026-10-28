@@ -5,7 +5,7 @@ Authored garments only; no primitive-based fake jacket or manual coat cutting.
 Blender 4.3:
  --blend <phase4.blend> --obj <system male_elegantsuit01.obj> --texture <diffuse.png> --out <output>
 """
-import bpy,os,sys,struct,json,math
+import bpy,bmesh,os,sys,struct,json,math
 from mathutils import Vector,Matrix,Quaternion
 from mathutils.kdtree import KDTree
 def arg(key):
@@ -62,33 +62,73 @@ for i,o in enumerate(garments):
     for p in o.data.polygons:p.use_smooth=True
 bpy.context.view_layer.update()
 
-# The standard elegant suit has an excessively high standard shirt collar
-# on this particular 1.84m head. Move ONLY upper/central collar vertices
-# below the original human chin, while preserving shoulders and coat.
-# Anatomical repair is based on 3D garment coordinates, not an image edit.
-neck_vertices=0
+# The sourced CC0 elegant suit has a high collar/shirt/tie island which
+# intersects the real head. We DO NOT move jacket lapels or shoulder vertices.
+# Remove only the DETACHED center shirt/collar islands, preserving authored
+# jacket, trousers, cuffs and UVs. Then place an independent black shirt,
+# formed from the same anatomically correct, skinned CC0 human topology.
+detached=[]
+removed_count=0
 for cloth in garments:
-    M=cloth.matrix_world.copy()
-    inv=M.inverted()
-    for v in cloth.data.vertices:
-        p=M@v.co
-        z=p.z-lo.z
-        ax=abs(p.x-body_center.x)
-        if z<1.48 or ax>.235:continue
-        closeness=1-min(1,max(0,(ax-.15)/.085))
-        heightweight=max(0,min(1,(z-1.48)/.17))
-        heightweight=heightweight*heightweight*(3-2*heightweight)
-        adjust=.142*heightweight*closeness
-        if adjust>.005:
-            p.z-=adjust
-            v.co=inv@p
-            neck_vertices+=1
-    cloth.data.update()
-assert neck_vertices>70,("Tailored collar not found",neck_vertices)
-print("CC0_SUIT_COLLAR_REAL_VERTEX_REPAIR",neck_vertices,flush=True)
+    bm=bmesh.new()
+    bm.from_mesh(cloth.data)
+    seen=set()
+    for first in bm.faces:
+        if first in seen:continue
+        stack=[first];piece=[]
+        while stack:
+            f=stack.pop()
+            if f in seen:continue
+            seen.add(f);piece.append(f)
+            for v in f.verts:
+                stack.extend(q for q in v.link_faces if q not in seen)
+        points=[cloth.matrix_world@v.co for f in piece for v in f.verts]
+        mn=Vector(tuple(min(p[k] for p in points) for k in range(3)))
+        mx=Vector(tuple(max(p[k] for p in points) for k in range(3)))
+        dx=mx.x-mn.x;dz=mx.z-mn.z
+        center_z=(mx.z+mn.z)*.5
+        # Narrow detached neck/chest panel (shirt+tie), plus an isolated
+        # high rear collar cuff. Do not touch jacket front panels (>0.7m tall).
+        chest=(len(piece)>250 and dx<.23 and .22<dz<.43 and
+               center_z>lo.z+1.50 and mx.z>lo.z+1.67)
+        collar=(len(piece)>100 and dx<.22 and dz<.065 and
+                mn.z>lo.z+1.66)
+        if chest or collar:
+            detached.extend(piece)
+            removed_count+=len(piece)
+    assert removed_count>400,("Expected independent shirt collar island missing",removed_count)
+    bmesh.ops.delete(bm,geom=detached,context="FACES")
+    bmesh.ops.delete(bm,geom=[v for v in bm.verts if not v.link_faces],context="VERTS")
+    bm.to_mesh(cloth.data);bm.free();cloth.data.update()
+assert removed_count>400,removed_count
+print("REMOVED_ONLY_AUTHORED_CC0_COLLAR_TIE_ISLANDS",removed_count,flush=True)
 
-# Textile PBR using actual MakeHuman texture and UV, multiplied dark enough
-# to turn formal shirt graphite and jacket matte black; original UVs retained.
+# Build genuinely independent shirt from the existing MakeHuman body mesh.
+# There are NO cylinders, spheres or fabricated garment reference images.
+source_body=max(full,key=lambda x:len(x.data.polygons))
+undershirt=source_body.copy()
+undershirt.data=source_body.data.copy()
+undershirt.name="Cuervo_Camisa_Anatomica_Grafito"
+scene.collection.objects.link(undershirt)
+undershirt.hide_render=False
+undershirt.hide_set(False)
+bm=bmesh.new();bm.from_mesh(undershirt.data)
+def inside(v):
+    p=undershirt.matrix_world@v.co
+    return (lo.z+1.03<p.z<lo.z+1.57 and
+            abs(p.x-body_center.x)<.34)
+drop=[face for face in bm.faces if not all(inside(v) for v in face.verts)]
+bmesh.ops.delete(bm,geom=drop,context="FACES")
+bmesh.ops.delete(bm,geom=[v for v in bm.verts if not v.link_faces],context="VERTS")
+bm.to_mesh(undershirt.data);bm.free()
+undershirt.data.update()
+assert sum(len(p.vertices)-2 for p in undershirt.data.polygons)>400
+# Tiny fabric stand-off from the skin. The real rig and its weights are copied.
+for v in undershirt.data.vertices:v.co+=v.normal*.006
+undershirt.data.update()
+assert any(m.type=="ARMATURE" for m in undershirt.modifiers),"Shirt lost original armature skin"
+
+# Preserve exact PBR UV atlas of authentic jacket and trousers.
 img=bpy.data.images.load(texture,check_existing=True)
 assert min(img.size)>=128,img.size
 mat=bpy.data.materials.new("Cuervo_Traje_Negro_Original_CC0")
@@ -99,38 +139,25 @@ links=mat.node_tree.links
 base=nodes.get("Principled BSDF")
 base.inputs["Roughness"].default_value=.88
 base.inputs["Metallic"].default_value=.0
-tex=nodes.new("ShaderNodeTexImage")
-tex.image=img
-mix=nodes.new("ShaderNodeMixRGB")
-mix.blend_type="MULTIPLY"
+tex=nodes.new("ShaderNodeTexImage");tex.image=img
+mix=nodes.new("ShaderNodeMixRGB");mix.blend_type="MULTIPLY"
 mix.inputs[0].default_value=1
 mix.inputs[2].default_value=(.25,.26,.29,1)
 links.new(tex.outputs["Color"],mix.inputs[1])
 links.new(mix.outputs["Color"],base.inputs["Base Color"])
-graphite=bpy.data.materials.new("Cuervo_Camisa_Interior_Grafito")
-graphite.use_nodes=True
-cbs=graphite.node_tree.nodes.get("Principled BSDF")
-cbs.inputs["Base Color"].default_value=(.029,.031,.039,1)
-cbs.inputs["Roughness"].default_value=.93
-cbs.inputs["Metallic"].default_value=0
-shirt_faces=0
 for o in garments:
     assert o.data.uv_layers.active is not None,("no UV in original CC0 suit",o.name)
     o.data.materials.clear()
     o.data.materials.append(mat)
-    o.data.materials.append(graphite)
-    # Assign central collar and tie geometry graphite; no bright striped tie
-    # at mouth level. The authentic UVs remain in the main jacket.
-    for face in o.data.polygons:
-        positions=[o.matrix_world@o.data.vertices[i].co for i in face.vertices]
-        c=sum(positions,Vector())/len(positions)
-        if (abs(c.x-body_center.x)<.155 and
-                lo.z+1.39<c.z<lo.z+1.69 and
-                c.y<body_center.y+.07):
-            face.material_index=1
-            shirt_faces+=1
-assert shirt_faces>100,shirt_faces
-print("CC0_SHIRT_GRAPHITE_FACE_MATERIAL",shirt_faces,flush=True)
+
+clothmat=bpy.data.materials.new("Cuervo_Camisa_Grafito_Anatomica")
+clothmat.use_nodes=True
+bs=clothmat.node_tree.nodes.get("Principled BSDF")
+bs.inputs["Base Color"].default_value=(.022,.024,.031,1)
+bs.inputs["Roughness"].default_value=.92
+bs.inputs["Metallic"].default_value=0
+undershirt.data.materials.clear()
+undershirt.data.materials.append(clothmat)
 
 # Skin original CC0 suit to the ORIGINAL 163-bone human. This is a transfer
 # starting point, not a professional manual rig guarantee.
@@ -213,7 +240,7 @@ blend=os.path.join(out,"El_Cuervo_Sastre_CC0_NuevaBase_WIP.blend")
 bpy.ops.wm.save_as_mainfile(filepath=blend)
 assert os.path.getsize(blend)>10000
 bpy.ops.object.select_all(action="DESELECT")
-for ob in [rig]+garments+skin+boots:ob.select_set(True)
+for ob in [rig,undershirt]+garments+skin+boots:ob.select_set(True)
 bpy.context.view_layer.objects.active=rig
 glb=os.path.join(out,"El_Cuervo_Sastre_CC0_NuevaBase_WIP.glb")
 bpy.ops.export_scene.gltf(filepath=glb,export_format="GLB",
@@ -226,6 +253,7 @@ with open(glb,"rb") as f:
     g=json.loads(f.read(length).decode("utf8"))
 nodes=[n.get("name") for n in g["nodes"] if "mesh" in n]
 assert any(n.startswith("Cuervo_Traje_MakeHumanElegante_CC0_") for n in nodes),nodes
+assert undershirt.name in nodes,("independent shirt lost during GLB export",nodes)
 assert any(n.startswith("Cuervo_Botin_CC0") for n in nodes),nodes
 assert len(g.get("skins",[]))>=1
 result={"status":"WIP_NEW_CC0_SUIT_NOT_ART_APPROVED",
@@ -237,8 +265,8 @@ result={"status":"WIP_NEW_CC0_SUIT_NOT_ART_APPROVED",
         "male_body_original_height_m":H,
         "male_body_original_unmodified":True,
         "rig_bones":len(rig.data.bones),
-        "neckline_vertices_laid_down":neck_vertices,
-        "shirt_faces_reassigned_to_graphite":shirt_faces,
+        "removed_collar_tie_original_faces":removed_count,
+        "independent_shirt_triangles":sum(len(p.vertices)-2 for p in undershirt.data.polygons),
         "parts":skin_stats,
         "exported_nodes":nodes,
         "blender_file":os.path.basename(blend),
