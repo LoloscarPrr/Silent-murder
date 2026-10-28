@@ -62,46 +62,45 @@ for i,o in enumerate(garments):
     for p in o.data.polygons:p.use_smooth=True
 bpy.context.view_layer.update()
 
-# The sourced CC0 elegant suit has a high collar/shirt/tie island which
-# intersects the real head. We DO NOT move jacket lapels or shoulder vertices.
-# Remove only the DETACHED center shirt/collar islands, preserving authored
-# jacket, trousers, cuffs and UVs. Then place an independent black shirt,
-# formed from the same anatomically correct, skinned CC0 human topology.
-detached=[]
+# Semantic cut using the CC0 garment's REAL texture UV atlas.
+# Source collar is pale (atlas brightness ~0.7), jacket fabric dark (~0.16).
+# Delete ONLY the bright upper-collar triangles that collide with the face;
+# never translate any lapel or shoulder vertex (previous attempt made spikes).
+import numpy as np
+image=bpy.data.images.load(texture,check_existing=True)
+width,height=image.size
+rgba=np.asarray(image.pixels[:],dtype=np.float32).reshape((height,width,4))
 removed_count=0
 for cloth in garments:
+    uv=cloth.data.uv_layers.active
+    assert uv is not None,"Original CC0 suit UV missing"
+    indices=[]
+    for face in cloth.data.polygons:
+        positions=[cloth.matrix_world@cloth.data.vertices[k].co for k in face.vertices]
+        point=sum(positions,Vector())/len(positions)
+        z=point.z-lo.z
+        ax=abs(point.x-body_center.x)
+        if z<1.53 or ax>.22:continue
+        u=sum(uv.data[i].uv.x for i in face.loop_indices)/len(face.loop_indices)
+        v=sum(uv.data[i].uv.y for i in face.loop_indices)/len(face.loop_indices)
+        ix=max(0,min(width-1,int(u*(width-1))))
+        iy=max(0,min(height-1,int(v*(height-1))))
+        value=float(rgba[iy,ix,:3].mean())
+        # RGB near-white shirt/collar only; preserve matte jacket lapels.
+        if value>.45:
+            indices.append(face.index)
+    assert 40<len(indices)<2500,("Shirt/collar semantic UV cut failed",len(indices))
     bm=bmesh.new()
     bm.from_mesh(cloth.data)
-    seen=set()
-    for first in bm.faces:
-        if first in seen:continue
-        stack=[first];piece=[]
-        while stack:
-            f=stack.pop()
-            if f in seen:continue
-            seen.add(f);piece.append(f)
-            for v in f.verts:
-                stack.extend(q for q in v.link_faces if q not in seen)
-        points=[cloth.matrix_world@v.co for f in piece for v in f.verts]
-        mn=Vector(tuple(min(p[k] for p in points) for k in range(3)))
-        mx=Vector(tuple(max(p[k] for p in points) for k in range(3)))
-        dx=mx.x-mn.x;dz=mx.z-mn.z
-        center_z=(mx.z+mn.z)*.5
-        # Narrow detached neck/chest panel (shirt+tie), plus an isolated
-        # high rear collar cuff. Do not touch jacket front panels (>0.7m tall).
-        chest=(len(piece)>250 and dx<.23 and .22<dz<.43 and
-               center_z>lo.z+1.50 and mx.z>lo.z+1.67)
-        collar=(len(piece)>100 and dx<.22 and dz<.065 and
-                mn.z>lo.z+1.66)
-        if chest or collar:
-            detached.extend(piece)
-            removed_count+=len(piece)
-    assert removed_count>400,("Expected independent shirt collar island missing",removed_count)
-    bmesh.ops.delete(bm,geom=detached,context="FACES")
+    bm.faces.ensure_lookup_table()
+    bmesh.ops.delete(bm,geom=[bm.faces[k] for k in indices],context="FACES")
     bmesh.ops.delete(bm,geom=[v for v in bm.verts if not v.link_faces],context="VERTS")
-    bm.to_mesh(cloth.data);bm.free();cloth.data.update()
-assert removed_count>400,removed_count
-print("REMOVED_ONLY_AUTHORED_CC0_COLLAR_TIE_ISLANDS",removed_count,flush=True)
+    bm.to_mesh(cloth.data)
+    bm.free()
+    cloth.data.update()
+    removed_count+=len(indices)
+del rgba
+print("CC0_BRIGHT_COLLAR_FACES_DELETED_BY_TEXTURE_MASK",removed_count,flush=True)
 
 # Build genuinely independent shirt from the existing MakeHuman body mesh.
 # There are NO cylinders, spheres or fabricated garment reference images.
