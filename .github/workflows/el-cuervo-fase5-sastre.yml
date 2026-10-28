@@ -52,7 +52,7 @@ jobs:
           root="character_assets/el_cuervo/fase5"
           r=json.load(open(os.path.join(root,"Fase5_Auditoria.json")))
           assert r["rig_bones"]==163
-          assert len(r["identified_front_panels"])==2
+          assert r["authored_front_panels_opened"] is True and r["jacket_front_vertices_edited_left"]>110 and r["jacket_front_vertices_edited_right"]>110
           assert r["real_front_pattern_vertices_edited"]>500
           assert r["independent_shirt_triangles"]>400
           bpy.ops.import_scene.gltf(filepath=os.path.join(root,r["glb"]))
