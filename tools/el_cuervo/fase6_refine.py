@@ -134,10 +134,11 @@ for side in ("L", "R"):
         # Target cuff 16 mm above wrist, leaving the gloved hand visible.
         target = wrist - direction * .016
         difference = target - cuff
-        if difference.length > .095:
-            difference *= .095 / difference.length
-        # Constrain corrective motion to the actual forearm direction.
-        correction = direction * difference.dot(direction)
+        if difference.length > .135:
+            difference *= .135 / difference.length
+        # Correct the full three-dimensional cuff/wrist offset. Restricting
+        # the motion to the bone axis preserved the camera-space gap in v6.
+        correction = difference * .85
         start_t = (cuff - shoulder).dot(direction) - .26
         end_t = (cuff - shoulder).dot(direction) - .012
         touched = 0
@@ -153,7 +154,10 @@ for side in ("L", "R"):
                 continue
             vertex.co = world_inverse @ (p + correction * weight)
             touched += 1
-        report.update({"ring_vertices": n, "cuff_shift_m": correction.length,
+        report.update({"ring_vertices": n, "cuff_center_before": list(cuff),
+                       "target_wrist_center": list(target),
+                       "cuff_shift_world": list(correction),
+                       "cuff_shift_m": correction.length,
                        "altered_vertices": touched})
     else:
         report.update({"warning": "No verified cuff ring: preserved original geometry"})
@@ -305,11 +309,19 @@ bmesh.ops.bisect_plane(
     clear_inner=True,
     clear_outer=False,
 )
+# The original MakeHuman scalp has overlapping internal patches.
+# Replace those faces with the watertight CONVEX HULL of the real scalp
+# vertex coordinates, not with geometric primitives or synthetic hair cards.
+# This removes old self-intersecting hair triangles and missing-face holes.
+bmesh.ops.delete(hair_mesh, geom=list(hair_mesh.faces), context="FACES_ONLY")
+hull = bmesh.ops.convex_hull(
+    hair_mesh, input=list(hair_mesh.verts), use_existing_faces=False)
 bmesh.ops.delete(
     hair_mesh,
     geom=[v for v in hair_mesh.verts if not v.link_faces],
     context="VERTS",
 )
+assert sum(1 for f in hair_mesh.faces) > 100, "Scalp hull lost its surface"
 hair_mesh.to_mesh(hair.data)
 hair_mesh.free()
 hair.data.update()
@@ -327,6 +339,7 @@ assert any(md.type == "ARMATURE" for md in hair.modifiers)
 data["scalp_source"] = head_source.name
 data["hair_triangles"] = triangles(hair)
 data["hair_bisect_continuous"] = True
+data["scalp_self_intersection_repair"] = "convex hull of actual CC0 head vertices"
 data["face_from_original_mesh"] = True
 
 for b in base:
