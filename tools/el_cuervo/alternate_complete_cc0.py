@@ -28,7 +28,7 @@ entries = [
     ("shirt", "clothing_shirt.glb"),
     ("jeans", "clothing_jeans.glb"),
     ("boots", "clothing_boots.glb"),
-    ("jacket", "clothing_jacket.glb"),
+    ("jacket", "clothing_trenchcoat.glb"),
 ]
 stats = {
     "status": "PREVIEW_NOT_APPROVED",
@@ -72,10 +72,10 @@ for kind, filename in entries:
 # Only tint the CLOTHING colors to charcoal and black. These input
 # garments share the SAME upstream MPFB morph/rest-body architecture.
 tints = {
-    "shirt": (.15, .15, .16),
-    "jeans": (.14, .14, .16),
-    "boots": (.085, .082, .08),
-    "jacket": (.10, .11, .13),
+    "shirt": (.055, .056, .062),
+    "jeans": (.046, .047, .056),
+    "boots": (.042, .041, .042),
+    "jacket": (.055, .054, .061),
     "hair": (.28, .23, .20),
 }
 for kind, tint in tints.items():
@@ -105,6 +105,20 @@ for kind, tint in tints.items():
             else:
                 base.default_value = (*tint, 1)
             shader.inputs["Roughness"].default_value = .76
+
+# Neutralize imported facial-expression weights. A neutral character must not
+# default to eyes-closed; preserve all morph shapes for later animation.
+stats["eye_lid_morphs_before"] = []
+for part in parts.values():
+    for obj in part["meshes"]:
+        keys = obj.data.shape_keys
+        if keys is None:
+            continue
+        for block in keys.key_blocks:
+            if "blink" in block.name.lower() or "closure" in block.name.lower():
+                stats["eye_lid_morphs_before"].append({"mesh":obj.name,"key":block.name,"weight":block.value})
+                block.value=0.0
+stats["facial_eye_morphs_cleared"] = True
 
 all_meshes = [o for p in parts.values() for o in p["meshes"]]
 all_rigs = [o for p in parts.values() for o in p["arms"]]
@@ -148,8 +162,9 @@ for rig in all_rigs:
         # Keep other armatures only if a rigid attachment still needs them.
         rigid = [o for o in all_meshes if o.parent == rig]
         if not rigid:
+            name = rig.name
             bpy.data.objects.remove(rig, do_unlink=True)
-            merged_rigs.append(rig.name)
+            merged_rigs.append(name)
 stats["merged_armatures"] = merged_rigs
 
 def bounding(objects):
@@ -196,7 +211,7 @@ bpy.ops.file.pack_all()
 blend = os.path.join(out, "El_Cuervo_Candidato_Profesional_CC0.blend")
 bpy.ops.wm.save_as_mainfile(filepath=blend)
 bpy.ops.object.select_all(action="DESELECT")
-export_items = [o for o in all_meshes + all_rigs if o.name in bpy.data.objects]
+export_items = [o for o in bpy.data.objects if o.type == "ARMATURE" or (o.type == "MESH" and o in all_meshes)]
 for item in export_items:
     item.select_set(True)
 bpy.context.view_layer.objects.active = main_rig
