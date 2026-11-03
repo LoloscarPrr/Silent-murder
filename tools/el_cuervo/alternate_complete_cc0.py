@@ -141,42 +141,86 @@ stats["all_armatures_found"] = len(all_rigs)
 # These imported garments may contain their own partial glTF skin rigs.
 # Reuse the main body rig only where source rig names and bind positions
 # match. Never silently force unrelated bones onto another armature.
+# All six source GLBs were authored for the same 53-bone MPFB rig.
+# Blender appends .001/.002 numeric suffixes to duplicate imported joint names.
+# Match canonical original bone names AND rest positions before rig consolidation.
+import re
+def canonical(name):
+    return re.sub(r"\\.\\d{3}$", "", name)
+main_bone_map = {canonical(bone.name): bone for bone in main_rig.data.bones}
 merged_rigs = []
-for rig in all_rigs:
+rig_diagnostics = []
+for rig in list(all_rigs):
     if rig == main_rig:
         continue
-    names = set(rig.data.bones)
-    main_names = set(main_rig.data.bones)
-    shared = names & main_names
-    if len(shared) < max(4, int(len(names) * .6)):
+    match = {canonical(bone.name): bone for bone in rig.data.bones}
+    shared = set(main_bone_map) & set(match)
+    diag = {"armature": rig.name, "source_bone_samples": list(match)[:8],
+            "bone_overlap": len(shared), "total_bones":len(match)}
+    if len(shared) < max(4, int(len(match)*.90)):
+        diag["merge_status"] = "rejected_bone_names_not_equivalent"
+        rig_diagnostics.append(diag)
         continue
-    # Compare rest-space head/tail positions before retargeting.
-    diffs = []
+    differences = []
     for name in shared:
-        p1 = rig.matrix_world @ rig.data.bones[name].head_local
-        p2 = main_rig.matrix_world @ main_rig.data.bones[name].head_local
-        diffs.append((p1-p2).length)
-    if max(diffs) > .008:
+        a = rig.matrix_world @ match[name].head_local
+        b = main_rig.matrix_world @ main_bone_map[name].head_local
+        differences.append((a-b).length)
+    diag["max_rest_offset_m"] = max(differences)
+    diag["mean_rest_offset_m"] = sum(differences)/len(differences)
+    if max(differences) > .025:
+        diag["merge_status"] = "rejected_rest_pose_mismatch"
+        rig_diagnostics.append(diag)
         continue
-    related = [o for o in all_meshes if any(
+    affected = [o for o in all_meshes if any(
         mod.type == "ARMATURE" and mod.object == rig for mod in o.modifiers)]
-    for mesh in related:
-        for mod in mesh.modifiers:
-            if mod.type == "ARMATURE" and mod.object == rig:
-                mod.object = main_rig
+    for mesh in affected:
+        # Re-map original names before replacing the skin modifier.
+        for group in mesh.vertex_groups:
+            name = canonical(group.name)
+            if name in main_bone_map and group.name != main_bone_map[name].name:
+                group.name = main_bone_map[name].name
+        world = mesh.matrix_world.copy()
         if mesh.parent == rig:
-            world = mesh.matrix_world.copy()
-            mesh.parent = main_rig
+            mesh.parent = None
             mesh.matrix_world = world
-    if not any(any(mod.type == "ARMATURE" and mod.object == rig
-                   for mod in m.modifiers) for m in all_meshes):
-        # Keep other armatures only if a rigid attachment still needs them.
-        rigid = [o for o in all_meshes if o.parent == rig]
-        if not rigid:
-            name = rig.name
-            bpy.data.objects.remove(rig, do_unlink=True)
-            merged_rigs.append(name)
+        for modifier in mesh.modifiers:
+            if modifier.type == "ARMATURE" and modifier.object == rig:
+                modifier.object = main_rig
+    if not any(any(mod.type=="ARMATURE" and mod.object == rig
+                   for mod in m.modifiers) for m in all_meshes) and not any(
+                    m.parent==rig for m in all_meshes):
+        old_name = rig.name
+        bpy.data.objects.remove(rig, do_unlink=True)
+        merged_rigs.append(old_name)
+        diag["merge_status"] = "merged_to_primary_53_bone_rig"
+    else:
+        diag["merge_status"] = "retargeted_but_existing_dependency"
+    rig_diagnostics.append(diag)
 stats["merged_armatures"] = merged_rigs
+stats["rig_compatibility_report"] = rig_diagnostics
+stats["rig_count_after"] = len([o for o in bpy.data.objects if o.type=="ARMATURE"])
+print("CC0_RIG_COMPATIBILITY", json.dumps(rig_diagnostics), flush=True)
+
+# This is a fixed cinematic protagonist, not a customizable MakeHuman avatar.
+# Bake current neutral body by discarding hundreds of unrelated shape keys,
+# preserving only eye-blink and eye-gaze keys for future facial animation.
+dynamic_eye_keys = {"blink_left","blink_right","look_left","look_right",
+                    "look_up","look_down"}
+stats["morphs_removed_for_android"] = 0
+stats["morphs_kept_for_eyes"] = 0
+for obj in all_meshes:
+    if not obj.data.shape_keys:
+        continue
+    retain = dynamic_eye_keys if obj.name in {"Body","Eyes","Eyelashes","Eyebrows"} else set()
+    for key in reversed(list(obj.data.shape_keys.key_blocks)[1:]):
+        if key.name in retain:
+            stats["morphs_kept_for_eyes"] += 1
+        else:
+            obj.shape_key_remove(key)
+            stats["morphs_removed_for_android"] += 1
+stats["lod_optimization_policy"] = "fixed avatar, preserve blink/look only"
+print("CC0_REMOVED_UNUSED_MORPHS", stats["morphs_removed_for_android"], flush=True)
 
 def bounding(objects):
     points = [o.matrix_world @ Vector(c) for o in objects for c in o.bound_box]
@@ -186,7 +230,22 @@ def bounding(objects):
 lo, hi = bounding(parts["body"]["meshes"])
 height = hi.z-lo.z
 assert .9 < height < 2.5, "Unexpected model coordinate system " + str(height)
+stats["source_body_height_m"] = height
+# Correct the protagonist height to the existing 1.84m El Cuervo blueprint.
+# Uniformly scale each top-level imported object so arms, skin, clothes, hair
+# and original skinning rest positions remain in correct proportions.
+from mathutils import Matrix
+scale = 1.84 / height
+for ob in list(bpy.data.objects):
+    if ob.type not in {"ARMATURE", "MESH"} or ob.parent is not None:
+        continue
+    ob.matrix_world = Matrix.Scale(scale, 4) @ ob.matrix_world
+bpy.context.view_layer.update()
+lo, hi = bounding(parts["body"]["meshes"])
+height = hi.z-lo.z
+assert abs(height-1.84) < .02, "Uniform human scaling unsuccessful"
 stats["body_height_m"] = height
+stats["uniform_scale_factor"] = scale
 cx = (lo.x+hi.x)*.5
 cy = (lo.y+hi.y)*.5
 
