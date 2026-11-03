@@ -146,7 +146,7 @@ stats["all_armatures_found"] = len(all_rigs)
 # Match canonical original bone names AND rest positions before rig consolidation.
 import re
 def canonical(name):
-    return re.sub(r"\\.\\d{3}$", "", name)
+    return re.sub(r"\.\d{3}$", "", name)
 main_bone_map = {canonical(bone.name): bone for bone in main_rig.data.bones}
 merged_rigs = []
 rig_diagnostics = []
