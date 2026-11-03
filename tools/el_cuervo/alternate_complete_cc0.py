@@ -74,15 +74,12 @@ tints = {
 }
 for kind, tint in tints.items():
     for obj in parts[kind]["meshes"]:
-        for mat in obj.data.materials:
-            if mat is None:
+        for j, source_mat in enumerate(list(obj.data.materials)):
+            if source_mat is None:
                 continue
-            mat = mat.copy()
-            # Mesh-local material: do not recolor the body, eyes or face.
-            for j, slot in enumerate(obj.data.materials):
-                if slot and slot.name == mat.name.split(".")[0]:
-                    obj.data.materials[j] = mat
-                    break
+            mat = source_mat.copy()
+            # Mesh-local material: do not recolor body, eyes or face.
+            obj.data.materials[j] = mat
             if not mat.use_nodes:
                 mat.diffuse_color = (*tint, 1)
                 continue
