@@ -5165,8 +5165,112 @@
   "all_morph_targets_neutralized": true,
   "main_skeleton_bones": 53,
   "all_armatures_found": 6,
-  "merged_armatures": [],
-  "body_height_m": 1.6657327566063032,
+  "merged_armatures": [
+    "Armature.001",
+    "Armature.002",
+    "Armature.003",
+    "Armature.004",
+    "Armature.005"
+  ],
+  "rig_compatibility_report": [
+    {
+      "armature": "Armature.001",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    },
+    {
+      "armature": "Armature.002",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    },
+    {
+      "armature": "Armature.003",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    },
+    {
+      "armature": "Armature.004",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    },
+    {
+      "armature": "Armature.005",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    }
+  ],
+  "rig_count_after": 1,
+  "morphs_removed_for_android": 988,
+  "morphs_kept_for_eyes": 24,
+  "lod_optimization_policy": "fixed avatar, preserve blink/look only",
+  "source_body_height_m": 1.6657327566063032,
+  "body_height_m": 1.8330391051778108,
+  "uniform_scale_factor": 1.1046189688607324,
   "glb_mesh_nodes": [
     "Body",
     "Eyebrows",
@@ -5182,7 +5286,7 @@
   ],
   "blender_file": "El_Cuervo_Candidato_Profesional_CC0.blend",
   "glb_file": "El_Cuervo_Candidato_Profesional_CC0.glb",
-  "glb_size_bytes": 26012248,
+  "glb_size_bytes": 5280936,
   "total_triangles": 50058,
   "blender_reimport_verified": true,
   "godot43_import_verified": true
