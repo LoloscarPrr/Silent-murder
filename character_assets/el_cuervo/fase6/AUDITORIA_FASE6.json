@@ -1,0 +1,66 @@
+{
+  "base": "phase4 verified authentic CC0 suit; not the rejected phase5 garment",
+  "source_blend": "El_Cuervo_Refinado_Fase4_WIP.blend",
+  "source_suit_name": "CC0_toigo_male_suit_3_0",
+  "source_license": "Margaret Toigo / MakeHuman Community suits01 CC0",
+  "original_body_modified": false,
+  "original_height_m": 1.8399999141693115,
+  "skeleton_bones": 163,
+  "phase5_rejected_assets_used": false,
+  "game_main_modified": false,
+  "artistic_review_approved": false,
+  "animation_review_approved": false,
+  "android_fps_measured": false,
+  "source_boundary_loops": 23,
+  "sleeve_corrections": {
+    "L": {
+      "side": "L",
+      "wrist": [
+        0.45744064450263977,
+        -0.11978686600923538,
+        1.202169418334961
+      ],
+      "candidate_rings": 6,
+      "ring_vertices": 8,
+      "cuff_shift_m": 0.0697764972605018,
+      "altered_vertices": 707
+    },
+    "R": {
+      "side": "R",
+      "wrist": [
+        -0.45744067430496216,
+        -0.11978685855865479,
+        1.202169418334961
+      ],
+      "candidate_rings": 6,
+      "ring_vertices": 8,
+      "cuff_shift_m": 0.06824719045202289,
+      "altered_vertices": 733
+    }
+  },
+  "source_suit_triangles": 15018,
+  "after_suit_triangles": 15018,
+  "genuine_hand_glove_faces": 25630,
+  "remaining_skin_faces": 37686,
+  "scalp_source": "base_male_body",
+  "hair_triangles": 4022,
+  "hair_is_sculpt_from_original_anatomy": true,
+  "exported_mesh_nodes": [
+    "ElCuervo_CabelloCorto_EscalpOriginal",
+    "VisibleSkin_base_male_body",
+    "VisibleSkin_base_male_body.high-poly",
+    "CC0_toigo_male_suit_3_0",
+    "Cuervo_Botin_CC0_1"
+  ],
+  "visible_triangles": 86476,
+  "blender_file": "El_Cuervo_Refinado_Fase6_REVISION.blend",
+  "glb_file": "El_Cuervo_Refinado_Fase6_REVISION.glb",
+  "blender_reimport_verified": true,
+  "godot43_import_verified": true,
+  "warnings": [
+    "Review facial hairline and sleeve alignment in genuine renders",
+    "Scalp and gloves use native mesh; no geometry primitives added",
+    "No Android framerate measurement and no gameplay animation approval",
+    "No change to current game build or main branch"
+  ]
+}
