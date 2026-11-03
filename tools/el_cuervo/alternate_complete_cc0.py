@@ -49,6 +49,11 @@ for kind, filename in entries:
     assert os.path.getsize(path) > 100000, path
     bpy.ops.import_scene.gltf(filepath=path)
     new = [o for o in bpy.data.objects if o not in before]
+    # glTF Blender importer creates an Icosphere auxiliary that is not a
+    # glTF mesh node (verified in the original source project). Exclude it.
+    for helper in [o for o in new if o.type == "MESH" and o.name.startswith("Icosphere")]:
+        bpy.data.objects.remove(helper, do_unlink=True)
+    new = [o for o in new if o.name in bpy.data.objects]
     meshes = [o for o in new if o.type == "MESH"]
     armatures = [o for o in new if o.type == "ARMATURE"]
     assert meshes, (kind, filename, [x.name for x in new])
