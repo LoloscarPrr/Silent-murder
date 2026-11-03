@@ -86,19 +86,132 @@
     },
     {
       "kind": "jacket",
-      "source": "clothing_jacket.glb",
+      "source": "clothing_trenchcoat.glb",
       "objects": [
         "Armature.005",
-        "Cloth_jacket"
+        "Cloth_trenchcoat"
       ],
       "meshes": 1,
       "armatures": 1,
-      "triangles": 3668,
+      "triangles": 4480,
       "bones": [
         53
       ]
     }
   ],
+  "eye_lid_morphs_before": [
+    {
+      "mesh": "Body",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "blink_right",
+      "weight": 1.0
+    }
+  ],
+  "facial_eye_morphs_cleared": true,
   "main_skeleton_bones": 53,
   "all_armatures_found": 6,
   "merged_armatures": [],
@@ -114,12 +227,12 @@
     "Cloth_shirt",
     "Cloth_jeans",
     "Cloth_boots",
-    "Cloth_jacket"
+    "Cloth_trenchcoat"
   ],
   "blender_file": "El_Cuervo_Candidato_Profesional_CC0.blend",
   "glb_file": "El_Cuervo_Candidato_Profesional_CC0.glb",
-  "glb_size_bytes": 25612784,
-  "total_triangles": 49246,
+  "glb_size_bytes": 26012248,
+  "total_triangles": 50058,
   "blender_reimport_verified": true,
   "godot43_import_verified": true
 }
