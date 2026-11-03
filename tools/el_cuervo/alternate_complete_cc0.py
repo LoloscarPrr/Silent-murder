@@ -51,9 +51,10 @@ for kind, filename in entries:
     new = [o for o in bpy.data.objects if o not in before]
     # glTF Blender importer creates an Icosphere auxiliary that is not a
     # glTF mesh node (verified in the original source project). Exclude it.
-    for helper in [o for o in new if o.type == "MESH" and o.name.startswith("Icosphere")]:
+    to_remove = [o for o in new if o.type == "MESH" and o.name.startswith("Icosphere")]
+    new = [o for o in new if o not in to_remove]
+    for helper in to_remove:
         bpy.data.objects.remove(helper, do_unlink=True)
-    new = [o for o in new if o.name in bpy.data.objects]
     meshes = [o for o in new if o.type == "MESH"]
     armatures = [o for o in new if o.type == "ARMATURE"]
     assert meshes, (kind, filename, [x.name for x in new])
