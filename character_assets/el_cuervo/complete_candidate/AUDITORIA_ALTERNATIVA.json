@@ -1,0 +1,125 @@
+{
+  "status": "PREVIEW_NOT_APPROVED",
+  "source": "kblood/CharacterCreator output CC0",
+  "source_repo": "https://github.com/kblood/CharacterCreator",
+  "source_revision": "852e48f316b90a0937234886630e4fb4cdfd1f78",
+  "body_and_wardrobe_compatible_source": true,
+  "main_game_modified": false,
+  "animation_review_approved": false,
+  "android_fps_tested": false,
+  "artistic_review_approved": false,
+  "parts": [
+    {
+      "kind": "body",
+      "source": "base_body.glb",
+      "objects": [
+        "Armature",
+        "Body",
+        "Eyebrows",
+        "Eyelashes",
+        "Eyes",
+        "Teeth",
+        "Tongue"
+      ],
+      "meshes": 6,
+      "armatures": 1,
+      "triangles": 36924,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "hair",
+      "source": "hair_short04.glb",
+      "objects": [
+        "Armature.001",
+        "Hair_short04"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 1050,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "shirt",
+      "source": "clothing_shirt.glb",
+      "objects": [
+        "Armature.002",
+        "Cloth_shirt"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 2688,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "jeans",
+      "source": "clothing_jeans.glb",
+      "objects": [
+        "Armature.003",
+        "Cloth_jeans"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 1712,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "boots",
+      "source": "clothing_boots.glb",
+      "objects": [
+        "Armature.004",
+        "Cloth_boots"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 3204,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "jacket",
+      "source": "clothing_jacket.glb",
+      "objects": [
+        "Armature.005",
+        "Cloth_jacket"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 3668,
+      "bones": [
+        53
+      ]
+    }
+  ],
+  "main_skeleton_bones": 53,
+  "all_armatures_found": 6,
+  "merged_armatures": [],
+  "body_height_m": 1.6657327566063032,
+  "glb_mesh_nodes": [
+    "Body",
+    "Eyebrows",
+    "Eyelashes",
+    "Eyes",
+    "Teeth",
+    "Tongue",
+    "Hair_short04",
+    "Cloth_shirt",
+    "Cloth_jeans",
+    "Cloth_boots",
+    "Cloth_jacket"
+  ],
+  "blender_file": "El_Cuervo_Candidato_Profesional_CC0.blend",
+  "glb_file": "El_Cuervo_Candidato_Profesional_CC0.glb",
+  "glb_size_bytes": 25612784,
+  "total_triangles": 49246,
+  "blender_reimport_verified": true,
+  "godot43_import_verified": true
+}
