@@ -38,13 +38,13 @@ jobs:
           mkdir -p /tmp/cuervo_matching
           rev='852e48f316b90a0937234886630e4fb4cdfd1f78'
           base="https://raw.githubusercontent.com/kblood/CharacterCreator/$rev/output"
-          for name in base_body hair_short04 clothing_shirt clothing_jeans clothing_boots clothing_jacket; do
+          for name in base_body hair_short04 clothing_shirt clothing_jeans clothing_boots clothing_trenchcoat; do
             curl -fL --retry 3 --connect-timeout 20 "$base/$name.glb" -o "/tmp/cuervo_matching/$name.glb"
           done
           python3 - <<'PY'
           import os,struct,hashlib
           root='/tmp/cuervo_matching'
-          for name in ['base_body','hair_short04','clothing_shirt','clothing_jeans','clothing_boots','clothing_jacket']:
+          for name in ['base_body','hair_short04','clothing_shirt','clothing_jeans','clothing_boots','clothing_trenchcoat']:
               path=os.path.join(root,name+'.glb')
               assert os.path.getsize(path)>100000, path
               with open(path,'rb') as f:
