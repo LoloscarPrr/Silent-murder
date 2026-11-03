@@ -160,6 +160,26 @@ for side in ("L", "R"):
     sleeves[side] = report
 suit.data.update()
 data["sleeve_corrections"] = sleeves
+# Restrained shoulder refinement, with a compact weight function that
+# fades at sleeve and chest seams. No uncontrolled vertex translation.
+shoulder_touches = 0
+for vertex in suit.data.vertices:
+    point = mat_world @ vertex.co
+    ax = abs(point.x - cx)
+    height = point.z - low.z
+    shoulder_blend = (smoothstep(1.35, 1.46, height) *
+                      (1 - smoothstep(1.58, 1.66, height)) *
+                      smoothstep(.25, .34, ax) *
+                      (1 - smoothstep(.61, .73, ax)))
+    if shoulder_blend < .001:
+        continue
+    point.x = cx + (point.x - cx) * (1 - .050 * shoulder_blend)
+    point.z -= .010 * shoulder_blend
+    vertex.co = world_inverse @ point
+    shoulder_touches += 1
+suit.data.update()
+data["shoulder_vertices_smoothed"] = shoulder_touches
+
 data["source_suit_triangles"] = original_suit_triangles
 data["after_suit_triangles"] = triangles(suit)
 assert triangles(suit) == original_suit_triangles, "Garment topology lost"
@@ -198,30 +218,70 @@ for mat in suit.data.materials:
     mat.node_tree.links.new(noise.outputs["Fac"], bump.inputs["Height"])
     mat.node_tree.links.new(bump.outputs["Normal"], shader.inputs["Normal"])
 
-# Realistic restrained skin tone for bare face, tailored black gloves for
-# skin-derived HAND meshes, without fabricating oversized replacement hands.
+# One continuous anatomy-derived hand AND forearm per side. The previous
+# visible-skin-only mesh stopped at the wrist and looked like severed hands;
+# completing the original forearms is necessary to bridge into the jacket.
 complexion = principled("Cuervo_Piel_Natural_Mate", (.42, .302, .249), .91)
 gloves = principled("Cuervo_Guantes_Cuero_Negro", (.019, .021, .025), .68)
-gloved_faces = 0
-bare_faces = 0
+removed_skin_hand_faces = 0
 for obj in skin:
+    mesh_bm = bmesh.new()
+    mesh_bm.from_mesh(obj.data)
+    mat = obj.matrix_world
+    doomed = []
+    for face in mesh_bm.faces:
+        coords = [mat @ v.co for v in face.verts]
+        if all(abs(p.x - cx) > .27 and
+               low.z + .72 < p.z < low.z + 1.62 for p in coords):
+            doomed.append(face)
+    removed_skin_hand_faces += len(doomed)
+    if doomed:
+        bmesh.ops.delete(mesh_bm, geom=doomed, context="FACES")
+        bmesh.ops.delete(mesh_bm,
+                         geom=[v for v in mesh_bm.verts if not v.link_faces],
+                         context="VERTS")
+    mesh_bm.to_mesh(obj.data)
+    mesh_bm.free()
+    obj.data.update()
     obj.data.materials.clear()
     obj.data.materials.append(complexion)
-    obj.data.materials.append(gloves)
-    for poly in obj.data.polygons:
-        p = sum((obj.matrix_world @ obj.data.vertices[vi].co
-                 for vi in poly.vertices), Vector()) / len(poly.vertices)
-        on_hand = abs(p.x - cx) > .30 and low.z + .86 < p.z < low.z + 1.29
-        poly.material_index = 1 if on_hand else 0
-        gloved_faces += int(on_hand)
-        bare_faces += int(not on_hand)
-data["genuine_hand_glove_faces"] = gloved_faces
-data["remaining_skin_faces"] = bare_faces
+data["hidden_short_wrist_mesh_faces"] = removed_skin_hand_faces
 
-# Hair cap conforms exactly to the existing CC0 human scalp. Keep the
-# character's own facial anatomy. Copy a small section of original skin,
-# rather than adding a sphere or a planar false hairstyle.
+# This clone keeps continuous source arms, palms and fingers + exactly
+# their original armature weights. The cut edge stays under the real sleeve.
 head_source = max(base, key=lambda item: len(item.data.polygons))
+hands = head_source.copy()
+hands.data = head_source.data.copy()
+hands.name = "ElCuervo_Guantes_AntebrazosContinuos"
+scene.collection.objects.link(hands)
+hands.hide_render = False
+hands.hide_set(False)
+hands.matrix_world = head_source.matrix_world.copy()
+hands_bm = bmesh.new()
+hands_bm.from_mesh(hands.data)
+hands_matrix = hands.matrix_world.copy()
+doomed = []
+for face in hands_bm.faces:
+    coords = [hands_matrix @ v.co for v in face.verts]
+    if not all(abs(p.x - cx) > .27 and
+               low.z + .71 < p.z < low.z + 1.63 for p in coords):
+        doomed.append(face)
+bmesh.ops.delete(hands_bm, geom=doomed, context="FACES")
+bmesh.ops.delete(hands_bm,
+                 geom=[v for v in hands_bm.verts if not v.link_faces],
+                 context="VERTS")
+hands_bm.to_mesh(hands.data)
+hands_bm.free()
+hands.data.update()
+assert 400 < triangles(hands) < 60000, "Hands/forearms failed extraction"
+hands.data.materials.clear()
+hands.data.materials.append(gloves)
+assert any(mod.type == "ARMATURE" for mod in hands.modifiers)
+data["continuous_original_hand_triangles"] = triangles(hands)
+
+# Hair from a single anatomically-continuous scalp patch, not individually
+# culled triangles. BMesh planar bisect adds clean cuts along existing faces;
+# the previous all-vertex face mask left visible triangular bald patches.
 hair = head_source.copy()
 hair.data = head_source.data.copy()
 hair.name = "ElCuervo_CabelloCorto_EscalpOriginal"
@@ -229,42 +289,45 @@ scene.collection.objects.link(hair)
 hair.hide_render = False
 hair.hide_set(False)
 hair.matrix_world = head_source.matrix_world.copy()
-m = hair.matrix_world.copy()
 hair_mesh = bmesh.new()
 hair_mesh.from_mesh(hair.data)
-removed = []
-for face in hair_mesh.faces:
-    pts = [m @ v.co for v in face.verts]
-    # Short close-cut hairstyle: higher hairline in front, lower at nape.
-    keep = all((p.z - low.z > 1.762) or
-               ((p.z - low.z > 1.713) and (p.y > cy + .047))
-               for p in pts)
-    if not keep:
-        removed.append(face)
-bmesh.ops.delete(hair_mesh, geom=removed, context="FACES")
-bmesh.ops.delete(hair_mesh,
-                 geom=[v for v in hair_mesh.verts if not v.link_faces],
-                 context="VERTS")
+hair_matrix = hair.matrix_world.copy()
+# Geometry is evaluated in WORLD coordinates; bisect plane must be local.
+local_plane_origin = hair_matrix.inverted() @ Vector((cx, cy, low.z + 1.742))
+local_plane_normal = hair_matrix.to_3x3().transposed() @ Vector((0, .37, 1))
+local_plane_normal.normalize()
+bmesh.ops.bisect_plane(
+    hair_mesh,
+    geom=list(hair_mesh.verts) + list(hair_mesh.edges) + list(hair_mesh.faces),
+    plane_co=local_plane_origin,
+    plane_no=local_plane_normal,
+    dist=.00001,
+    clear_inner=True,
+    clear_outer=False,
+)
+bmesh.ops.delete(
+    hair_mesh,
+    geom=[v for v in hair_mesh.verts if not v.link_faces],
+    context="VERTS",
+)
 hair_mesh.to_mesh(hair.data)
 hair_mesh.free()
 hair.data.update()
-assert 200 < triangles(hair) < 40000, "Scalp topology invalid"
-# Lift hair mesh slightly off the anatomically correct scalp, with natural
-# short-hair variation measured in mm, preserving existing hairline.
+assert 200 < triangles(hair) < 40000, "Contiguous scalp extraction failed"
 for v in hair.data.vertices:
     p = hair.matrix_world @ v.co
-    h = smoothstep(1.72, 1.82, p.z - low.z)
-    thickness = .004 + .011 * h
-    v.co += v.normal * thickness
+    top = smoothstep(1.72, 1.82, p.z - low.z)
+    # 4-15 mm above the real scalp. No independent floating 'helmet' mesh.
+    v.co += v.normal * (.004 + .011 * top)
 hair.data.update()
 hair.data.materials.clear()
 hair.data.materials.append(principled(
-    "Cuervo_Cabello_CastanoOscuro", (.037, .026, .021), .87))
-assert any(md.type == "ARMATURE" for md in hair.modifiers), \
-    "Hair must retain the original 163-bone skinning"
+    "Cuervo_CabelloCorto_CastanoOscuro", (.039, .029, .026), .88))
+assert any(md.type == "ARMATURE" for md in hair.modifiers)
 data["scalp_source"] = head_source.name
 data["hair_triangles"] = triangles(hair)
-data["hair_is_sculpt_from_original_anatomy"] = True
+data["hair_bisect_continuous"] = True
+data["face_from_original_mesh"] = True
 
 for b in base:
     b.hide_render = True
@@ -328,7 +391,7 @@ blend = os.path.join(out, "El_Cuervo_Refinado_Fase6_REVISION.blend")
 bpy.ops.wm.save_as_mainfile(filepath=blend)
 assert os.path.getsize(blend) > 10000
 bpy.ops.object.select_all(action="DESELECT")
-to_export = [rig, suit, hair] + skin + boots
+to_export = [rig, suit, hair, hands] + skin + boots
 for obj in to_export:
     obj.select_set(True)
 bpy.context.view_layer.objects.active = rig
@@ -355,7 +418,7 @@ data["blender_reimport_verified"] = False
 data["godot43_import_verified"] = False
 data["warnings"] = [
     "Review facial hairline and sleeve alignment in genuine renders",
-    "Scalp and gloves use native mesh; no geometry primitives added",
+    "Hair and full hand/forearm continuity rely on CC0 source anatomy",
     "No Android framerate measurement and no gameplay animation approval",
     "No change to current game build or main branch",
 ]
