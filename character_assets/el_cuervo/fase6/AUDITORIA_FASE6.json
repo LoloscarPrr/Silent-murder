@@ -22,7 +22,22 @@
       ],
       "candidate_rings": 6,
       "ring_vertices": 8,
-      "cuff_shift_m": 0.06977653521666118,
+      "cuff_center_before": [
+        0.5604942440986633,
+        -0.26856958866119385,
+        1.1734869480133057
+      ],
+      "target_wrist_center": [
+        0.4470082223415375,
+        -0.11554794013500214,
+        1.2135359048843384
+      ],
+      "cuff_shift_world": [
+        -0.06689342111349106,
+        0.0901973694562912,
+        0.02360653318464756
+      ],
+      "cuff_shift_m": 0.1147500052698491,
       "altered_vertices": 707
     },
     "R": {
@@ -34,7 +49,22 @@
       ],
       "candidate_rings": 6,
       "ring_vertices": 8,
-      "cuff_shift_m": 0.06824721241405557,
+      "cuff_center_before": [
+        -0.5577410459518433,
+        -0.27711448073387146,
+        1.1731910705566406
+      ],
+      "target_wrist_center": [
+        -0.44700825214385986,
+        -0.11554793268442154,
+        1.2135359048843384
+      ],
+      "cuff_shift_world": [
+        0.0635383352637291,
+        0.09270668029785156,
+        0.02314981259405613
+      ],
+      "cuff_shift_m": 0.11474999994365803,
       "altered_vertices": 733
     }
   },
@@ -44,8 +74,9 @@
   "hidden_short_wrist_mesh_faces": 25630,
   "continuous_original_hand_triangles": 31880,
   "scalp_source": "base_male_body",
-  "hair_triangles": 8304,
+  "hair_triangles": 2752,
   "hair_bisect_continuous": true,
+  "scalp_self_intersection_repair": "convex hull of actual CC0 head vertices",
   "face_from_original_mesh": true,
   "exported_mesh_nodes": [
     "ElCuervo_CabelloCorto_EscalpOriginal",
@@ -55,7 +86,7 @@
     "CC0_toigo_male_suit_3_0",
     "Cuervo_Botin_CC0_1"
   ],
-  "visible_triangles": 97008,
+  "visible_triangles": 91456,
   "blender_file": "El_Cuervo_Refinado_Fase6_REVISION.blend",
   "glb_file": "El_Cuervo_Refinado_Fase6_REVISION.glb",
   "blender_reimport_verified": true,
