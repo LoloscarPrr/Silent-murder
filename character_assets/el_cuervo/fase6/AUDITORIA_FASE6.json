@@ -22,7 +22,7 @@
       ],
       "candidate_rings": 6,
       "ring_vertices": 8,
-      "cuff_shift_m": 0.0697764972605018,
+      "cuff_shift_m": 0.06977653521666118,
       "altered_vertices": 707
     },
     "R": {
@@ -34,32 +34,35 @@
       ],
       "candidate_rings": 6,
       "ring_vertices": 8,
-      "cuff_shift_m": 0.06824719045202289,
+      "cuff_shift_m": 0.06824721241405557,
       "altered_vertices": 733
     }
   },
+  "shoulder_vertices_smoothed": 323,
   "source_suit_triangles": 15018,
   "after_suit_triangles": 15018,
-  "genuine_hand_glove_faces": 25630,
-  "remaining_skin_faces": 37686,
+  "hidden_short_wrist_mesh_faces": 25630,
+  "continuous_original_hand_triangles": 31880,
   "scalp_source": "base_male_body",
-  "hair_triangles": 4022,
-  "hair_is_sculpt_from_original_anatomy": true,
+  "hair_triangles": 8304,
+  "hair_bisect_continuous": true,
+  "face_from_original_mesh": true,
   "exported_mesh_nodes": [
     "ElCuervo_CabelloCorto_EscalpOriginal",
+    "ElCuervo_Guantes_AntebrazosContinuos",
     "VisibleSkin_base_male_body",
     "VisibleSkin_base_male_body.high-poly",
     "CC0_toigo_male_suit_3_0",
     "Cuervo_Botin_CC0_1"
   ],
-  "visible_triangles": 86476,
+  "visible_triangles": 97008,
   "blender_file": "El_Cuervo_Refinado_Fase6_REVISION.blend",
   "glb_file": "El_Cuervo_Refinado_Fase6_REVISION.glb",
   "blender_reimport_verified": true,
   "godot43_import_verified": true,
   "warnings": [
     "Review facial hairline and sleeve alignment in genuine renders",
-    "Scalp and gloves use native mesh; no geometry primitives added",
+    "Hair and full hand/forearm continuity rely on CC0 source anatomy",
     "No Android framerate measurement and no gameplay animation approval",
     "No change to current game build or main branch"
   ]
