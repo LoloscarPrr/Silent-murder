@@ -106,19 +106,30 @@ for kind, tint in tints.items():
                 base.default_value = (*tint, 1)
             shader.inputs["Roughness"].default_value = .76
 
-# Neutralize imported facial-expression weights. A neutral character must not
-# default to eyes-closed; preserve all morph shapes for later animation.
-stats["eye_lid_morphs_before"] = []
+# Each glTF morph arrived with a FULL weight of 1.0 in Blender, even though
+# upstream engine normally initializes each weight to neutral 0.0. Applying
+# ALL of these shape keys simultaneously enormously inflated jacket and body.
+# Reset every non-Basis morph to 0 without removing any key from export.
+stats["morph_weights_nonzero_before"] = []
+stats["morph_count_reset"] = 0
 for part in parts.values():
     for obj in part["meshes"]:
         keys = obj.data.shape_keys
         if keys is None:
             continue
         for block in keys.key_blocks:
-            if "blink" in block.name.lower() or "closure" in block.name.lower():
-                stats["eye_lid_morphs_before"].append({"mesh":obj.name,"key":block.name,"weight":block.value})
-                block.value=0.0
-stats["facial_eye_morphs_cleared"] = True
+            if block == keys.key_blocks[0]:
+                continue
+            if abs(block.value) > .00001:
+                stats["morph_weights_nonzero_before"].append({
+                    "mesh": obj.name, "key": block.name, "weight": block.value
+                })
+            block.value = 0.0
+            stats["morph_count_reset"] += 1
+stats["all_morph_targets_neutralized"] = True
+assert stats["morph_count_reset"] >= 50, "Expected source body/facial morphs"
+print("CC0_NEUTRALIZED_MORPHS", stats["morph_count_reset"],
+      "nonzero", len(stats["morph_weights_nonzero_before"]), flush=True)
 
 all_meshes = [o for p in parts.values() for o in p["meshes"]]
 all_rigs = [o for p in parts.values() for o in p["arms"]]
