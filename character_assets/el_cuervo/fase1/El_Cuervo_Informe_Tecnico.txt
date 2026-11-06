@@ -1,0 +1,27 @@
+SILENT KILLER — EL CUERVO / FASE 1
+Fuente: Innerscene / MakeHuman (CC0)
+Altura verificable: 1.8400 m
+mesh_objects: 2
+vertices: 72771
+edges: 185951
+faces: 109064
+triangles: 109064
+armatures: 1
+bones: 163
+materials: 1
+all_imported_objects: 3
+mesh_object_names: ['base_male_body', 'base_male_body.high-poly']
+height_m: 1.84
+width_m: 1.22232
+depth_m: 0.50331
+original_import_height_m: 1.78536
+source_helpers_excluded: ['Icosphere']
+scale_factor_applied: 1.030605
+rig_tests: [{'armature': 'base_male_body.rig', 'skinned_meshes': 2, 'weighted_vertices': 72771, 'pose_deformation_verified': True, 'bone_tested': 'upperarm01.L', 'max_sample_displacement_m': 0.174572}]
+visual_quality_approved: False
+android_performance_approved: False
+source: Innerscene / MakeHuman CC0
+source_url: https://www.innerscene.com/tools/library/3d-parts/male-base-mesh-3d-person-rigged-a-pose-380e6d89
+
+Sin aprobación artística ni evaluación real de FPS Android.
+Pose test automática: deformación geométrica no equivale a rig listo para producción.

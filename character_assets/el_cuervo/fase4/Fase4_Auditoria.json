@@ -1,0 +1,102 @@
+{
+  "source_blend": "El_Cuervo_toigo_male_suit_3_TRAJE_REAL_WIP.blend",
+  "source_suit_mesh_triangles": 15018,
+  "source_human_triangles": 109064,
+  "source_makehuman_male_height_m": 1.84,
+  "source_original_CC0_suit": "Margaret Toigo, suits01",
+  "source_original_CC0_shoes": "MakeHuman Community shoes01; toigo_ankle_boots_male",
+  "comparison_to_user_feedback": [
+    "hombros anchos",
+    "mangas gruesas",
+    "cintura boxy",
+    "camisa palida",
+    "sin calzado",
+    "A-pose poco natural"
+  ],
+  "edited_suit_vertices_shoulder": 563.0,
+  "edited_suit_vertices_waist": 584.0,
+  "suit_shoulder_shrink_max": 0.11,
+  "suit_waist_shrink_max": 0.065,
+  "suit_material_darkening_applied": true,
+  "outfit_intent": "matte black jacket and distinctly darker graphite shirt; authored UV atlas retained",
+  "shirt_faces_recolored_using_original_UV": 737,
+  "shoe_original_obj": "clothes/toigo_ankle_boots_male/boots_ankle_male.obj",
+  "shoe_original_triangles": 4120,
+  "shoe_fitted_bounds": {
+    "min": [
+      -0.2937106788158417,
+      -0.25512635707855225,
+      0.005999977700412273
+    ],
+    "max": [
+      0.2937106788158417,
+      0.08229358494281769,
+      0.20099999010562897
+    ]
+  },
+  "shoe_weights_report": [
+    {
+      "name": "Cuervo_Botin_CC0_1",
+      "vertices": 2084,
+      "triangles": 4120,
+      "weighted_vertices": 2084
+    }
+  ],
+  "visible_skin_faces_after_shoes": 63316,
+  "posed_arm_down_trials": [
+    {
+      "bone": "upperarm01.L",
+      "axis": "Z",
+      "radians": -0.5,
+      "score": 0.81023,
+      "elbow_world": [
+        0.21900570392608643,
+        -0.024253282696008682,
+        1.398983120918274
+      ],
+      "wrist_world": [
+        0.2963983714580536,
+        -0.14406482875347137,
+        1.1239078044891357
+      ],
+      "wrist_drop_m": 0.3481,
+      "wrist_spread_from_center_m": 0.2964
+    },
+    {
+      "bone": "upperarm01.R",
+      "axis": "Z",
+      "radians": 0.5,
+      "score": 0.81023,
+      "elbow_world": [
+        -0.21900568902492523,
+        -0.02425328642129898,
+        1.398983120918274
+      ],
+      "wrist_world": [
+        -0.2963983714580536,
+        -0.14406482875347137,
+        1.1239078044891357
+      ],
+      "wrist_drop_m": 0.3481,
+      "wrist_spread_from_center_m": 0.2964
+    }
+  ],
+  "exported_mesh_nodes": [
+    "VisibleSkin_base_male_body",
+    "VisibleSkin_base_male_body.high-poly",
+    "CC0_toigo_male_suit_3_0",
+    "Cuervo_Botin_CC0_1"
+  ],
+  "shoe_source_license": "CC0 per MakeHuman Community shoes01 pack",
+  "blender_file": "El_Cuervo_Refinado_Fase4_WIP.blend",
+  "godot_glb_file": "El_Cuervo_Refinado_Fase4_WIP.glb",
+  "suit_triangles": 15018,
+  "shoes_triangles": 4120,
+  "total_visible_triangles_blender": 82454,
+  "artistic_approval": false,
+  "cloth_clipping_qa_done": false,
+  "android_fps_measured": false,
+  "game_changed": false,
+  "note": "Real CC0 tailored clothing and CC0 boot mesh. Skinning and sleeve poses preliminary.",
+  "godot43_headless_import_verified": true
+}

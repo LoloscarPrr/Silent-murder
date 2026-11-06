@@ -1,0 +1,121 @@
+{
+  "status": "WIP_MODELO_GEOMETRICO_REAL_NO_APROBADO",
+  "source": "El_Cuervo_Base_Humana_v1.blend",
+  "reference_height_m": 1.84,
+  "original_human_triangles": 109064,
+  "garment_triangles": 2120,
+  "garment_pieces": [
+    {
+      "name": "Shirt_Inner",
+      "vertices": 343,
+      "triangles": 576,
+      "material": "Cuervo_Camisa_Grafito"
+    },
+    {
+      "name": "Jacket_Blazer",
+      "vertices": 513,
+      "triangles": 896,
+      "material": "Cuervo_Blazer_Carbon"
+    },
+    {
+      "name": "Jacket_Lapel_L",
+      "vertices": 10,
+      "triangles": 8,
+      "material": "Cuervo_Solapas_Textil"
+    },
+    {
+      "name": "Jacket_Lapel_R",
+      "vertices": 10,
+      "triangles": 8,
+      "material": "Cuervo_Solapas_Textil"
+    },
+    {
+      "name": "Shirt_Collar_L",
+      "vertices": 6,
+      "triangles": 4,
+      "material": "Cuervo_Camisa_Grafito"
+    },
+    {
+      "name": "Shirt_Collar_R",
+      "vertices": 6,
+      "triangles": 4,
+      "material": "Cuervo_Camisa_Grafito"
+    },
+    {
+      "name": "Shirt_Sleeve_L",
+      "vertices": 80,
+      "triangles": 156,
+      "material": "Cuervo_Camisa_Grafito"
+    },
+    {
+      "name": "Jacket_Sleeve_L",
+      "vertices": 80,
+      "triangles": 156,
+      "material": "Cuervo_Blazer_Carbon"
+    },
+    {
+      "name": "Shirt_Sleeve_R",
+      "vertices": 80,
+      "triangles": 156,
+      "material": "Cuervo_Camisa_Grafito"
+    },
+    {
+      "name": "Jacket_Sleeve_R",
+      "vertices": 80,
+      "triangles": 156,
+      "material": "Cuervo_Blazer_Carbon"
+    }
+  ],
+  "glb_mesh_nodes": [
+    "base_male_body",
+    "base_male_body.high-poly",
+    "Shirt_Inner",
+    "Jacket_Blazer",
+    "Jacket_Lapel_L",
+    "Jacket_Lapel_R",
+    "Shirt_Collar_L",
+    "Shirt_Collar_R",
+    "Shirt_Sleeve_L",
+    "Jacket_Sleeve_L",
+    "Shirt_Sleeve_R",
+    "Jacket_Sleeve_R"
+  ],
+  "armature_bones": 163,
+  "body_base_preserved": true,
+  "rig_weight_transfer": "nearest source vertices; requires artist correction",
+  "anatomical_measurements_radii": {
+    "0.51": [
+      0.1846,
+      0.2446
+    ],
+    "0.58": [
+      0.1538,
+      0.2354
+    ],
+    "0.65": [
+      0.145,
+      0.2122
+    ],
+    "0.72": [
+      0.32,
+      0.2274
+    ],
+    "0.79": [
+      0.2923,
+      0.2376
+    ],
+    "0.84": [
+      0.2138,
+      0.2085
+    ]
+  },
+  "artistic_review_approved": false,
+  "android_fps_measured": false,
+  "limitations": [
+    "Patronaje y arrugas son prototipo geométrico, NO vestuario AAA terminado.",
+    "Transferencia de pesos automática no garantiza que hombros/codos queden bien.",
+    "Hacen falta renders de poses, pruebas de clipping y telas definitivas.",
+    "No existe LOD de vestuario ni benchmark Android."
+  ],
+  "godot_4_3_import_verified": true
+}

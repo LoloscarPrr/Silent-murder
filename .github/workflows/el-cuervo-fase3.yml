@@ -1,0 +1,120 @@
+name: El Cuervo - Fase 3 Blender blazer y camisa 3D reales
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/fase3_clothing.py'
+      - '.github/workflows/el-cuervo-fase3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-fase3-produccion
+  cancel-in-progress: true
+
+jobs:
+  model:
+    name: Generar BLEND, GLB, vistas y auditoria con Blender 4.3
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout de rama de produccion
+        uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Preparar dependencias y Blender real
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy; assert bpy.app.version[:2]==(4,3); print("BLENDER:",bpy.app.version_string)'
+      - name: Exigir malla humana valida
+        run: |
+          test -s character_assets/el_cuervo/fase1/El_Cuervo_Base_Humana_v1.blend
+          test -s character_assets/el_cuervo/fase1/El_Cuervo_Verificacion.json
+      - name: Modelar, renderizar y exportar blazer y camisa usando cuerpo CC0
+        run: |
+          mkdir -p character_assets/el_cuervo/fase3
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/fase3_clothing.py -- \
+            --blend character_assets/el_cuervo/fase1/El_Cuervo_Base_Humana_v1.blend \
+            --out character_assets/el_cuervo/fase3
+      - name: Volver a abrir BLEND y GLB para validar meshes skinned y escala
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,os,json
+          base="character_assets/el_cuervo/fase3"
+          source=os.path.join(base,"El_Cuervo_Blazer_Camisa_WIP.blend")
+          dest=os.path.join(base,"El_Cuervo_Blazer_Camisa_WIP.glb")
+          bpy.ops.wm.open_mainfile(filepath=source)
+          orig_names={o.name for o in bpy.data.objects if o.type=="MESH"}
+          assert "Jacket_Blazer" in orig_names and "Shirt_Inner" in orig_names,orig_names
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=dest)
+          meshes=[o for o in bpy.context.scene.objects if o.type=="MESH"]
+          arms=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
+          names={x.name for x in meshes}
+          assert "Jacket_Blazer" in names and "Shirt_Inner" in names,names
+          assert arms and sum(len(x.data.bones) for x in arms)>=100
+          for ob in meshes:
+              if ob.name.startswith(("Shirt_","Jacket_")):
+                  assert any(m.type=="ARMATURE" for m in ob.modifiers),(ob.name,"missing skin")
+          report=json.load(open(os.path.join(base,"Fase3_Auditoria.json")))
+          assert report["garment_triangles"]>900
+          print("FASE3_REIMPORT_VERIFIED",sorted(names),"bones",sum(len(x.data.bones) for x in arms))
+          '
+      - name: Validar importacion en Godot 4.3 en escena temporal
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          mkdir -p /tmp/cuervo_qa
+          cp character_assets/el_cuervo/fase3/El_Cuervo_Blazer_Camisa_WIP.glb /tmp/cuervo_qa/
+          printf '[application]\nconfig/name="Cuervo Wardrobe QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_qa/project.godot
+          sed 's/El_Cuervo_Base_Humana_v1.glb/El_Cuervo_Blazer_Camisa_WIP.glb/' tools/el_cuervo/verify_godot.gd > /tmp/cuervo_qa/verify_godot.gd
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_qa --script res://verify_godot.gd
+          python3 - <<'PY'
+          import json
+          p="character_assets/el_cuervo/fase3/Fase3_Auditoria.json"
+          d=json.load(open(p))
+          d["godot_4_3_import_verified"]=True
+          json.dump(d,open(p,"w"),ensure_ascii=False,indent=2)
+          PY
+      - name: Licencia y limitaciones de la geometria
+        run: |
+          cat > character_assets/el_cuervo/fase3/README.md <<'EOF'
+          # El Cuervo — Fase 3: blazer y camisa 3D reales (WIP)
+          - Origen corporal: MakeHuman/Innerscene CC0 documentado en ../fase1/PROCEDENCIA_LICENCIA.md
+          - Las prendas se generaron por geometria paramétrica guiada por medidas reales de la malla humana. No son imagenes de IA ni mallas comerciales.
+          - NO es patronaje profesional ni escaneo: es primer prototipo 3D editable para inspeccion.
+          - Las prendas tienen grupos de vertices derivados del rig; quedan pendientes QA de hombros, codos, axilas y clipping.
+          - La reimportacion confirma formato y rig, no calidad artistica ni FPS.
+          - NO integrar este prototipo al juego ni darlo por terminado antes de revision visual.
+          EOF
+      - name: Publicar entregables en rama aislada solamente
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add character_assets/el_cuervo/fase3
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): real Blender garment prototype blazer and shirt phase3'
+            git pull --rebase origin feature/el-cuervo-base-humana-v1
+            git push origin HEAD:feature/el-cuervo-base-humana-v1
+          fi
+      - name: Artefacto respaldado
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase3_Blazer_Camisa_WIP
+          path: character_assets/el_cuervo/fase3/
+          if-no-files-found: error
+          retention-days: 30

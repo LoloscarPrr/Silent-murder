@@ -1,0 +1,59 @@
+name: El Cuervo - vistas compactas para celular
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - '.github/workflows/el-cuervo-previews-mobile.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lightweight_previews:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Verify genuine Blender renders exist
+        run: |
+          test -s character_assets/el_cuervo/refine_fase7/01_Cuervo_Refinado_Frontal.png
+          test -s character_assets/el_cuervo/refine_fase7/02_Cuervo_Refinado_TresCuartos.png
+          test -s character_assets/el_cuervo/refine_fase7/04_Cuervo_Detalle_Rostro.png
+      - name: Compress authentic renders for phone
+        run: |
+          command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y ffmpeg)
+          root=character_assets/el_cuervo/refine_fase7
+          ffmpeg -hide_banner -loglevel error -y -i "$root/01_Cuervo_Refinado_Frontal.png" -vf 'scale=430:-2' -frames:v 1 -q:v 6 "$root/01_Cuervo_Frontal_Celular.jpg"
+          ffmpeg -hide_banner -loglevel error -y -i "$root/02_Cuervo_Refinado_TresCuartos.png" -vf 'scale=430:-2' -frames:v 1 -q:v 6 "$root/02_Cuervo_TresCuartos_Celular.jpg"
+          ffmpeg -hide_banner -loglevel error -y -i "$root/04_Cuervo_Detalle_Rostro.png" -vf 'scale=430:-2' -frames:v 1 -q:v 6 "$root/04_Cuervo_Rostro_Celular.jpg"
+          python3 - <<'PY'
+          import os
+          root='character_assets/el_cuervo/refine_fase7'
+          for filename in ['01_Cuervo_Frontal_Celular.jpg','02_Cuervo_TresCuartos_Celular.jpg','04_Cuervo_Rostro_Celular.jpg']:
+              p=os.path.join(root,filename)
+              with open(p,'rb') as f:assert f.read(3)==b'\xff\xd8\xff'
+              n=os.path.getsize(p)
+              print(filename,n,'bytes')
+              assert 6000<n<180000, (p,n)
+          PY
+      - name: Store real thumbnails in isolated branch
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add character_assets/el_cuervo/refine_fase7/*_Celular.jpg
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): compact genuine Blender renders for low-bandwidth mobile previews'
+            for i in 1 2 3 4 5; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then exit 0; fi
+              git rebase --abort || true
+              sleep 4
+            done
+            exit 1
+          fi

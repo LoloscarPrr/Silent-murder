@@ -1,0 +1,19 @@
+{
+  "blend_opened": true,
+  "glb_binary_structure_valid": true,
+  "glb_reimported_in_blender": true,
+  "glb_height_m": 1.8399479258805513,
+  "glb_mesh_nodes": [
+    "base_male_body",
+    "base_male_body.high-poly"
+  ],
+  "blender_import_extra_objects": [
+    "Icosphere"
+  ],
+  "glb_triangles": 109064,
+  "glb_vertices": 73559,
+  "glb_bones": 163,
+  "glb_materials": 1,
+  "godot_4_3_import_verified": true,
+  "artistic_human_review_approved": false
+}

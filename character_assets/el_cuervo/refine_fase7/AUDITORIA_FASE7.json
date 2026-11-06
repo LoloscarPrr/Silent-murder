@@ -1,0 +1,51 @@
+{
+  "status": "ARTISTIC_REVIEW_PENDING",
+  "source_blend": "El_Cuervo_Candidato_Profesional_CC0.blend",
+  "source_assets": "MakeHuman CC0 / CharacterCreator by kblood",
+  "license_citation": "See upstream MakeHuman system assets CC0 and repository licenses",
+  "game_main_modified": false,
+  "character_height_m": 1.8330391051778108,
+  "rig_bones": 53,
+  "original_outfit_triangles": 4480,
+  "base_human_triangles": 26756,
+  "hair_triangles": 1050,
+  "original_eye_mesh_kept": true,
+  "original_compatible_skinning_kept": true,
+  "artistic_approval": false,
+  "android_fps_measured": false,
+  "gameplay_animations_tested": false,
+  "coat_vertices_tailored": 1517,
+  "coat_faces_before": 4480,
+  "coat_faces_after": 3832,
+  "coat_triangles_after": 3868,
+  "cut_hem_height_m": 0.5590768672352838,
+  "body_faces_recolored_glove": 7208,
+  "hand_bone_names": [
+    "hand_l",
+    "hand_r"
+  ],
+  "glb_nodes": [
+    "Body",
+    "Eyebrows",
+    "Eyelashes",
+    "Eyes",
+    "Teeth",
+    "Tongue",
+    "Hair_short04",
+    "Cloth_shirt",
+    "Cloth_jeans",
+    "Cloth_boots",
+    "Cloth_trenchcoat"
+  ],
+  "total_triangles": 49446,
+  "glb_bytes": 5273472,
+  "blend_file": "El_Cuervo_Refinado_Fase7_REVISION.blend",
+  "glb_file": "El_Cuervo_Refinado_Fase7_REVISION.glb",
+  "blender_reimport_verified": true,
+  "godot43_import_verified": true,
+  "warnings": [
+    "Artistic review required; not approved until real renders inspected.",
+    "No proof of Android FPS, animation skinning in combat or cloth dynamics.",
+    "Separate branch and art directory; no change to main or APK."
+  ]
+}
