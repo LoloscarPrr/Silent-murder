@@ -18,14 +18,13 @@ jobs:
       - name: Assemble existing genuine Blender views into JPEG
         run: |
           set -euo pipefail
-          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           folder="character_assets/el_cuervo/refine_fase7"
-          ffmpeg -hide_banner -loglevel error -y \
-            -i "$folder/01_Cuervo_Refinado_Frontal.png" \
-            -i "$folder/02_Cuervo_Refinado_TresCuartos.png" \
-            -i "$folder/04_Cuervo_Detalle_Rostro.png" \
-            -filter_complex '[0:v]scale=260:342[a];[1:v]scale=260:342[b];[2:v]scale=260:342[c];[a][b][c]hstack=inputs=3[out]' \
-            -map '[out]' -frames:v 1 -q:v 15 "$folder/El_Cuervo_Fase7_CHAT.jpg"
+          command -v convert
+          convert \
+            \( "$folder/01_Cuervo_Refinado_Frontal.png" -resize 200x264! \) \
+            \( "$folder/02_Cuervo_Refinado_TresCuartos.png" -resize 200x264! \) \
+            \( "$folder/04_Cuervo_Detalle_Rostro.png" -resize 200x264! \) \
+            +append -strip -interlace Plane -sampling-factor 4:2:0 -quality 48 "$folder/El_Cuervo_Fase7_CHAT.jpg"
           python3 - <<'PY'
           import os
           p='character_assets/el_cuervo/refine_fase7/El_Cuervo_Fase7_CHAT.jpg'
