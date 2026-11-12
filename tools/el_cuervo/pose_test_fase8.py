@@ -82,6 +82,16 @@ def render(name,offset,aim=focus,scale=None):
     scene.render.filepath=os.path.join(out,name+".png")
     bpy.ops.render.render(write_still=True)
     assert os.path.getsize(scene.render.filepath)>5000
+    # True Blender render reduced for the user's low-bandwidth Android chat.
+    # No second render; load that exact PNG, resize, write tiny JPEG locally.
+    rendered=bpy.data.images.load(scene.render.filepath,check_existing=False)
+    rendered.scale(350,456)
+    scene.render.image_settings.file_format="JPEG"
+    scene.render.image_settings.quality=55
+    rendered.save_render(os.path.join(out,name+"_CHAT.jpg"),scene=scene)
+    scene.render.image_settings.file_format="PNG"
+    bpy.data.images.remove(rendered)
+    assert os.path.getsize(os.path.join(out,name+"_CHAT.jpg"))>3000
     return name+".png"
 
 def sampled_world_vertices(obj,skip=14):
@@ -141,13 +151,25 @@ report["renders"]=[
 # The default source has upper arms at an A-pose. Rotate the REAL upper-arm
 # bones, allowing the original full-weight skinning to drive cloth and hands.
 for arm in arms:
-    side=-1 if arm.name.endswith("_l") else 1
-    target_world=Vector((side*.13,0,-.991))
+    # IMPORTANT: original MPFB armature's LEFT projects to positive Blender X.
+    # Derive side from actual bone axis; suffix "_l" is not world -X.
+    side=1 if world_direction(arm).x>0 else -1
+    target_world=Vector((side*.18,0,-.984))
     report["pose_angles_deg"][arm.name]=math.degrees(world_direction(arm).angle(target_world))
     report["pose_bone_names"][arm.name]={"original_world":list(world_direction(arm)),
                                         "target_world":list(target_world)}
     report["pose_bone_names"][arm.name]["angular_error_deg"] = set_world_bone_direction(arm,target_world)
 
+# Lower forearms also point forward in the original A-pose.
+# Bend them into the anatomical rest direction so hands hang alongside hips.
+for forearm in forearms:
+    side=1 if forearm.name.endswith("_l") else -1
+    target_world=Vector((side*.13,-.035,-.991))
+    report["pose_bone_names"][forearm.name+"_lowered"]={
+        "target_world":list(target_world),
+        "angular_error_deg":set_world_bone_direction(forearm,target_world)
+    }
+down_pose_forearms={f.name:f.matrix.copy() for f in forearms}
 bpy.context.view_layer.update()
 down_body=sampled_world_vertices(body)
 down_coat=sampled_world_vertices(coat)
@@ -165,9 +187,9 @@ report["renders"] += [
 # Elbows bent deliberately to expose possible cloth crossings at cuffs and
 # torso. Rotate each lowerarm only after upper arms reached the low pose.
 for forearm in forearms:
-    side=-1 if forearm.name.endswith("_l") else 1
+    side=1 if forearm.name.endswith("_l") else -1
     current=world_direction(forearm)
-    new_target=Vector((side*.16,-.70,-.70))
+    new_target=Vector((side*.17,-.63,-.76))
     report["pose_bone_names"][forearm.name]={
         "original_world_after_upperarm":list(current),
         "target_world":list(new_target),
@@ -180,10 +202,10 @@ report["renders"] += [
 report["bent_coat_deformation"]=displacement_stats(base_coat,sampled_world_vertices(coat))
 # Preserve an actual evaluated GLB in arms-down inspection pose, but keep
 # production gameplay candidate unchanged. Pose not approved until visual QA.
-for pb in rig.pose.bones:
-    if pb.name in [f.name for f in forearms]:
-        pb.matrix_basis.identity()
+for pb in forearms:
+    pb.matrix=down_pose_forearms[pb.name]
 bpy.context.view_layer.update()
+report["restored_anatomical_forearms_for_down_glb"]=True
 bpy.ops.object.select_all(action="DESELECT")
 objects=[obj for obj in bpy.data.objects if obj.type=="MESH" or obj==rig]
 for obj in objects:obj.select_set(True)
