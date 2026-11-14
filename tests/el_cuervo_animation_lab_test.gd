@@ -118,6 +118,15 @@ func _run() -> void:
         fail("Imported Aim clip not playing")
         return
     anim.advance(0.95)
+    var imported_aim := anim.get_animation(AIM)
+    print("FASE10_TRACK_INFO count=", imported_aim.get_track_count(),
+          " aim_current=", anim.current_animation,
+          " time=", anim.current_animation_position,
+          " player_active=", anim.active)
+    for index in range(mini(8, imported_aim.get_track_count())):
+        print("FASE10_TRACK ", index, " target=", imported_aim.track_get_path(index),
+              " type=", imported_aim.track_get_type(index),
+              " keys=", imported_aim.track_get_key_count(index))
     var hand_l := skeleton.find_bone("hand_l")
     var hand_r := skeleton.find_bone("hand_r")
     if hand_l < 0 or hand_r < 0:
@@ -126,6 +135,18 @@ func _run() -> void:
     var left_pos := skeleton.get_bone_global_pose(hand_l).origin
     var right_pos := skeleton.get_bone_global_pose(hand_r).origin
     var gap := left_pos.distance_to(right_pos)
+    # Diagnose whether the imported AnimationPlayer really drives skeleton
+    # coordinates, or just changes its playback clock.
+    var spine := skeleton.find_bone("upperarm_l")
+    print("FASE10_BONE_ROT before_seek=", skeleton.get_bone_pose_rotation(spine))
+    anim.seek(0.98, true)
+    skeleton.force_update_all_bone_transforms()
+    var after_seek_l := skeleton.get_bone_global_pose(hand_l).origin
+    var after_seek_r := skeleton.get_bone_global_pose(hand_r).origin
+    print("FASE10_SEEK_DIAGNOSTICS left=", after_seek_l,
+          " right=", after_seek_r,
+          " gap=", after_seek_l.distance_to(after_seek_r),
+          " arm_rot=", skeleton.get_bone_pose_rotation(spine))
     print("FASE10_AIM_POSE_DIAGNOSTICS clip=", anim.current_animation,
           " position=", anim.current_animation_position,
           " playing=", anim.is_playing(), " left=", left_pos,
