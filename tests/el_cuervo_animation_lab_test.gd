@@ -117,7 +117,10 @@ func _run() -> void:
     if String(anim.current_animation) != AIM:
         fail("Imported Aim clip not playing")
         return
-    anim.advance(0.95)
+    # Test genuine runtime playback and the finishing hold, not only a
+    # direct seek. The whole aim clip is 1s; wait 1.15s with Godot running.
+    await create_timer(1.15).timeout
+    skeleton.force_update_all_bone_transforms()
     var imported_aim := anim.get_animation(AIM)
     print("FASE10_TRACK_INFO count=", imported_aim.get_track_count(),
           " aim_current=", anim.current_animation,
@@ -135,6 +138,11 @@ func _run() -> void:
     var left_pos := skeleton.get_bone_global_pose(hand_l).origin
     var right_pos := skeleton.get_bone_global_pose(hand_r).origin
     var gap := left_pos.distance_to(right_pos)
+    print("FASE10_REALTIME_AIM_HOLD gap=", gap, " animation_position=",
+          anim.current_animation_position, " playing=", anim.is_playing())
+    if gap > .25 or gap < .045:
+        fail("Actual real-time aim playback did not hold correct grip: %.3f m" % gap)
+        return
     # Diagnose whether the imported AnimationPlayer really drives skeleton
     # coordinates, or just changes its playback clock.
     var spine := skeleton.find_bone("upperarm_l")
