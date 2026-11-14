@@ -117,7 +117,7 @@ func _run() -> void:
     if String(anim.current_animation) != AIM:
         fail("Imported Aim clip not playing")
         return
-    anim.advance(1.0)
+    anim.advance(0.95)
     var hand_l := skeleton.find_bone("hand_l")
     var hand_r := skeleton.find_bone("hand_r")
     if hand_l < 0 or hand_r < 0:
@@ -126,6 +126,10 @@ func _run() -> void:
     var left_pos := skeleton.get_bone_global_pose(hand_l).origin
     var right_pos := skeleton.get_bone_global_pose(hand_r).origin
     var gap := left_pos.distance_to(right_pos)
+    print("FASE10_AIM_POSE_DIAGNOSTICS clip=", anim.current_animation,
+          " position=", anim.current_animation_position,
+          " playing=", anim.is_playing(), " left=", left_pos,
+          " right=", right_pos, " gap=", gap)
     if gap > .25 or gap < .045:
         fail("Aiming wrists are not aligned in Godot: %.3f m" % gap)
         return
