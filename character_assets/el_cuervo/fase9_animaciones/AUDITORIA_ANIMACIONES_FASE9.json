@@ -1,0 +1,107 @@
+{
+  "status": "TECHNICAL_ANIMATION_QA_ART_NOT_APPROVED",
+  "source": "true CC0 MakeHuman body and compatible trenchcoat, Phase7",
+  "source_blend": "El_Cuervo_Refinado_Fase7_REVISION.blend",
+  "original_blend_untouched": true,
+  "game_main_untouched": true,
+  "height_m": 1.8330391051778108,
+  "original_skeleton_bones": 53,
+  "requested_clips": [
+    "Cuervo_Walk_InPlace",
+    "Cuervo_Aim_Raise"
+  ],
+  "clip_tracks": {
+    "Cuervo_Walk_InPlace": {
+      "frames": [
+        1,
+        4,
+        7,
+        10,
+        13,
+        16,
+        19,
+        22,
+        25
+      ],
+      "duration_sec": 1.0,
+      "keyed_bones": [
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "thigh_l",
+        "thigh_r",
+        "calf_l",
+        "calf_r",
+        "foot_l",
+        "foot_r",
+        "upperarm_l",
+        "upperarm_r",
+        "lowerarm_l",
+        "lowerarm_r"
+      ],
+      "root_motion": false,
+      "loop_requested": true
+    },
+    "Cuervo_Aim_Raise": {
+      "frames": [
+        1,
+        7,
+        13,
+        19,
+        25
+      ],
+      "duration_sec": 1.0,
+      "keyed_bones": [
+        "spine_02",
+        "spine_03",
+        "upperarm_l",
+        "upperarm_r",
+        "lowerarm_l",
+        "lowerarm_r"
+      ],
+      "root_motion": false,
+      "loop_requested": false
+    }
+  },
+  "render_frames": {
+    "walk_start": "01_Caminata_Frente_Contacto.jpg",
+    "walk_mid": "02_Caminata_Frente_Paso.jpg",
+    "walk_3q": "03_Caminata_TresCuartos.jpg",
+    "walk_profile": "04_Caminata_Perfil.jpg",
+    "aim_neutral": "05_Apuntar_Reposo.jpg",
+    "aim_transition": "06_Apuntar_Transicion.jpg",
+    "aim_held": "07_Apuntar_BrazosElevados.jpg",
+    "aim_front": "08_Apuntar_Frente.jpg"
+  },
+  "skeleton_deformation_tested": true,
+  "animation_godot_import_validated": true,
+  "android_fps_tested": false,
+  "locomotion_gameplay_integrated": false,
+  "artistic_approved": false,
+  "limitations": [
+    "Walk is hand-authored rig motion, no foot IK/plant lock; sliding may be visible.",
+    "Aim holds empty hands, weapon grip and real aiming gameplay not integrated.",
+    "Coat has skeletal skinning only; no dynamic cloth simulation.",
+    "No FPS benchmark on Android, do not replace main character."
+  ],
+  "saved_action_names": [
+    "Cuervo_Aim_Raise",
+    "Cuervo_Walk_InPlace"
+  ],
+  "exported_animation_names": [
+    "Cuervo_Walk_InPlace",
+    "Cuervo_Aim_Raise"
+  ],
+  "animation_channel_counts": {
+    "Cuervo_Walk_InPlace": 159,
+    "Cuervo_Aim_Raise": 159
+  },
+  "exported_skin_joints": [
+    53
+  ],
+  "glb_file": "El_Cuervo_Fase9_Walk_Aim_REVISION.glb",
+  "blend_file": "El_Cuervo_Fase9_Walk_Aim_REVISION.blend",
+  "glb_bytes": 5357380,
+  "blender_reimport_verified": true,
+  "godot43_animation_verified": true
+}
