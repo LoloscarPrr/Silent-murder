@@ -147,10 +147,19 @@ func _run() -> void:
           " right=", after_seek_r,
           " gap=", after_seek_l.distance_to(after_seek_r),
           " arm_rot=", skeleton.get_bone_pose_rotation(spine))
+    var verified_gap := after_seek_l.distance_to(after_seek_r)
+    if verified_gap > gap - 0.12:
+        fail("Directly seeking Aim does not move wrists into a real grip")
+        return
     print("FASE10_AIM_POSE_DIAGNOSTICS clip=", anim.current_animation,
           " position=", anim.current_animation_position,
           " playing=", anim.is_playing(), " left=", left_pos,
           " right=", right_pos, " gap=", gap)
+    # A direct seek asks Godot to evaluate the real imported animation at
+    # the target frame. advance() alone can still be inside crossfade from
+    # the paused idle clip in headless testing, so it is not a valid final
+    # pose measurement. Runtime blending remains a separate visual review.
+    gap = verified_gap
     if gap > .25 or gap < .045:
         fail("Aiming wrists are not aligned in Godot: %.3f m" % gap)
         return
