@@ -137,8 +137,11 @@ func get_debug_status() -> Dictionary:
     }
 
 func _on_animation_finished(name: StringName) -> void:
-    # For AIM, don't restart the animation or return to an A-pose.
+    # Explicitly hold last evaluated aim pose. Godot may otherwise return
+    # bones toward import rest as a non-looped clip finishes.
     if name == AIM_CLIP and _mode == "aim":
+        _anim.seek(maxf(0.0, _anim.get_animation(AIM_CLIP).length - 0.01), true)
+        _anim.pause()
         _update_hud()
 
 func _physics_process(delta: float) -> void:
