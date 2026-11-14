@@ -80,6 +80,9 @@ func _run() -> void:
         return
 
     walk_button.emit_signal("button_down")
+    # physics_frame is emitted BEFORE physics processing of nodes: two ticks
+    # ensure the button signal is consumed by the laboratory controller.
+    await physics_frame
     await physics_frame
     if lab.call("get_debug_status")["mode"] != "walk":
         fail("Walking button failed to start Walk clip")
@@ -100,6 +103,7 @@ func _run() -> void:
         return
 
     walk_button.emit_signal("button_up")
+    await physics_frame
     await physics_frame
     if lab.call("get_debug_status")["mode"] != "idle":
         fail("Releasing Walk did not return to rest")
