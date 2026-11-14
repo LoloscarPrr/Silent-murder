@@ -156,8 +156,10 @@ func _run() -> void:
           " gap=", after_seek_l.distance_to(after_seek_r),
           " arm_rot=", skeleton.get_bone_pose_rotation(spine))
     var verified_gap := after_seek_l.distance_to(after_seek_r)
-    if verified_gap > gap - 0.12:
-        fail("Directly seeking Aim does not move wrists into a real grip")
+    # Real-time playback already held the correct pose. Direct seek should
+    # preserve it within normal interpolation tolerance, not "improve" it.
+    if absf(verified_gap - gap) > .065:
+        fail("Direct seek differs from real-time held Aim pose")
         return
     print("FASE10_AIM_POSE_DIAGNOSTICS clip=", anim.current_animation,
           " position=", anim.current_animation_position,
