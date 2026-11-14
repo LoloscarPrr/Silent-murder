@@ -227,11 +227,12 @@ for frame in aim_keys:
     for suffix in ("l","r"):
         s=side("upperarm_"+suffix)
         start_upper=Vector((s*.18,0,-.984))
-        upper_aim=Vector((s*.095,-.77,-.63)) if suffix=="l" \
-            else Vector((s*.085,-.91,-.39))
+        # Bring BOTH elbow hinges closer to the chest centerline, keep the
+        # wrists at shoulder height and meet support hand below the dominant.
+        # The first export had hands ~0.42 m apart and looked like a zombie.
+        upper_aim=Vector((-s*.11,-.935,-.335))
         start_forearm=Vector((s*.13,-.035,-.991))
-        forearm_aim=Vector((-.12,-.96,-.245)) if suffix=="l" \
-            else Vector((s*.055,-.98,-.19))
+        forearm_aim=Vector((-s*.39,-.865,+.30))
         orient(bones["upperarm_"+suffix],
                start_upper.lerp(upper_aim,eased))
         orient(bones["lowerarm_"+suffix],
@@ -275,6 +276,18 @@ report["render_frames"]["aim_held"]=view("07_Apuntar_BrazosElevados",
                                           (2.8,-3.8,.14),25)
 report["render_frames"]["aim_front"]=view("08_Apuntar_Frente",
                                            (0,-4,.13),25)
+# Numerical aiming quality gate: both original skinned hands must converge
+# approximately on a two-handed grip, rather than point from 40 cm apart.
+scene.frame_set(25)
+bpy.context.view_layer.update()
+lh=rig.matrix_world @ rig.pose.bones["hand_l"].head
+rh=rig.matrix_world @ rig.pose.bones["hand_r"].head
+report["aim_hand_gap_m"]=(lh-rh).length
+report["aim_hand_heights_world_m"]=[lh.z,rh.z]
+assert .065<report["aim_hand_gap_m"]<.22, (
+    "The two-handed aim pose is not aligned",report["aim_hand_gap_m"])
+assert min(lh.z,rh.z)>lo.z+height*.71, (
+    "Aiming hands too low for shooting",lh.z,rh.z)
 rig.animation_data.action=None
 for tr in rig.animation_data.nla_tracks:
     tr.mute=False
