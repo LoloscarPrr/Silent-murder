@@ -1,0 +1,5293 @@
+{
+  "status": "PREVIEW_NOT_APPROVED",
+  "source": "kblood/CharacterCreator output CC0",
+  "source_repo": "https://github.com/kblood/CharacterCreator",
+  "source_revision": "852e48f316b90a0937234886630e4fb4cdfd1f78",
+  "body_and_wardrobe_compatible_source": true,
+  "main_game_modified": false,
+  "animation_review_approved": false,
+  "android_fps_tested": false,
+  "artistic_review_approved": false,
+  "parts": [
+    {
+      "kind": "body",
+      "source": "base_body.glb",
+      "objects": [
+        "Armature",
+        "Body",
+        "Eyebrows",
+        "Eyelashes",
+        "Eyes",
+        "Teeth",
+        "Tongue"
+      ],
+      "meshes": 6,
+      "armatures": 1,
+      "triangles": 36924,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "hair",
+      "source": "hair_short04.glb",
+      "objects": [
+        "Armature.001",
+        "Hair_short04"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 1050,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "shirt",
+      "source": "clothing_shirt.glb",
+      "objects": [
+        "Armature.002",
+        "Cloth_shirt"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 2688,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "jeans",
+      "source": "clothing_jeans.glb",
+      "objects": [
+        "Armature.003",
+        "Cloth_jeans"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 1712,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "boots",
+      "source": "clothing_boots.glb",
+      "objects": [
+        "Armature.004",
+        "Cloth_boots"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 3204,
+      "bones": [
+        53
+      ]
+    },
+    {
+      "kind": "jacket",
+      "source": "clothing_trenchcoat.glb",
+      "objects": [
+        "Armature.005",
+        "Cloth_trenchcoat"
+      ],
+      "meshes": 1,
+      "armatures": 1,
+      "triangles": 4480,
+      "bones": [
+        53
+      ]
+    }
+  ],
+  "morph_weights_nonzero_before": [
+    {
+      "mesh": "Body",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Body",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyebrows",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyelashes",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Eyes",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Teeth",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Tongue",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Hair_short04",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_shirt",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_jeans",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_boots",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "gender_female",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "gender_male",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "height_short",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "height_tall",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "proportions_ideal",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "proportions_uncommon",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "breast_cup_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "breast_cup_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_nose_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_nose_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_nose_length_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_nose_length_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_nose_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_nose_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_jaw_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_jaw_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_chin_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_chin_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_cheekbones_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_cheekbones_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_eye_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_eye_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_eye_spacing_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_eye_spacing_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_eye_tilt_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_eye_tilt_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_lips_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_lips_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_mouth_width_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_mouth_width_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_ear_size_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_ear_size_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_forehead_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "face_forehead_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "blink_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "blink_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "look_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "look_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "look_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "look_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_female__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_female__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_male__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_male__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_weight_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_weight_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_weight_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_weight_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_female__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_female__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_male__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_male__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_female__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_female__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_male__weight_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_gender_male__weight_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_min__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_min__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_max__breast_firm_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_max__breast_firm_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_min__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_min__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_max__muscle_min",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_cup_max__muscle_max",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_firm_min__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_firm_min__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_firm_max__age_child",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "corr_breast_firm_max__age_old",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "bdet_breast_dist_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "bdet_breast_dist_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "bdet_breast_point_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "bdet_breast_point_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "bdet_breast_height_decr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "bdet_breast_height_incr",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "dyn_breast_up",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "dyn_breast_down",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "dyn_breast_left",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "dyn_breast_right",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "dyn_breast_fwd",
+      "weight": 1.0
+    },
+    {
+      "mesh": "Cloth_trenchcoat",
+      "key": "dyn_breast_back",
+      "weight": 1.0
+    }
+  ],
+  "morph_count_reset": 1012,
+  "all_morph_targets_neutralized": true,
+  "main_skeleton_bones": 53,
+  "all_armatures_found": 6,
+  "merged_armatures": [
+    "Armature.001",
+    "Armature.002",
+    "Armature.003",
+    "Armature.004",
+    "Armature.005"
+  ],
+  "rig_compatibility_report": [
+    {
+      "armature": "Armature.001",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    },
+    {
+      "armature": "Armature.002",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    },
+    {
+      "armature": "Armature.003",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    },
+    {
+      "armature": "Armature.004",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    },
+    {
+      "armature": "Armature.005",
+      "source_bone_samples": [
+        "Root",
+        "pelvis",
+        "spine_01",
+        "spine_02",
+        "spine_03",
+        "clavicle_l",
+        "upperarm_l",
+        "lowerarm_l"
+      ],
+      "bone_overlap": 53,
+      "total_bones": 53,
+      "max_rest_offset_m": 0.0,
+      "mean_rest_offset_m": 0.0,
+      "merge_status": "merged_to_primary_53_bone_rig"
+    }
+  ],
+  "rig_count_after": 1,
+  "morphs_removed_for_android": 988,
+  "morphs_kept_for_eyes": 24,
+  "lod_optimization_policy": "fixed avatar, preserve blink/look only",
+  "source_body_height_m": 1.6657327566063032,
+  "body_height_m": 1.8330391051778108,
+  "uniform_scale_factor": 1.1046189688607324,
+  "glb_mesh_nodes": [
+    "Body",
+    "Eyebrows",
+    "Eyelashes",
+    "Eyes",
+    "Teeth",
+    "Tongue",
+    "Hair_short04",
+    "Cloth_shirt",
+    "Cloth_jeans",
+    "Cloth_boots",
+    "Cloth_trenchcoat"
+  ],
+  "blender_file": "El_Cuervo_Candidato_Profesional_CC0.blend",
+  "glb_file": "El_Cuervo_Candidato_Profesional_CC0.glb",
+  "glb_size_bytes": 5280936,
+  "total_triangles": 50058,
+  "blender_reimport_verified": true,
+  "godot43_import_verified": true
+}

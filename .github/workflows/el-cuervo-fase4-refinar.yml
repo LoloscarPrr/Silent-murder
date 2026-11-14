@@ -1,0 +1,149 @@
+name: El Cuervo - Fase 4 refinement, CC0 suit and true boots
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/fase4_refine.py'
+      - '.github/workflows/el-cuervo-fase4-refinar.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cuervo-fase4-refinamiento-wip
+  cancel-in-progress: true
+
+jobs:
+  refine:
+    name: Blender 4.3 - authentic boots, suit refinement and rig QA
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Dependencies and official Blender 4.3.2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl unzip libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy;assert bpy.app.version[:2]==(4,3);print("BLENDER_VERIFIED",bpy.app.version_string)'
+      - name: Download shoes01 CC0 authentic male ankle boots
+        run: |
+          curl -fL --retry 3 --connect-timeout 20 --max-time 360 \
+            'https://files2.makehumancommunity.org/asset_packs/shoes01/shoes01_cc0.zip' -o /tmp/shoes01_cc0.zip
+          python3 - <<'PY'
+          import zipfile,hashlib,os
+          p='/tmp/shoes01_cc0.zip'
+          assert zipfile.is_zipfile(p)
+          z=zipfile.ZipFile(p)
+          matches=[x for x in z.namelist() if "toigo_ankle_boots_male" in x.lower() and x.lower().endswith(".obj")]
+          assert len(matches)==1,("Expected Margaret Toigo ankle boots",matches)
+          with open(p,'rb') as f:h=hashlib.sha256(f.read()).hexdigest()
+          print("AUTHENTIC_CC0_SHOES_ARCHIVE",os.path.getsize(p),h,matches)
+          PY
+      - name: Require authentic tailored suit and original human rig
+        run: |
+          test -s character_assets/el_cuervo/fase3_prenda_real/El_Cuervo_toigo_male_suit_3_TRAJE_REAL_WIP.blend
+          test -s character_assets/el_cuervo/fase3_prenda_real/AUDITORIA_TRAJES_REALES.json
+      - name: Edit mesh, add boots, pose test and render in Blender
+        run: |
+          mkdir -p character_assets/el_cuervo/fase4
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/fase4_refine.py -- \
+            --blend character_assets/el_cuervo/fase3_prenda_real/El_Cuervo_toigo_male_suit_3_TRAJE_REAL_WIP.blend \
+            --shoes /tmp/shoes01_cc0.zip \
+            --out character_assets/el_cuervo/fase4
+      - name: Independently reopen actual BLEND and GLB
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,json,os
+          path="character_assets/el_cuervo/fase4"
+          stats=json.load(open(os.path.join(path,"Fase4_Auditoria.json")))
+          assert stats["shoe_original_triangles"]>1000
+          assert len(stats["shoe_weights_report"])>=1
+          blend=os.path.join(path,stats["blender_file"])
+          glb=os.path.join(path,stats["godot_glb_file"])
+          bpy.ops.wm.open_mainfile(filepath=blend)
+          bm=[o for o in bpy.context.scene.objects if o.type=="MESH" and o.name.startswith("Cuervo_Botin_CC0")]
+          assert bm
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=glb)
+          boots=[o for o in bpy.context.scene.objects if o.type=="MESH" and o.name.startswith("Cuervo_Botin_CC0")]
+          suit=[o for o in bpy.context.scene.objects if o.type=="MESH" and o.name.startswith("CC0_toigo_male_suit_3")]
+          arm=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
+          assert boots and suit and arm
+          assert all(any(m.type=="ARMATURE" for m in o.modifiers) for o in boots+suit)
+          assert sum(len(x.data.bones) for x in arm)>=160
+          print("FASE4_REIMPORT_CONFIRMED",len(boots),len(suit),len(arm))
+          '
+      - name: Validate GLB in fresh Godot 4.3 project
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot /tmp/cuervo_fase4_qa
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          cp character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.glb /tmp/cuervo_fase4_qa/
+          printf '[application]\nconfig/name="Cuervo Fase4 QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_fase4_qa/project.godot
+          sed 's/El_Cuervo_Base_Humana_v1.glb/El_Cuervo_Refinado_Fase4_WIP.glb/' tools/el_cuervo/verify_godot.gd > /tmp/cuervo_fase4_qa/verify_godot.gd
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase4_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase4_qa --script res://verify_godot.gd
+          python3 - <<'PY'
+          import json
+          p='character_assets/el_cuervo/fase4/Fase4_Auditoria.json'
+          d=json.load(open(p))
+          d['godot43_headless_import_verified']=True
+          json.dump(d,open(p,'w'),ensure_ascii=False,indent=2)
+          PY
+      - name: Record CC0 license and pending artist approval
+        run: |
+          cat > character_assets/el_cuervo/fase4/LEEME.md <<'EOF'
+          # El Cuervo - Fase 4 (prototipo refinado editable, no definitivo)
+          Anatomía: Innerscene / MakeHuman CC0; original preservado.
+          Traje: Margaret Toigo, MakeHuman Community suits01 (CC0).
+          Calzado: Margaret Toigo, toigo_ankle_boots_male, MakeHuman Community shoes01 (CC0).
+          Fuente:
+          https://static.makehumancommunity.org/assets/assetpacks/suits01.html
+          https://static.makehumancommunity.org/assets/assetpacks/shoes01.html
+
+          No se fabrican botas primitivas. El material y la geometría se editan
+          sobre prendas reales. Todo render proviene de Blender.
+          La vista con brazos bajos es PRUEBA de pose: el GLB se exporta
+          en pose base neutra, no como animación terminada.
+          No hay validación artística final, skinning limpio, ni FPS Android.
+          No fusionar con main ni reemplazar al personaje jugable.
+          EOF
+      - name: Publish files on production branch, retry concurrent bot push
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find character_assets/el_cuervo/fase4 -name '*.blend1' -delete
+          git add character_assets/el_cuervo/fase4
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): refined genuine CC0 suit and male ankle boots phase4'
+            for attempt in 1 2 3 4 5 6 7; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then
+                echo "Published on attempt $attempt"
+                exit 0
+              fi
+              git rebase --abort || true
+              sleep 6
+            done
+            exit 1
+          fi
+      - name: Backup WIP models and authentic Blender renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase4_Refinado_Botines_CC0
+          path: character_assets/el_cuervo/fase4/
+          if-no-files-found: warn
+          retention-days: 30

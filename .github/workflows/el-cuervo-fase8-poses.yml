@@ -1,0 +1,81 @@
+name: El Cuervo - Fase 8 prueba real de poses y mangas
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/pose_test_fase8.py'
+      - '.github/workflows/el-cuervo-fase8-poses.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-fase8-rig-qa
+  cancel-in-progress: true
+
+jobs:
+  real_pose_test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Install official Blender 4.3.2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy;assert bpy.app.version[:2]==(4,3)'
+      - name: Animate verified 53 bone character with real weights
+        run: |
+          set -euo pipefail
+          test -s character_assets/el_cuervo/refine_fase7/El_Cuervo_Refinado_Fase7_REVISION.blend
+          mkdir -p character_assets/el_cuervo/fase8_prueba_poses
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/pose_test_fase8.py -- \
+            --blend character_assets/el_cuervo/refine_fase7/El_Cuervo_Refinado_Fase7_REVISION.blend \
+            --out character_assets/el_cuervo/fase8_prueba_poses
+      - name: Audit movement and output without artistic false approval
+        run: |
+          python3 - <<'PY'
+          import os,json
+          root='character_assets/el_cuervo/fase8_prueba_poses'
+          with open(os.path.join(root,'AUDITORIA_MOVIMIENTO_FASE8.json')) as f:j=json.load(f)
+          assert j['source_pose_restored'] and j['coat_deformation_measured']
+          assert len(j['renders'])>=7 and j['rig_bones']==53
+          assert j['artistic_approved'] is False
+          assert j['original_phase7_modified'] is False and j['game_main_modified'] is False
+          for p in j['renders']+[j['inspection_glb']]:
+              assert os.path.getsize(os.path.join(root,p))>5000,p
+          print('PHASE8_VERIFIED',j['coat_deformation'],j['body_deformation'])
+          PY
+      - name: Preserve independent pose diagnostic assets on feature branch
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add character_assets/el_cuervo/fase8_prueba_poses
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): real Blender profile and arm articulation QA, not approved'
+            for i in 1 2 3 4 5; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then exit 0; fi
+              git rebase --abort || true
+              sleep 4
+            done
+            exit 1
+          fi
+      - name: Keep raw PNGs and GLB from real Blender in run artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase8_Poses_Reales
+          path: character_assets/el_cuervo/fase8_prueba_poses/
+          if-no-files-found: warn
+          retention-days: 30

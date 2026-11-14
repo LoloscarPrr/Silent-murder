@@ -1,0 +1,44 @@
+name: Cuervo - hoja compacta para chat
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - .github/workflows/cuervo-chat-sheet.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sheet:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+      - name: Assemble existing genuine Blender views into JPEG
+        run: |
+          set -euo pipefail
+          folder="character_assets/el_cuervo/refine_fase7"
+          command -v convert
+          convert \
+            \( "$folder/01_Cuervo_Refinado_Frontal.png" -resize 200x264! \) \
+            \( "$folder/02_Cuervo_Refinado_TresCuartos.png" -resize 200x264! \) \
+            \( "$folder/04_Cuervo_Detalle_Rostro.png" -resize 200x264! \) \
+            +append -strip -interlace Plane -sampling-factor 4:2:0 -quality 48 "$folder/El_Cuervo_Fase7_CHAT.jpg"
+          python3 - <<'PY'
+          import os
+          p='character_assets/el_cuervo/refine_fase7/El_Cuervo_Fase7_CHAT.jpg'
+          n=os.stat(p).st_size
+          assert 2000<n<35000,n
+          print("CUERVO_CHAT_IMAGE_READY",n)
+          PY
+      - name: Save image with real source provenance
+        run: |
+          git config user.name "El Cuervo Production Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add character_assets/el_cuervo/refine_fase7/El_Cuervo_Fase7_CHAT.jpg
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(character): small real Blender contact sheet for chat"
+            git pull --rebase origin feature/el-cuervo-base-humana-v1
+            git push origin HEAD:feature/el-cuervo-base-humana-v1
+          fi
