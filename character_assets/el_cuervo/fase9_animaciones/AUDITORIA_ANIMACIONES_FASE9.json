@@ -84,6 +84,11 @@
     "Coat has skeletal skinning only; no dynamic cloth simulation.",
     "No FPS benchmark on Android, do not replace main character."
   ],
+  "aim_hand_gap_m": 0.11027428360155274,
+  "aim_hand_heights_world_m": [
+    1.4181318283081055,
+    1.418131947517395
+  ],
   "saved_action_names": [
     "Cuervo_Aim_Raise",
     "Cuervo_Walk_InPlace"
