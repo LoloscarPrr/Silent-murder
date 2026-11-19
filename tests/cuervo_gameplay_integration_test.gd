@@ -126,7 +126,8 @@ func _run() -> void:
     # Direct multi-finger interactions through original HUD: one finger move,
     # one look and one sprint. None may steal the other finger's role.
     var ui = _scene._hud
-    var size: Vector2 = get_root().size
+    # Match the existing HUD input domain; headless root.size may be zero.
+    var size: Vector2 = ui.get_viewport().get_visible_rect().size
     ui._press(11, Vector2(size.x * .13, size.y * .75))
     ui._drag(11, Vector2(size.x * .13 + 45, size.y * .75 - 50), Vector2(45,-50))
     ui._press(22, Vector2(size.x * .60, size.y * .42))
