@@ -20,6 +20,9 @@ func _run() -> void:
         return
     _scene = packed.instantiate()
     get_root().add_child(_scene)
+    # Unlike the normal engine launch, a -s SceneTree test does not assign
+    # current_scene automatically. The existing tracer uses that property.
+    current_scene = _scene
     await process_frame
     await physics_frame
     await physics_frame
@@ -128,6 +131,11 @@ func _run() -> void:
     ui._drag(11, Vector2(size.x * .13 + 45, size.y * .75 - 50), Vector2(45,-50))
     ui._press(22, Vector2(size.x * .60, size.y * .42))
     ui._press(33, Vector2(size.x * .90, size.y * .84))
+    print("FASE11_TOUCH_DEBUG move=", player.move_input,
+          " look_touch=", ui._look_touch, " sprint=", player.is_sprinting,
+          " crouch=", player.is_crouching, " aim=", player.is_aiming,
+          " roles=", ui._roles, " mission=", ui._mission_state,
+          " rects=", ui._buttons["sprint"].get_global_rect())
     if player.move_input.length() <= .2 or ui._look_touch != 22 or not player.is_sprinting:
         fail("Three-finger joystick/look/sprint broke after model integration")
         return
