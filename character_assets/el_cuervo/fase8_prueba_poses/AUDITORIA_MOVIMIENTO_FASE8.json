@@ -1,0 +1,126 @@
+{
+  "status": "KINEMATIC_QA_RENDER_PENDING_ARTISTIC_REVIEW",
+  "source_real_blend": "El_Cuervo_Refinado_Fase7_REVISION.blend",
+  "original_phase7_modified": false,
+  "game_main_modified": false,
+  "height_m": 1.8330391051778108,
+  "rig_count": 1,
+  "rig_bones": 53,
+  "coat_original_polygons": 3832,
+  "pose_angles_deg": {
+    "upperarm_l": 31.386160406123462,
+    "upperarm_r": 31.386160406123462
+  },
+  "pose_bone_names": {
+    "upperarm_l": {
+      "original_world": [
+        0.6659038662910461,
+        -0.003275905968621373,
+        -0.7460303902626038
+      ],
+      "target_world": [
+        0.18000000715255737,
+        0.0,
+        -0.984000027179718
+      ],
+      "angular_error_deg": 0.0
+    },
+    "upperarm_r": {
+      "original_world": [
+        -0.6659038662910461,
+        -0.0032758982852101326,
+        -0.7460303902626038
+      ],
+      "target_world": [
+        -0.18000000715255737,
+        0.0,
+        -0.984000027179718
+      ],
+      "angular_error_deg": 0.0
+    },
+    "lowerarm_l_lowered": {
+      "target_world": [
+        0.12999999523162842,
+        -0.03500000014901161,
+        -0.9909999966621399
+      ],
+      "angular_error_deg": 0.0
+    },
+    "lowerarm_r_lowered": {
+      "target_world": [
+        -0.12999999523162842,
+        -0.03500000014901161,
+        -0.9909999966621399
+      ],
+      "angular_error_deg": 0.0
+    },
+    "lowerarm_l": {
+      "original_world_after_upperarm": [
+        0.12998659908771515,
+        -0.034996215254068375,
+        -0.9908979535102844
+      ],
+      "target_world": [
+        0.17000000178813934,
+        -0.6299999952316284,
+        -0.7599999904632568
+      ],
+      "angular_error_deg": 0.0
+    },
+    "lowerarm_r": {
+      "original_world_after_upperarm": [
+        -0.12998653948307037,
+        -0.03499620780348778,
+        -0.9908979535102844
+      ],
+      "target_world": [
+        -0.17000000178813934,
+        -0.6299999952316284,
+        -0.7599999904632568
+      ],
+      "angular_error_deg": 0.0
+    }
+  },
+  "body_deformation_measured": true,
+  "coat_deformation_measured": true,
+  "artistic_approved": false,
+  "animations_integrated": false,
+  "android_fps_tested": false,
+  "renders": [
+    "01_Frente_BrazosAbiertos.png",
+    "02_Perfil_BrazosAbiertos.png",
+    "03_Frente_BrazosAbajo.png",
+    "04_TresCuartos_BrazosAbajo.png",
+    "05_Perfil_BrazosAbajo.png",
+    "06_Frente_CodosFlexionados.png",
+    "07_TresCuartos_CodosFlexionados.png"
+  ],
+  "body_deformation": {
+    "sampled": 1037,
+    "median_m": 0.0,
+    "p95_m": 0.4779164046237208,
+    "max_m": 0.5042783745608473
+  },
+  "coat_deformation": {
+    "sampled": 163,
+    "median_m": 0.0026649426517499006,
+    "p95_m": 0.35474371328102833,
+    "max_m": 0.38022336919221494
+  },
+  "bent_coat_deformation": {
+    "sampled": 163,
+    "median_m": 0.0026649426517499006,
+    "p95_m": 0.2628700504893247,
+    "max_m": 0.28249604287480895
+  },
+  "restored_anatomical_forearms_for_down_glb": true,
+  "inspection_glb": "El_Cuervo_Fase8_Inspeccion_BrazosAbajo.glb",
+  "inspection_glb_bytes": 5273472,
+  "source_pose_restored": true,
+  "known_limits": [
+    "Only static bone poses: no complete locomotion, aiming or action animations tested",
+    "Cloth can intersect when animated; inspect PNG frontal/profile/bent elbow views",
+    "No simulation of cloth dynamics or Android device performance",
+    "This is an isolated QA artifact and does not replace the playable character"
+  ]
+}

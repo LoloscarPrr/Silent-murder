@@ -1,0 +1,106 @@
+{
+  "archive_source": "https://files2.makehumancommunity.org/asset_packs/suits01/suits01_cc0.zip",
+  "archive_sha256": "2b1d8676f3863b188e9eea98c1d8f234543d54c440e791d92b819f8ee1861f19",
+  "archive_bytes": 42624017,
+  "copyright": "Margaret Toigo, CC0 per official MakeHuman suits01 asset pack",
+  "all_files": 67,
+  "obj_candidates": [
+    {
+      "path": "clothes/toigo_male_double-breasted_suit/suit_double_breasted.obj",
+      "vertices": 5393,
+      "faces": 5031,
+      "bounds_min": [
+        -5.074,
+        -7.4843,
+        -1.2368
+      ],
+      "bounds_max": [
+        5.1026,
+        7.0894,
+        2.2153
+      ],
+      "dimensions": [
+        10.1766,
+        14.5737,
+        3.4521
+      ],
+      "groups": [],
+      "materials": [],
+      "matching_files": [
+        "clothes/toigo_male_double-breasted_suit/",
+        "clothes/toigo_male_double-breasted_suit/toigo_male_double-breasted_suit.mhclo",
+        "clothes/toigo_male_double-breasted_suit/suit_double_breasted.obj",
+        "clothes/toigo_male_double-breasted_suit/toigo_male_double-breasted_suit.thumb",
+        "clothes/toigo_male_double-breasted_suit/suit_double_breasted.mhmat",
+        "clothes/toigo_male_double-breasted_suit/DB-suit.png",
+        "clothes/toigo_male_double-breasted_suit/DB-suit-norm.png",
+        "clothes/toigo_male_double-breasted_suit/DB-suit-spec.png"
+      ]
+    },
+    {
+      "path": "clothes/toigo_male_suit_3/suit3.obj",
+      "vertices": 8527,
+      "faces": 8125,
+      "bounds_min": [
+        -5.2566,
+        -7.5644,
+        -1.2653
+      ],
+      "bounds_max": [
+        5.283,
+        7.3724,
+        2.6238
+      ],
+      "dimensions": [
+        10.5396,
+        14.9368,
+        3.8891
+      ],
+      "groups": [],
+      "materials": [],
+      "matching_files": [
+        "clothes/toigo_male_suit_3/",
+        "clothes/toigo_male_suit_3/NewSuit3.png",
+        "clothes/toigo_male_suit_3/toigo_male_suit_3.mhclo",
+        "clothes/toigo_male_suit_3/toigo_male_suit_3.thumb",
+        "clothes/toigo_male_suit_3/NewSuit3-spec.png",
+        "clothes/toigo_male_suit_3/suit3.mhmat",
+        "clothes/toigo_male_suit_3/NewSuit3-norm.png",
+        "clothes/toigo_male_suit_3/suit3.obj"
+      ]
+    },
+    {
+      "path": "clothes/toigo_male_suit_tie_and_jacket/jacket_tie_pants.obj",
+      "vertices": 9980,
+      "faces": 9601,
+      "bounds_min": [
+        -5.3061,
+        -7.569,
+        -1.3729
+      ],
+      "bounds_max": [
+        5.3061,
+        7.3675,
+        2.5211
+      ],
+      "dimensions": [
+        10.6122,
+        14.9365,
+        3.894
+      ],
+      "groups": [],
+      "materials": [],
+      "matching_files": [
+        "clothes/toigo_male_suit_tie_and_jacket/",
+        "clothes/toigo_male_suit_tie_and_jacket/Suit-tie-Jacket-spec.png",
+        "clothes/toigo_male_suit_tie_and_jacket/Suit-tie-Jacket-bump.png",
+        "clothes/toigo_male_suit_tie_and_jacket/jacket_tie_pants.mhmat",
+        "clothes/toigo_male_suit_tie_and_jacket/Suit-tie-Jacket-diff.png",
+        "clothes/toigo_male_suit_tie_and_jacket/toigo_male_suit_tie_and_jacket.thumb",
+        "clothes/toigo_male_suit_tie_and_jacket/jacket_tie_pants.obj",
+        "clothes/toigo_male_suit_tie_and_jacket/toigo_male_suit_tie_and_jacket.mhclo"
+      ]
+    }
+  ],
+  "candidate_count": 3
+}

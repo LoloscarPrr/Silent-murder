@@ -1,0 +1,126 @@
+name: El Cuervo - Fase 6 refinamiento real y validacion Blender/Godot
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/fase6_refine.py'
+      - '.github/workflows/el-cuervo-fase6.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-fase6-verified
+  cancel-in-progress: true
+
+jobs:
+  genuine_character:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    name: Render, inspect and validate genuine CC0 character
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Obtain Blender 4.3.2 official binary
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl unzip libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy;assert bpy.app.version[:2]==(4,3)'
+      - name: Produce actual CC0 mesh, face, glove and garment diagnostics
+        run: |
+          test -s character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.blend
+          mkdir -p character_assets/el_cuervo/fase6
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/fase6_refine.py -- \
+            --blend character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.blend \
+            --out character_assets/el_cuervo/fase6
+      - name: Independent Blender GLB import verification
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,json,os
+          root="character_assets/el_cuervo/fase6"
+          p=os.path.join(root,"AUDITORIA_FASE6.json")
+          j=json.load(open(p))
+          assert j["skeleton_bones"] == 163
+          assert j["original_body_modified"] == False
+          assert j["phase5_rejected_assets_used"] == False
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.wm.open_mainfile(filepath=os.path.join(root,j["blender_file"]))
+          assert any(o.type=="MESH" and o.name=="ElCuervo_CabelloCorto_EscalpOriginal" for o in bpy.context.scene.objects)
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=os.path.join(root,j["glb_file"]))
+          meshes=[o for o in bpy.context.scene.objects if o.type=="MESH"]
+          arms=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
+          assert len(meshes)>=4 and arms
+          assert sum(len(a.data.bones) for a in arms)>=160
+          assert any(o.name=="ElCuervo_CabelloCorto_EscalpOriginal" for o in meshes)
+          assert all(any(m.type=="ARMATURE" for m in o.modifiers) for o in meshes if o.name in j["exported_mesh_nodes"])
+          j["blender_reimport_verified"]=True
+          json.dump(j,open(p,"w"),indent=2,ensure_ascii=False)
+          print("PHASE6_HUMAN_AND_RIG_REIMPORT_VERIFIED",len(meshes))
+          '
+      - name: Godot 4.3 standalone import test
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot /tmp/cuervo_fase6_qa
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          cp character_assets/el_cuervo/fase6/El_Cuervo_Refinado_Fase6_REVISION.glb /tmp/cuervo_fase6_qa/
+          printf '[application]\nconfig/name="Cuervo Fase6 QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_fase6_qa/project.godot
+          sed 's/El_Cuervo_Base_Humana_v1.glb/El_Cuervo_Refinado_Fase6_REVISION.glb/' tools/el_cuervo/verify_godot.gd > /tmp/cuervo_fase6_qa/verify_godot.gd
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase6_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase6_qa --script res://verify_godot.gd
+          python3 - <<'PY'
+          import json
+          p='character_assets/el_cuervo/fase6/AUDITORIA_FASE6.json'
+          j=json.load(open(p))
+          j['godot43_import_verified']=True
+          with open(p,'w') as f:json.dump(j,f,indent=2,ensure_ascii=False)
+          PY
+      - name: Add documented limitations; do not modify gameplay
+        run: |
+          cat > character_assets/el_cuervo/fase6/LEEME.md <<'EOF'
+          # Silent Killer / El Cuervo - Fase 6
+          Archivo BLEND editable y GLB genuino importable en Godot 4.3.
+          Fuente CC0: cuerpo MakeHuman / Innerscene; traje original Margaret Toigo
+          MakeHuman Community suits01; botas MakeHuman shoes01.
+          Parte de Fase 4. No utiliza el traje de Fase 5 rechazado.
+          Incluye 7 renders reales para revision de cuerpo, rostro, cuello,
+          puños y dos vistas con hombros girados.
+          El personaje **NO ESTA APROBADO ARTISTICAMENTE** hasta inspeccionar
+          los renders. No se ha probado FPS ni animacion jugable en Android.
+          Este workflow no toca main, APK ni escena original del juego.
+          EOF
+      - name: Save checked outputs on isolated production branch
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find character_assets/el_cuervo/fase6 -name '*.blend1' -delete
+          git add character_assets/el_cuervo/fase6
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): phase6 independent Blender and Godot verified candidate'
+            for i in 1 2 3 4 5; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then exit 0; fi
+              git rebase --abort || true
+              sleep 5
+            done
+            exit 1
+          fi
+      - name: Preserve reproducible character package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase6_Renders_BLENDER_GLB
+          path: character_assets/el_cuervo/fase6/
+          if-no-files-found: warn
+          retention-days: 30

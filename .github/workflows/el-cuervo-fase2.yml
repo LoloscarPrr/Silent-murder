@@ -1,0 +1,112 @@
+name: El Cuervo - Fase 2 (articulaciones y LOD candidato)
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/fase2_review.py'
+      - '.github/workflows/el-cuervo-fase2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-fase2
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Blender 4.3 - detalles, poses y LOD para revision humana
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+
+      - name: Instalar Blender 4.3.2 oficial
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+
+      - name: Exigir la base humana v1 verificada
+        run: |
+          test -s character_assets/el_cuervo/fase1/El_Cuervo_Base_Humana_v1.blend
+          test -s character_assets/el_cuervo/fase1/El_Cuervo_Verificacion.json
+
+      - name: Generar acercamientos, poses y candidato LOD
+        run: |
+          mkdir -p character_assets/el_cuervo/fase2
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/fase2_review.py -- \
+            --blend character_assets/el_cuervo/fase1/El_Cuervo_Base_Humana_v1.blend \
+            --out character_assets/el_cuervo/fase2
+
+      - name: Reimportar LOD en Blender para auditoria independiente
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,os,json
+          base="character_assets/el_cuervo/fase2"
+          bpy.ops.import_scene.gltf(filepath=os.path.join(base,"El_Cuervo_LOD40_CANDIDATO.glb"))
+          meshes=[o for o in bpy.context.scene.objects if o.type=="MESH" and o.name.startswith("LOD40_")]
+          arms=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
+          assert meshes and arms, (meshes,arms)
+          tris=sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in meshes)
+          d=json.load(open(os.path.join(base,"Fase2_Auditoria.json")))
+          assert tris<=d["original_triangles_blender"]*.65,(tris,d)
+          print("LOD_REIMPORT_VERIFIED",tris,"bones",sum(len(a.data.bones) for a in arms))
+          '
+
+      - name: Importar LOD candidato en Godot 4.3
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          mkdir -p /tmp/cuervo_qa
+          cp character_assets/el_cuervo/fase2/El_Cuervo_LOD40_CANDIDATO.glb /tmp/cuervo_qa/
+          printf '[application]\nconfig/name="Cuervo LOD QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_qa/project.godot
+          sed 's/El_Cuervo_Base_Humana_v1.glb/El_Cuervo_LOD40_CANDIDATO.glb/' tools/el_cuervo/verify_godot.gd > /tmp/cuervo_qa/verify_godot.gd
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_qa --script res://verify_godot.gd
+          python3 - <<'PY'
+          import json
+          p="character_assets/el_cuervo/fase2/Fase2_Auditoria.json"
+          d=json.load(open(p))
+          d["godot_4_3_lod_import_verified"]=True
+          json.dump(d,open(p,"w"),ensure_ascii=False,indent=2)
+          PY
+
+      - name: Documentar limitaciones
+        run: |
+          cat > character_assets/el_cuervo/fase2/LEEME.md <<'EOF'
+          # El Cuervo - Fase 2
+          Capturas autenticas de la malla humana con pruebas de pose en Blender.
+          Las pruebas numericas NO confirman buena calidad del rig.
+          El LOD40 es experimental y no esta aprobado visualmente ni por FPS.
+          NO se integra al juego actual. Licencia CC0 documentada en fase1.
+          EOF
+
+      - name: Publicar solo en la rama de produccion
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add character_assets/el_cuervo/fase2
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): phase 2 detailed pose and LOD candidate review'
+            git push origin HEAD:feature/el-cuervo-base-humana-v1
+          fi
+
+      - name: Respaldo descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase2_revision
+          path: character_assets/el_cuervo/fase2/
+          if-no-files-found: error
+          retention-days: 30

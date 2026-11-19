@@ -1,0 +1,116 @@
+name: El Cuervo - Fase 11 integracion jugable y regresiones Godot
+
+on:
+  push:
+    branches: [feature/el-cuervo-base-humana-v1]
+    paths:
+      - 'scripts/cuervo_real_visual.gd'
+      - 'scripts/player_controller.gd'
+      - 'scripts/weapon_controller.gd'
+      - 'tests/cuervo_gameplay_integration_test.gd'
+      - '.github/workflows/el-cuervo-fase11-gameplay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cuervo-gameplay-fase11
+  cancel-in-progress: true
+
+jobs:
+  mission_3d_regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+      - name: Install official Godot 4.3 binary
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --connect-timeout 20 \
+            'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --version
+      - name: Stage actual mission and every original GDScript, excluding old Blender source candidates
+        run: |
+          set -euo pipefail
+          stage=/tmp/silent_killer_fase11
+          mkdir -p "$stage/scripts" "$stage/scenes" "$stage/tests" \
+            "$stage/character_assets/el_cuervo/fase9_animaciones"
+          cp scripts/*.gd "$stage/scripts/"
+          cp scenes/*.tscn "$stage/scenes/"
+          cp tests/*.gd tests/*.tscn "$stage/tests/"
+          cp project.godot "$stage/project.godot"
+          cp character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb \
+             "$stage/character_assets/el_cuervo/fase9_animaciones/"
+          test -s "$stage/character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb"
+          grep -F 'run/main_scene="res://scenes/main.tscn"' "$stage/project.godot"
+          echo "Same production game and GLB, with irrelevant source Blender files excluded from import."
+      - name: Import GLB and compile all scripts
+        run: |
+          set -euo pipefail
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/silent_killer_fase11 \
+            --editor --import --quit > /tmp/cuervo_fase11_import.log 2>&1 || {
+              cat /tmp/cuervo_fase11_import.log
+              exit 1
+            }
+          tail -60 /tmp/cuervo_fase11_import.log
+      - name: Run actual mission with real skinned Cuervo rig and old gameplay
+        run: |
+          set -euo pipefail
+          timeout 100s /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless \
+            --path /tmp/silent_killer_fase11 \
+            --script res://tests/cuervo_gameplay_integration_test.gd \
+            > /tmp/cuervo_fase11_mission.log 2>&1 || {
+              cat /tmp/cuervo_fase11_mission.log
+              exit 1
+            }
+          cat /tmp/cuervo_fase11_mission.log
+          grep -F 'CUERVO_FASE11_PASS' /tmp/cuervo_fase11_mission.log
+          grep -F 'CUERVO_FASE11_MISSION_PASS' /tmp/cuervo_fase11_mission.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Invalid call|Invalid get index|CUERVO_FASE11_FAILED' /tmp/cuervo_fase11_mission.log; then
+            exit 1
+          fi
+      - name: Run existing pistol, multitouch, melee, guard, stealth and mission regressions
+        run: |
+          set -euo pipefail
+          godot=/tmp/godot/Godot_v4.3-stable_linux.x86_64
+          stage=/tmp/silent_killer_fase11
+          while IFS=':' read -r test marker; do
+            echo "VERIFYING $test: $marker"
+            timeout 90s "$godot" --headless --path "$stage" --quit-after 1800 \
+              "res://tests/$test.tscn" > "/tmp/fase11_$test.log" 2>&1 || {
+                tail -80 "/tmp/fase11_$test.log"
+                exit 1
+              }
+            grep -F "$marker" "/tmp/fase11_$test.log" || {
+              tail -80 "/tmp/fase11_$test.log"
+              exit 1
+            }
+            if grep -E 'SCRIPT ERROR|Parse Error|Invalid call|Invalid get index|Invalid assignment|Assertion failed' "/tmp/fase11_$test.log"; then
+              echo "Gameplay regression failed for $test"
+              exit 1
+            fi
+          done <<'TESTS'
+          multitouch_test:MULTITOUCH_TEST_PASS
+          combat_test:COMBAT_TEST_PASS
+          melee_test:MELEE_TEST_PASS
+          guard_ai_test:GUARD_AI_TEST_PASS
+          mission_test:MISSION_TEST_PASS
+          mission_failure_test:MISSION_FAILURE_TEST_PASS
+          quality_fix_test:QUALITY_FIX_TEST_PASS
+          shot_cover_test:SHOT_COVER_TEST_PASS
+          navigation_test:NAVIGATION_TEST_PASS
+          TESTS
+      - name: Retain real QA logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cuervo_Fase11_Real_Gameplay_QA
+          path: /tmp/cuervo_fase11_*.log
+          if-no-files-found: warn
+          retention-days: 14

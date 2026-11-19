@@ -1,0 +1,110 @@
+name: El Cuervo - Fase 10 escena Godot walk aim touch QA
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'scripts/el_cuervo_animation_lab.gd'
+      - 'scenes/el_cuervo_animation_lab.tscn'
+      - 'tests/el_cuervo_animation_lab_test.gd'
+      - '.github/workflows/el-cuervo-fase10-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cuervo-phase10-scene-testing
+  cancel-in-progress: true
+
+jobs:
+  verify_actual_godot_lab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+      - name: Download official Godot 4.3 stable binary
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --connect-timeout 20 \
+            'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' \
+            -o /tmp/godot.zip
+          mkdir -p /tmp/godot
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --version
+      - name: Verify production game main scene is still untouched
+        run: |
+          set -euo pipefail
+          grep -F 'run/main_scene="res://scenes/main.tscn"' project.godot
+          grep -F '[node name="SilentMurder" type="Node3D"]' scenes/main.tscn
+          test -s character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb
+          test -s scenes/el_cuervo_animation_lab.tscn
+      - name: Stage exact lab sources in minimal Godot 4.3 QA project
+        run: |
+          set -euo pipefail
+          stage=/tmp/cuervo_fase10_godot
+          mkdir -p "$stage/scenes" "$stage/scripts" "$stage/tests" \
+            "$stage/character_assets/el_cuervo/fase9_animaciones"
+          cp scenes/el_cuervo_animation_lab.tscn "$stage/scenes/"
+          cp scripts/el_cuervo_animation_lab.gd "$stage/scripts/"
+          cp tests/el_cuervo_animation_lab_test.gd "$stage/tests/"
+          cp character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb \
+            "$stage/character_assets/el_cuervo/fase9_animaciones/"
+          cat > "$stage/project.godot" <<'GODOT'
+          config_version=5
+
+          [application]
+          config/name="Silent Killer - El Cuervo Lab QA Fase10"
+          run/main_scene="res://scenes/el_cuervo_animation_lab.tscn"
+          config/features=PackedStringArray("4.3", "GL Compatibility")
+
+          [display]
+          window/size/viewport_width=1280
+          window/size/viewport_height=720
+          window/stretch/mode="canvas_items"
+
+          [input_devices]
+          pointing/emulate_mouse_from_touch=false
+
+          [rendering]
+          renderer/rendering_method="gl_compatibility"
+          renderer/rendering_method.mobile="gl_compatibility"
+          GODOT
+          echo "Staged exact branch model, scene, script and tests without
+          importing gigabytes of unrelated original .blend candidates."
+      - name: Import real animated GLB and parse independent lab scene
+        run: |
+          set -euo pipefail
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 \
+             --headless --path /tmp/cuervo_fase10_godot --editor --import --quit \
+             > /tmp/el_cuervo_fase10_import.log 2>&1 || {
+               cat /tmp/el_cuervo_fase10_import.log
+               exit 1
+             }
+          tail -50 /tmp/el_cuervo_fase10_import.log
+      - name: Test touch controls plus real walk aim clips on Godot skeleton
+        run: |
+          set -euo pipefail
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless \
+            --path /tmp/cuervo_fase10_godot \
+            --script res://tests/el_cuervo_animation_lab_test.gd \
+            > /tmp/el_cuervo_fase10_qa.log 2>&1 || {
+              cat /tmp/el_cuervo_fase10_qa.log
+              exit 1
+            }
+          cat /tmp/el_cuervo_fase10_qa.log
+          grep -F 'FASE10_QA_PASSED' /tmp/el_cuervo_fase10_qa.log
+      - name: Store verification logs (no inflated artistic claims)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase10_Godot_Scene_QA_Logs
+          path: |
+            /tmp/el_cuervo_fase10_import.log
+            /tmp/el_cuervo_fase10_qa.log
+          if-no-files-found: warn
+          retention-days: 14

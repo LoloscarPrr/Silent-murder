@@ -9,7 +9,8 @@ signal player_defeated()
 signal weapon_fired(origin: Vector3, radius: float)
 signal melee_availability_changed(available: bool, label: String)
 
-const VISUAL_SCRIPT = preload("res://scripts/operative_visual.gd")
+const VISUAL_SCRIPT = preload("res://scripts/cuervo_real_visual.gd")
+const LEGACY_VISUAL_SCRIPT = preload("res://scripts/operative_visual.gd")
 const WEAPON_SCRIPT = preload("res://scripts/weapon_controller.gd")
 const MELEE_SCRIPT = preload("res://scripts/melee_controller.gd")
 const WALK_SPEED := 3.75
@@ -50,6 +51,13 @@ func _ready() -> void:
  _make_collision()
  _visual = VISUAL_SCRIPT.new()
  add_child(_visual)
+ # Preserve a usable game if the experimental GLB cannot import on a device.
+ # Fallback is visible only if an actual character/animation dependency failed.
+ if not _visual.call("is_ready_for_gameplay"):
+  _visual.visible = false
+  _visual.queue_free()
+  _visual = LEGACY_VISUAL_SCRIPT.new()
+  add_child(_visual)
  _make_camera()
  _weapon = WEAPON_SCRIPT.new()
  _weapon.operative = self
@@ -65,7 +73,7 @@ func _ready() -> void:
  _melee.attack_message.connect(_on_melee_message)
  _melee.attack_performed.connect(_on_melee_animation)
  add_child(_melee)
- status_changed.emit("OPERACIÓN NOCHE CERO • Alpha 0.5.2")
+ status_changed.emit("OPERACIÓN NOCHE CERO • El Cuervo 3D Fase 11")
  health_changed.emit(health,MAX_HEALTH)
 
 func _physics_process(delta: float) -> void:
