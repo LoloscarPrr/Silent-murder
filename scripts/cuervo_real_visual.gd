@@ -28,6 +28,8 @@ var _running := false
 var _movement := 0.0
 var _last_error := ""
 var _skin_mesh_count := 0
+var _dark_material_surfaces := 0
+var _camera_fade_hidden := false
 
 func _ready() -> void:
     name = "ElCuervo_Real3D_Fase11"
@@ -77,8 +79,49 @@ func _inspect(node: Node) -> void:
         _skeleton = node as Skeleton3D
     elif node is MeshInstance3D:
         _skin_mesh_count += 1
+        _darken_authored_outfit(node as MeshInstance3D)
     for child in node.get_children():
         _inspect(child)
+
+## Godot's glTF PBR importer receives the cloth's grayscale texture but
+## Blender's MixRGB-to-BaseColor tint was not baked into glTF material factors.
+## The result in Android video is a bright white coat. Restore the intended
+## charcoal PBR factor PER INSTANCE without removing texture, normals or skin.
+func _darken_authored_outfit(part: MeshInstance3D) -> void:
+    if part.mesh == null:
+        return
+    var n := String(part.name)
+    var tint := Color.WHITE
+    if n.begins_with("Cloth_trenchcoat"):
+        tint = Color(0.115, 0.135, 0.155, 1.0)
+    elif n.begins_with("Cloth_shirt"):
+        tint = Color(0.12, 0.14, 0.16, 1.0)
+    elif n.begins_with("Cloth_jeans"):
+        tint = Color(0.10, 0.12, 0.14, 1.0)
+    elif n.begins_with("Cloth_boots"):
+        tint = Color(0.085, 0.095, 0.11, 1.0)
+    elif n.begins_with("Hair_short04"):
+        tint = Color(0.13, 0.115, 0.10, 1.0)
+    else:
+        return
+    for i in range(part.mesh.get_surface_count()):
+        var source := part.mesh.surface_get_material(i)
+        if source is BaseMaterial3D:
+            var copy := (source as BaseMaterial3D).duplicate(true) as BaseMaterial3D
+            copy.albedo_color = tint
+            copy.roughness = maxf(0.82, copy.roughness)
+            part.set_surface_override_material(i, copy)
+            _dark_material_surfaces += 1
+
+## If the collision-aware camera is pushed inside the collar, hide only the
+## render model. Keep the rig, the gun muzzle, physics and all inputs alive.
+## This is a near-camera occlusion fallback, NOT distance-based optimization.
+func set_camera_near(hidden: bool) -> void:
+    _camera_fade_hidden = hidden
+    if _character != null:
+        _character.visible = not hidden
+    if _right_hand != null:
+        _right_hand.visible = not hidden
 
 func is_ready_for_gameplay() -> bool:
     return _valid
@@ -92,6 +135,8 @@ func get_visual_status() -> Dictionary:
         "asset": MODEL_PATH,
         "skeleton_bones": _skeleton.get_bone_count() if _skeleton else 0,
         "mesh_instances": _skin_mesh_count,
+        "dark_material_surfaces": _dark_material_surfaces,
+        "camera_fade_hidden": _camera_fade_hidden,
         "state": _state,
         "aim_clip_active": _player != null and _player.current_animation == AIM,
         "walk_clip_active": _player != null and _player.current_animation == WALK,
