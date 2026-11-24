@@ -1,0 +1,57 @@
+{
+  "source_blend": "El_Cuervo_Base_Humana_v1.blend",
+  "original_triangles_blender": 109064,
+  "lod40_triangles_blender": 43625,
+  "reduction_percent": 60.0,
+  "lod_glb": "El_Cuervo_LOD40_CANDIDATO.glb",
+  "lod_glb_mesh_nodes": [
+    "LOD40_base_male_body",
+    "LOD40_base_male_body.high-poly"
+  ],
+  "lod_glb_skinned": true,
+  "lod_visual_approved": false,
+  "android_fps_measured": false,
+  "face_and_hands_visual_approved": false,
+  "pose_checks": [
+    {
+      "view": "07_Pose_Hombro",
+      "executed": true,
+      "bone": "upperarm01.L",
+      "test_rotation_degrees": 22.9,
+      "max_sample_displacement_m": 0.279899,
+      "skin_moves": true,
+      "visual_deformation_approved": false
+    },
+    {
+      "view": "08_Pose_Codo",
+      "executed": true,
+      "bone": "lowerarm01.L",
+      "test_rotation_degrees": 31.5,
+      "max_sample_displacement_m": 0.266494,
+      "skin_moves": true,
+      "visual_deformation_approved": false
+    },
+    {
+      "view": "09_Pose_Rodilla",
+      "executed": true,
+      "bone": "lowerleg01.L",
+      "test_rotation_degrees": 28.6,
+      "max_sample_displacement_m": 0.27726,
+      "skin_moves": true,
+      "visual_deformation_approved": false
+    },
+    {
+      "view": "10_Pose_Muneca",
+      "executed": false,
+      "reason": "hueso no encontrado"
+    }
+  ],
+  "closeup_bone_mapping": {
+    "left_hand": null,
+    "right_hand": null,
+    "shoulder": "upperarm01.L",
+    "knee": "lowerleg01.L"
+  },
+  "note": "LOD experimental. No integrar al juego hasta inspeccionar rostro, manos, deformaciones y FPS en Android real.",
+  "godot_4_3_lod_import_verified": true
+}

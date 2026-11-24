@@ -1,0 +1,128 @@
+name: El Cuervo - Fase 5 verdadero blazer abierto y camisa independiente
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/fase5_open_tailored.py'
+      - '.github/workflows/el-cuervo-fase5-sastre.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-fase5-sastre
+  cancel-in-progress: true
+
+jobs:
+  tailor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    name: Ropa CC0 existente - transformar patron, Blender 4.3, Godot QA
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Instalar Blender 4.3.2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl unzip libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy;assert bpy.app.version[:2]==(4,3)'
+      - name: Confirmar cuerpo + traje CC0 y botines originales
+        run: |
+          test -s character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.blend
+          test -s character_assets/el_cuervo/fase4/Fase4_Auditoria.json
+      - name: Redibujar patrones del blazer real, separar camisa real y generar vistas
+        run: |
+          mkdir -p character_assets/el_cuervo/fase5
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/fase5_open_tailored.py -- \
+            --blend character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.blend \
+            --out character_assets/el_cuervo/fase5
+      - name: Reimportacion independiente del GLB en Blender
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,os,json
+          root="character_assets/el_cuervo/fase5"
+          r=json.load(open(os.path.join(root,"Fase5_Auditoria.json")))
+          assert r["rig_bones"]==163
+          assert r["authored_front_panels_opened"] is True and r["front_cut_faces_left"]>80 and r["front_cut_faces_right"]>80
+          assert r["real_coat_faces_physically_removed"]>180 and r["real_sleeve_vertices_refined"]>100
+          assert r["independent_shirt_triangles"]>400
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=os.path.join(root,r["glb"]))
+          objs=[o for o in bpy.context.scene.objects if o.type=="MESH"]
+          names=[o.name for o in objs]
+          assert any(n.startswith("Cuervo_Camisa_Independiente_") for n in names),names
+          assert any(n.startswith("CC0_toigo_male_suit_3") for n in names),names
+          assert any(n.startswith("Cuervo_Botin_CC0") for n in names),names
+          assert all(any(m.type=="ARMATURE" for m in ob.modifiers) for ob in objs),(names,"lost skin")
+          print("EL_CUERVO_FASE5_BLENDER_REIMPORT",names)
+          '
+      - name: Verificacion importacion Godot 4.3 en proyecto temporal
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot /tmp/cuervo_fase5_qa
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          cp character_assets/el_cuervo/fase5/El_Cuervo_Blazer_Abierto_Fase5_WIP.glb /tmp/cuervo_fase5_qa/
+          printf '[application]\nconfig/name="Cuervo Fase5 QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_fase5_qa/project.godot
+          sed 's/El_Cuervo_Base_Humana_v1.glb/El_Cuervo_Blazer_Abierto_Fase5_WIP.glb/' tools/el_cuervo/verify_godot.gd > /tmp/cuervo_fase5_qa/verify_godot.gd
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase5_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase5_qa --script res://verify_godot.gd
+          python3 - <<'PY'
+          import json
+          p='character_assets/el_cuervo/fase5/Fase5_Auditoria.json'
+          d=json.load(open(p))
+          d['godot43_import_verified']=True
+          json.dump(d,open(p,'w'),indent=2,ensure_ascii=False)
+          PY
+      - name: Documentar que faltan pruebas visuales y FPS
+        run: |
+          cat > character_assets/el_cuervo/fase5/LEEME.md <<'EOF'
+          # El Cuervo: fase 5, blazer realmente abierto
+          Trabaja a partir de blazer/pantalon original MakeHuman Community
+          Margaret Toigo CC0; se cambian los paneles reales de la prenda.
+          La camisa de grafito es geometria independiente derivada de
+          topologia anatomica humana MakeHuman CC0: no es un cilindro.
+          Botines reales de MakeHuman shoes01 CC0.
+          Incluye vistas frontales, 3/4 y espalda en A-pose y brazos bajos.
+          El archivo GLB se exporta en A-pose neutra.
+          NO esta aprobado artisticamente; se requiere inspeccion, clipping,
+          poses de apuntado, animaciones y FPS Android.
+          La rama main y la APK existente permanecen intactas.
+          EOF
+      - name: Publicar archivos solo en rama aislada
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find character_assets/el_cuervo/fase5 -name '*.blend1' -delete
+          git add character_assets/el_cuervo/fase5
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): distinct open tailored blazer, independently skinned shirt and slender true sleeves'
+            for attempt in 1 2 3 4 5 6; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then
+                echo "Published after attempt $attempt"
+                exit 0
+              fi
+              git rebase --abort || true
+              sleep 5
+            done
+            exit 1
+          fi
+      - name: Respaldo aun si el envio a GitHub falla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase5_Blazer_Abierto_Camisa_Real
+          path: character_assets/el_cuervo/fase5/
+          if-no-files-found: warn
+          retention-days: 30

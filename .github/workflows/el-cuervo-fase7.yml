@@ -1,0 +1,122 @@
+name: El Cuervo - Fase 7 silueta refinada y guantes
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/refine_silhouette_fase7.py'
+      - '.github/workflows/el-cuervo-fase7.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-silhouette-fase7
+  cancel-in-progress: true
+
+jobs:
+  phase7_candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Install Blender 4.3.2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl unzip libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy;assert bpy.app.version[:2]==(4,3)'
+      - name: Validate source model and produce Fase 7
+        run: |
+          test -s character_assets/el_cuervo/complete_candidate/El_Cuervo_Candidato_Profesional_CC0.blend
+          mkdir -p character_assets/el_cuervo/refine_fase7
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/refine_silhouette_fase7.py -- \
+            --blend character_assets/el_cuervo/complete_candidate/El_Cuervo_Candidato_Profesional_CC0.blend \
+            --out character_assets/el_cuervo/refine_fase7
+      - name: Independent Blender import and skeleton validation
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,os,json
+          root="character_assets/el_cuervo/refine_fase7"
+          p=os.path.join(root,"AUDITORIA_FASE7.json")
+          j=json.load(open(p))
+          assert j["rig_bones"]==53 and j["game_main_modified"]==False
+          assert j["coat_faces_after"]<j["coat_faces_before"]
+          assert j["body_faces_recolored_glove"]>50
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.wm.open_mainfile(filepath=os.path.join(root,j["blend_file"]))
+          assert len([o for o in bpy.data.objects if o.type=="ARMATURE"])==1
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=os.path.join(root,j["glb_file"]))
+          meshes=[o for o in bpy.context.scene.objects if o.type=="MESH"]
+          rigs=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
+          assert len(meshes)>=9 and len(rigs)==1
+          assert len(rigs[0].data.bones)==53
+          assert any(o.name=="Cloth_trenchcoat" for o in meshes)
+          j["blender_reimport_verified"]=True
+          json.dump(j,open(p,"w"),indent=2,ensure_ascii=False)
+          print("CUERVO_FASE7_REIMPORT_AND_RIG_VERIFIED",len(meshes))
+          '
+      - name: Verify in Godot 4.3 isolated project
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot /tmp/cuervo_fase7_qa
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          cp character_assets/el_cuervo/refine_fase7/El_Cuervo_Refinado_Fase7_REVISION.glb /tmp/cuervo_fase7_qa/
+          printf '[application]\nconfig/name="Cuervo Fase7 QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_fase7_qa/project.godot
+          sed 's/El_Cuervo_Base_Humana_v1.glb/El_Cuervo_Refinado_Fase7_REVISION.glb/' tools/el_cuervo/verify_godot.gd > /tmp/cuervo_fase7_qa/verify_godot.gd
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase7_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase7_qa --script res://verify_godot.gd
+          python3 - <<'PY'
+          import json
+          p="character_assets/el_cuervo/refine_fase7/AUDITORIA_FASE7.json"
+          d=json.load(open(p))
+          d["godot43_import_verified"]=True
+          json.dump(d,open(p,"w"),indent=2,ensure_ascii=False)
+          PY
+      - name: Document artifact limitations
+        run: |
+          cat > character_assets/el_cuervo/refine_fase7/LEEME.md <<'EOF'
+          # El Cuervo — Fase 7, revision de silueta
+          Refit local de la malla real CC0 del abrigo, cortado a la rodilla,
+          punos y guantes negros como materiales de la anatomia CC0 original.
+          53 huesos preservados; rostro, cabello y botas independientes.
+          6 renders REALES de Blender + archivo editable BLEND + GLB.
+          Este candidato NO ESTA APROBADO ARTISTICAMENTE hasta revisar renders.
+          No se ha medido FPS ni animaciones jugables en Android.
+          Main y APK de Silent Killer permanecen intactos.
+          EOF
+      - name: Save art only to separate character branch
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find character_assets/el_cuervo/refine_fase7 -name '*.blend1' -delete
+          git add character_assets/el_cuervo/refine_fase7
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): phase7 genuine render and Blender/Godot validated candidate'
+            for i in 1 2 3 4 5; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then exit 0; fi
+              git rebase --abort || true
+              sleep 5
+            done
+            exit 1
+          fi
+      - name: Preserve source and true renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase7_ModeloYVistas
+          path: character_assets/el_cuervo/refine_fase7/
+          if-no-files-found: warn
+          retention-days: 30

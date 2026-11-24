@@ -1,0 +1,179 @@
+name: El Cuervo - Fase 9 caminar y apuntar animados en GLB
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/animate_fase9.py'
+      - '.github/workflows/el-cuervo-fase9-animaciones.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-fase9-animation-review
+  cancel-in-progress: true
+
+jobs:
+  actual_animated_glb:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Install official Blender 4.3.2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl unzip libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b -t 2 --factory-startup --python-expr 'import bpy;assert bpy.app.version[:2]==(4,3)'
+      - name: Generate true skinned walk and aim animations and eight real renders
+        run: |
+          set -euo pipefail
+          test -s character_assets/el_cuervo/refine_fase7/El_Cuervo_Refinado_Fase7_REVISION.blend
+          mkdir -p character_assets/el_cuervo/fase9_animaciones
+          /tmp/blender-4.3/blender -b -t 4 --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/animate_fase9.py -- \
+            --blend character_assets/el_cuervo/refine_fase7/El_Cuervo_Refinado_Fase7_REVISION.blend \
+            --out character_assets/el_cuervo/fase9_animaciones
+      - name: Check Blender reimport preserves bone skeleton and both animation clips
+        run: |
+          /tmp/blender-4.3/blender -b -t 2 --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,json,os
+          root="character_assets/el_cuervo/fase9_animaciones"
+          p=os.path.join(root,"AUDITORIA_ANIMACIONES_FASE9.json")
+          j=json.load(open(p))
+          assert len(j["render_frames"])==8
+          assert len(j["exported_animation_names"])>=2
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=os.path.join(root,j["glb_file"]))
+          rigs=[o for o in bpy.context.scene.objects if o.type=="ARMATURE"]
+          assert len(rigs)==1 and len(rigs[0].data.bones)==53
+          assert rigs[0].animation_data
+          anim_names=[a.name for a in bpy.data.actions]
+          print("REIMPORTED_ANIMATION_ACTIONS",anim_names,flush=True)
+          assert any("Walk" in s for s in anim_names) and any("Aim" in s for s in anim_names)
+          j["blender_reimport_verified"]=True
+          with open(p,"w") as f:json.dump(j,f,ensure_ascii=False,indent=2)
+          '
+      - name: Godot 4.3 import and inspect real AnimationPlayer clips
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot /tmp/cuervo_fase9_qa
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          cp character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb /tmp/cuervo_fase9_qa/
+          printf '[application]\nconfig/name="El Cuervo Fase9 Animation QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_fase9_qa/project.godot
+          cat > /tmp/cuervo_fase9_qa/validate_animation.gd <<'GODOT'
+          extends SceneTree
+
+          var skeleton_count := 0
+          var bone_count := 0
+          var mesh_count := 0
+          var players: Array[AnimationPlayer] = []
+
+          func inspect(node: Node) -> void:
+              if node is Skeleton3D:
+                  skeleton_count += 1
+                  bone_count = max(bone_count, node.get_bone_count())
+              if node is MeshInstance3D:
+                  mesh_count += 1
+              if node is AnimationPlayer:
+                  players.append(node)
+              for child in node.get_children():
+                  inspect(child)
+
+          func _initialize() -> void:
+              var path := "res://El_Cuervo_Fase9_Walk_Aim_REVISION.glb"
+              var packed := load(path)
+              if not packed is PackedScene:
+                  push_error("GLB is not an importable PackedScene")
+                  quit(2)
+                  return
+              var human: Node = packed.instantiate()
+              inspect(human)
+              if skeleton_count != 1 or bone_count != 53 or mesh_count < 9:
+                  push_error("Missing expected human rig or meshes")
+                  human.free()
+                  quit(3)
+                  return
+              if players.is_empty():
+                  push_error("No animation player was imported")
+                  human.free()
+                  quit(4)
+                  return
+              var found_walk := false
+              var found_aim := false
+              for player in players:
+                  for name in player.get_animation_list():
+                      var clip := player.get_animation(name)
+                      print("GODOT_ANIMATION name=", name, " length=", clip.length, " tracks=", clip.get_track_count())
+                      if clip.length < 0.70 or clip.get_track_count() < 4:
+                          continue
+                      if "Walk" in name or "WALK" in name:
+                          found_walk = true
+                      if "Aim" in name or "AIM" in name:
+                          found_aim = true
+              human.free()
+              if not found_walk or not found_aim:
+                  push_error("Missing real Walk and Aim clips in Godot 4.3")
+                  quit(5)
+                  return
+              print("GODOT43_REAL_WALK_AIM_CLIPS_VERIFIED bones=", bone_count, " meshes=", mesh_count)
+              quit(0)
+          GODOT
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase9_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_fase9_qa --script res://validate_animation.gd
+          python3 - <<'PY'
+          import json
+          p="character_assets/el_cuervo/fase9_animaciones/AUDITORIA_ANIMACIONES_FASE9.json"
+          j=json.load(open(p))
+          j["godot43_animation_verified"]=True
+          j["animation_godot_import_validated"]=True
+          with open(p,"w") as f:json.dump(j,f,indent=2,ensure_ascii=False)
+          PY
+      - name: README with honest gates, no gameplay merge
+        run: |
+          cat > character_assets/el_cuervo/fase9_animaciones/LEEME.md <<'EOF'
+          # El Cuervo — Fase 9, primer prototipo real de animaciones
+          **Dos acciones 3D verificables:** Cuervo_Walk_InPlace y Cuervo_Aim_Raise.
+          Cuerpo, ojos, abrigo y botas reales desde la base CC0 MakeHuman / MPFB.
+          Un solo esqueleto de 53 huesos y archivos originales BLEND + GLB.
+          Caminata **en sitio**, sin desplazamiento global duplicado con Godot.
+          Ocho renderizados JPEG reales con poses clave, no conceptos de IA.
+          Esta versión es PARA REVISIÓN ARTÍSTICA, no para integrar directamente
+          al gameplay: faltan pie fijado/IK, arma y puntería real, mezcla de
+          animaciones, dinámica de tela, y FPS reales en Android.
+          Ningún archivo de main ni del personaje jugable se ha reemplazado.
+          EOF
+      - name: Commit verified independent assets
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find character_assets/el_cuervo/fase9_animaciones -name '*.blend1' -delete
+          git add character_assets/el_cuervo/fase9_animaciones
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): real Walk and Aim skinned clips verified in Blender Godot 4.3'
+            for i in 1 2 3 4 5; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then exit 0; fi
+              git rebase --abort || true
+              sleep 4
+            done
+            exit 1
+          fi
+      - name: Store renders and model for inspection on mobile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Fase9_Clips_Walk_Aim
+          path: character_assets/el_cuervo/fase9_animaciones/
+          retention-days: 30
+          if-no-files-found: warn

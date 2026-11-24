@@ -140,12 +140,23 @@ func _draw_tracer(start_point: Vector3,end_point: Vector3) -> void:
  )
 
 func _attach_pistol() -> void:
- if visual == null or not is_instance_valid(visual.elbow_right):
+ if visual == null:
   return
- var grip_node: Node3D = visual.elbow_right
+ var rig_grip: Node3D = null
+ if visual.has_method("get_weapon_grip"):
+  rig_grip = visual.call("get_weapon_grip") as Node3D
+ var grip_node: Node3D = rig_grip if rig_grip != null else visual.elbow_right
+ if not is_instance_valid(grip_node):
+  return
  var gun := Node3D.new()
  gun.name = "SuppressedPistol_Blockout"
- gun.position = Vector3(.01,-.40,-.16)
+ # Fase11 real rig: wrist-origin anchor with forward-pointing muzzle.
+ # Preserve the prior shoulder/elbow offset only for the fallback visual.
+ gun.position = Vector3(0.0,-.035,-.045) if rig_grip != null else Vector3(.01,-.40,-.16)
+ # Blender-authored body measures 1.84m, but the previous pistol blockout
+ # was 0.62m long. At the real hand it looked like a giant black case.
+ # Reduce ONLY the rig version, keeping all legacy weapon dimensions intact.
+ gun.scale = Vector3(.49,.49,.49) if rig_grip != null else Vector3.ONE
  grip_node.add_child(gun)
  var metal := _mat(Color(.14,.16,.17))
  var black := _mat(Color(.035,.045,.052))

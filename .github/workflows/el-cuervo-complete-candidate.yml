@@ -1,0 +1,138 @@
+name: El Cuervo - candidato CC0 completo (cabello ojos ropa misma base)
+
+on:
+  push:
+    branches:
+      - feature/el-cuervo-base-humana-v1
+    paths:
+      - 'tools/el_cuervo/alternate_complete_cc0.py'
+      - '.github/workflows/el-cuervo-complete-candidate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: el-cuervo-complete-candidate
+  cancel-in-progress: true
+
+jobs:
+  build_candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/el-cuervo-base-humana-v1
+          persist-credentials: true
+      - name: Install official Blender 4.3.2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xz-utils curl unzip libgl1 libegl1 libx11-6 libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libsm6 libxfixes3 libgl1-mesa-dri
+          curl -fL --retry 3 --connect-timeout 20 'https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz' -o /tmp/blender.tar.xz
+          mkdir -p /tmp/blender-4.3
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender-4.3 --strip-components=1
+          /tmp/blender-4.3/blender -b --factory-startup --python-expr 'import bpy;assert bpy.app.version[:2]==(4,3)'
+      - name: Download matching CC0 original human/hair/wardrobe from pinned source
+        run: |
+          mkdir -p /tmp/cuervo_matching
+          rev='852e48f316b90a0937234886630e4fb4cdfd1f78'
+          base="https://raw.githubusercontent.com/kblood/CharacterCreator/$rev/output"
+          for name in base_body hair_short04 clothing_shirt clothing_jeans clothing_boots clothing_trenchcoat; do
+            curl -fL --retry 3 --connect-timeout 20 "$base/$name.glb" -o "/tmp/cuervo_matching/$name.glb"
+          done
+          python3 - <<'PY'
+          import os,struct,hashlib
+          root='/tmp/cuervo_matching'
+          for name in ['base_body','hair_short04','clothing_shirt','clothing_jeans','clothing_boots','clothing_trenchcoat']:
+              path=os.path.join(root,name+'.glb')
+              assert os.path.getsize(path)>100000, path
+              with open(path,'rb') as f:
+                  magic,version,length=struct.unpack('<4sII',f.read(12))
+                  assert magic==b'glTF' and version==2 and length==os.path.getsize(path), path
+              print('PINNED_SOURCE_CC0',name,os.path.getsize(path),hashlib.sha256(open(path,'rb').read()).hexdigest())
+          PY
+      - name: Import same-source human face hair and outfit into Blender
+        run: |
+          test -s character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.blend
+          mkdir -p character_assets/el_cuervo/complete_candidate
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 \
+            --python tools/el_cuervo/alternate_complete_cc0.py -- \
+            --studio character_assets/el_cuervo/fase4/El_Cuervo_Refinado_Fase4_WIP.blend \
+            --assets /tmp/cuervo_matching \
+            --out character_assets/el_cuervo/complete_candidate
+      - name: Verify real BLEND saved and reimport GLB
+        run: |
+          /tmp/blender-4.3/blender -b --factory-startup --python-exit-code 1 --python-expr '
+          import bpy,os,json
+          root="character_assets/el_cuervo/complete_candidate"
+          p=os.path.join(root,"AUDITORIA_ALTERNATIVA.json")
+          report=json.load(open(p))
+          assert len(report["parts"])==6
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.wm.open_mainfile(filepath=os.path.join(root,report["blender_file"]))
+          assert any(o.type=="ARMATURE" for o in bpy.data.objects)
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=os.path.join(root,report["glb_file"]))
+          assert len([o for o in bpy.context.scene.objects if o.type=="MESH"])>=6
+          assert any(o.type=="ARMATURE" for o in bpy.context.scene.objects)
+          report["blender_reimport_verified"]=True
+          with open(p,"w") as f:json.dump(report,f,indent=2,ensure_ascii=False)
+          print("ALTERNATIVE_CC0_REIMPORT_VERIFIED")
+          '
+      - name: Verify Godot 4.3 import without touching game
+        run: |
+          curl -fL --retry 3 'https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip' -o /tmp/godot.zip
+          mkdir -p /tmp/godot /tmp/cuervo_complete_qa
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.3-stable_linux.x86_64
+          cp character_assets/el_cuervo/complete_candidate/El_Cuervo_Candidato_Profesional_CC0.glb /tmp/cuervo_complete_qa/
+          printf '[application]\nconfig/name="Cuervo complete QA"\n\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > /tmp/cuervo_complete_qa/project.godot
+          sed 's/El_Cuervo_Base_Humana_v1.glb/El_Cuervo_Candidato_Profesional_CC0.glb/' tools/el_cuervo/verify_godot.gd > /tmp/cuervo_complete_qa/verify_godot.gd
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_complete_qa --editor --import --quit
+          /tmp/godot/Godot_v4.3-stable_linux.x86_64 --headless --path /tmp/cuervo_complete_qa --script res://verify_godot.gd
+          python3 - <<'PY'
+          import json
+          p='character_assets/el_cuervo/complete_candidate/AUDITORIA_ALTERNATIVA.json'
+          j=json.load(open(p))
+          j['godot43_import_verified']=True
+          json.dump(j,open(p,'w'),ensure_ascii=False,indent=2)
+          PY
+      - name: Document source license, provenance and quality gates
+        run: |
+          cat > character_assets/el_cuervo/complete_candidate/LEEME.md <<'EOF'
+          # El Cuervo - Candidato CC0 completo independiente
+          Origen de los componentes: https://github.com/kblood/CharacterCreator
+          Revision congelada: 852e48f316b90a0937234886630e4fb4cdfd1f78
+          Assets CC0 construidos con MakeHuman/MPFB: cuerpo, ojos, cabello
+          short04, camisa, jeans, botines y chaqueta (conservan texturas).
+          Fuente principal: output/*.glb; consultar LICENSE-NOTES.md upstream.
+          Esta es una ALTERNATIVA para auditoria visual, no la version final.
+          No fusionar a main ni modificar APK, animaciones o personaje jugable.
+          Blender, Godot y limites exactos en AUDITORIA_ALTERNATIVA.json.
+          EOF
+      - name: Commit verified candidate in isolated branch
+        if: github.event_name == 'push'
+        run: |
+          git config user.name 'El Cuervo Production Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find character_assets/el_cuervo/complete_candidate -name '*.blend1' -delete
+          git add character_assets/el_cuervo/complete_candidate
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(character): CC0 unified-body professional alternative for review'
+            for i in 1 2 3 4 5; do
+              git fetch origin feature/el-cuervo-base-humana-v1
+              if git rebase origin/feature/el-cuervo-base-humana-v1 && git push origin HEAD:feature/el-cuervo-base-humana-v1; then exit 0; fi
+              git rebase --abort || true
+              sleep 5
+            done
+            exit 1
+          fi
+      - name: Keep independently verifiable original renders and models
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: El_Cuervo_Candidato_Completo_CC0_Revision
+          path: character_assets/el_cuervo/complete_candidate/
+          if-no-files-found: warn
+          retention-days: 30
