@@ -13,6 +13,15 @@ func fail(message: String, code: int = 2) -> void:
     push_error("CUERVO_FASE11_FAILED: " + message)
     quit(code)
 
+func _find_mesh(node: Node, prefix: String) -> MeshInstance3D:
+    if node is MeshInstance3D and String(node.name).begins_with(prefix):
+        return node as MeshInstance3D
+    for child in node.get_children():
+        var found := _find_mesh(child,prefix)
+        if found != null:
+            return found
+    return null
+
 func _run() -> void:
     var packed := load(SCENE) as PackedScene
     if packed == null:
@@ -48,10 +57,40 @@ func _run() -> void:
     if status["mesh_instances"] < 9:
         fail("El Cuervo original body/coat/face meshes not all loaded")
         return
+    if status["dark_material_surfaces"] < 5:
+        fail("Character colors not corrected on imported GLB material surfaces")
+        return
+    for prefix in ["Cloth_trenchcoat", "Cloth_jeans", "Cloth_boots", "Hair_short04"]:
+        var part := _find_mesh(visual._character, prefix)
+        if part == null:
+            fail("Missing outfit/hair component: "+prefix)
+            return
+        var override := part.get_surface_override_material(0) as BaseMaterial3D
+        if override == null:
+            fail("Missing non-destructive PBR material override: "+prefix)
+            return
+        if override.albedo_color.r > .18 or override.albedo_color.g > .18:
+            fail("Material is still bright instead of matte charcoal: "+prefix)
+            return
+        if override.albedo_texture == null:
+            fail("Actual source fabric/hair texture was lost: "+prefix)
+            return
+    visual.set_camera_near(true)
+    if visual._character.visible:
+        fail("Camera near-collar occlusion fallback did not hide coat")
+        return
+    visual.set_camera_near(false)
+    if not visual._character.visible:
+        fail("Camera remained hidden after exiting the wall")
+        return
     var grip: Node3D = visual.get_weapon_grip()
     var weapon = player._weapon
     if grip == null or weapon._muzzle == null:
         fail("Gun does not have a valid skeletal hand grip and muzzle")
+        return
+    var gun: Node3D = weapon._muzzle.get_parent()
+    if gun.scale.x < .35 or gun.scale.x > .60:
+        fail("Pistol is still giant or incorrectly miniaturized: "+str(gun.scale))
         return
     if not weapon._muzzle.is_ancestor_of(grip):
         # Ancestor direction is grip->muzzle, NOT muzzle->grip.
