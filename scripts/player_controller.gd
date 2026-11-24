@@ -259,4 +259,9 @@ func _update_camera(delta: float) -> void:
   desired_local = desired_local.normalized()*allowed
  var response := 16.0 if blocked else 7.5
  _camera.position = _camera.position.lerp(desired_local,minf(1.0,delta*response))
+ # When camera collision moves the lens INTO the trenchcoat, hide just
+ # the visible GLB temporarily rather than filling the screen with collar.
+ # This leaves collision, animation, gun rays, touch aiming untouched.
+ if _visual != null and _visual.has_method("set_camera_near"):
+  _visual.call("set_camera_near",blocked and _camera.position.length() < 0.90)
  _camera.fov = lerpf(_camera.fov,51.0 if is_aiming else 66.0,minf(1.0,delta*7.0))
