@@ -1,4 +1,4 @@
-name: Silent Killer - Android Cuervo Fase 11 real 3D QA
+name: Silent Killer - Android Cuervo Fase 12 refinado tras prueba movil
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: silent-killer-android-cuervo11
+  group: silent-killer-android-cuervo12
   cancel-in-progress: true
 
 jobs:
@@ -69,10 +69,10 @@ jobs:
           cp project.godot export_presets.cfg "$p/"
           cp character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb \
             "$p/character_assets/el_cuervo/fase9_animaciones/"
-          sed -i 's/version\/code=10/version\/code=11/' "$p/export_presets.cfg"
-          sed -i 's/version\/name="0.6.0"/version\/name="0.7.0-cuervo11"/' "$p/export_presets.cfg"
+          sed -i 's/version\/code=10/version\/code=12/' "$p/export_presets.cfg"
+          sed -i 's/version\/name="0.6.0"/version\/name="0.7.1-cuervo12"/' "$p/export_presets.cfg"
           grep -F 'package/unique_name="com.loloscarprr.silentmurder"' "$p/export_presets.cfg"
-          grep -F 'version/code=11' "$p/export_presets.cfg"
+          grep -F 'version/code=12' "$p/export_presets.cfg"
           test -s "$p/character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb"
           echo "APK staging preserves current game main scene, original scripts, package and original debug signing."
       - name: Import real CC0 rig with two clips
@@ -91,22 +91,22 @@ jobs:
           set -euo pipefail
           mkdir -p build/apk
           godot --headless --path build/cuervo_android_game --export-debug \
-             "Android" "$GITHUB_WORKSPACE/build/apk/SilentKiller_ElCuervo_Fase11_v0.7_debug.apk" \
+             "Android" "$GITHUB_WORKSPACE/build/apk/SilentKiller_ElCuervo_Fase12_v0.7.1_debug.apk" \
              > /tmp/cuervo11_android_export.log 2>&1 || {
               tail -100 /tmp/cuervo11_android_export.log
               exit 1
             }
-          test -s build/apk/SilentKiller_ElCuervo_Fase11_v0.7_debug.apk
+          test -s build/apk/SilentKiller_ElCuervo_Fase12_v0.7.1_debug.apk
           tail -50 /tmp/cuervo11_android_export.log
       - name: Verify APK metadata, package, version code and arm64
         shell: bash
         run: |
           set -euo pipefail
-          file=build/apk/SilentKiller_ElCuervo_Fase11_v0.7_debug.apk
+          file=build/apk/SilentKiller_ElCuervo_Fase12_v0.7.1_debug.apk
           unzip -t "$file" | tail -2
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$file" > /tmp/cuervo11_badging.txt
           grep -F "name='com.loloscarprr.silentmurder'" /tmp/cuervo11_badging.txt
-          grep -F "versionCode='11'" /tmp/cuervo11_badging.txt
+          grep -F "versionCode='12'" /tmp/cuervo11_badging.txt
           grep -F 'arm64-v8a' /tmp/cuervo11_badging.txt
           ls -lh "$file"
           # Package name and signing must remain compatible with the existing
@@ -116,8 +116,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: SilentKiller_ElCuervo_Fase11_Android_APK
-          path: build/apk/SilentKiller_ElCuervo_Fase11_v0.7_debug.apk
+          name: SilentKiller_ElCuervo_Fase12_Android_APK
+          path: build/apk/SilentKiller_ElCuervo_Fase12_v0.7.1_debug.apk
           if-no-files-found: error
           retention-days: 30
       - name: Retain troubleshooting logs
