@@ -152,7 +152,11 @@ func _attach_pistol() -> void:
  gun.name = "SuppressedPistol_Blockout"
  # Fase11 real rig: wrist-origin anchor with forward-pointing muzzle.
  # Preserve the prior shoulder/elbow offset only for the fallback visual.
- gun.position = Vector3(0,0.0,0.0) if rig_grip != null else Vector3(.01,-.40,-.16)
+ gun.position = Vector3(0.0,-.035,-.045) if rig_grip != null else Vector3(.01,-.40,-.16)
+ # Blender-authored body measures 1.84m, but the previous pistol blockout
+ # was 0.62m long. At the real hand it looked like a giant black case.
+ # Reduce ONLY the rig version, keeping all legacy weapon dimensions intact.
+ gun.scale = Vector3(.49,.49,.49) if rig_grip != null else Vector3.ONE
  grip_node.add_child(gun)
  var metal := _mat(Color(.14,.16,.17))
  var black := _mat(Color(.035,.045,.052))
