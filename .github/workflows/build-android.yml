@@ -1,31 +1,30 @@
-name: Android - Silent Killer
+name: Silent Killer - Android baseline
 
 on:
   workflow_dispatch:
   push:
+    branches: [main, 'integration/**']
+  pull_request:
     branches: [main]
-    paths:
-      - '**.gd'
-      - '**.tscn'
-      - 'project.godot'
-      - 'export_presets.cfg'
-      - '.github/workflows/build-android.yml'
+
+permissions:
+  contents: read
 
 concurrency:
-  group: silent-killer-navigation-v06-${{ github.ref }}
+  group: silent-killer-android-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  export-android-debug:
-    runs-on: ubuntu-latest
+  verified_android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
     container:
       image: barichello/godot-ci:4.3
     steps:
       - uses: actions/checkout@v4
-
-      # GitHub Actions overwrites HOME with /github/home; the Godot CI
-      # image installed Android templates and editor configuration in /root.
-      - name: Configure Godot Android tools
+        with:
+          persist-credentials: false
+      - name: Setup Godot 4.3 official Android export tools
         shell: bash
         run: |
           set -euo pipefail
@@ -48,140 +47,162 @@ jobs:
           test -s /root/debug.keystore
           command -v keytool
           command -v godot
-
-      - name: Install Android 34 SDK required by Godot 4.3
+          echo "Android signing fingerprint of the CI debug keystore:"
+          keytool -list -v -keystore /root/debug.keystore -alias androiddebugkey -storepass android -keypass android \
+            | grep -F 'SHA256:' | head -1
+      - name: Install Android SDK 34
         shell: bash
         run: |
           set -euo pipefail
           yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
           sdkmanager --sdk_root="$ANDROID_HOME" "platform-tools" "build-tools;34.0.0" "platforms;android-34"
           test -x "$ANDROID_HOME/build-tools/34.0.0/aapt"
-
-      - name: Import Godot project
-        run: godot --headless --path . --import
-
-      - name: Smoke-test scene and GDScript
+      - name: Stage actual mission and every original GDScript, excluding old Blender source candidates
+        run: |
+          set -euo pipefail
+          stage=/tmp/silent_killer_fase11
+          mkdir -p "$stage/scripts" "$stage/scenes" "$stage/tests" \
+            "$stage/character_assets/el_cuervo/fase9_animaciones"
+          cp scripts/*.gd "$stage/scripts/"
+          cp scenes/*.tscn "$stage/scenes/"
+          cp tests/*.gd tests/*.tscn "$stage/tests/"
+          cp project.godot "$stage/project.godot"
+          cp character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb \
+             "$stage/character_assets/el_cuervo/fase9_animaciones/"
+          test -s "$stage/character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb"
+          grep -F 'run/main_scene="res://scenes/main.tscn"' "$stage/project.godot"
+          echo "Same production game and GLB, with irrelevant source Blender files excluded from import."
+      - name: Import GLB and compile all scripts
+        run: |
+          set -euo pipefail
+          godot --headless --path /tmp/silent_killer_fase11 \
+            --editor --import --quit > /tmp/cuervo_fase11_import.log 2>&1 || {
+              cat /tmp/cuervo_fase11_import.log
+              exit 1
+            }
+          tail -60 /tmp/cuervo_fase11_import.log
+      - name: Run actual mission with real skinned Cuervo rig and old gameplay
+        run: |
+          set -euo pipefail
+          timeout 100s godot --headless \
+            --path /tmp/silent_killer_fase11 \
+            --script res://tests/cuervo_gameplay_integration_test.gd \
+            > /tmp/cuervo_fase11_mission.log 2>&1 || {
+              cat /tmp/cuervo_fase11_mission.log
+              exit 1
+            }
+          cat /tmp/cuervo_fase11_mission.log
+          grep -F 'CUERVO_FASE11_PASS' /tmp/cuervo_fase11_mission.log
+          grep -F 'CUERVO_FASE11_MISSION_PASS' /tmp/cuervo_fase11_mission.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Invalid call|Invalid get index|CUERVO_FASE11_FAILED' /tmp/cuervo_fase11_mission.log; then
+            exit 1
+          fi
+      - name: Run existing pistol, multitouch, melee, guard, stealth and mission regressions
+        run: |
+          set -euo pipefail
+          godot=$(command -v godot)
+          stage=/tmp/silent_killer_fase11
+          while IFS=':' read -r test marker; do
+            echo "VERIFYING $test: $marker"
+            timeout 90s "$godot" --headless --path "$stage" --quit-after 1800 \
+              "res://tests/$test.tscn" > "/tmp/fase11_$test.log" 2>&1 || {
+                tail -80 "/tmp/fase11_$test.log"
+                exit 1
+              }
+            grep -F "$marker" "/tmp/fase11_$test.log" || {
+              tail -80 "/tmp/fase11_$test.log"
+              exit 1
+            }
+            if grep -E 'SCRIPT ERROR|Parse Error|Invalid call|Invalid get index|Invalid assignment|Assertion failed' "/tmp/fase11_$test.log"; then
+              echo "Gameplay regression failed for $test"
+              exit 1
+            fi
+          done <<'TESTS'
+          multitouch_test:MULTITOUCH_TEST_PASS
+          combat_test:COMBAT_TEST_PASS
+          melee_test:MELEE_TEST_PASS
+          guard_ai_test:GUARD_AI_TEST_PASS
+          mission_test:MISSION_TEST_PASS
+          mission_failure_test:MISSION_FAILURE_TEST_PASS
+          quality_fix_test:QUALITY_FIX_TEST_PASS
+          shot_cover_test:SHOT_COVER_TEST_PASS
+          navigation_test:NAVIGATION_TEST_PASS
+          TESTS
+      - name: Stage only playable project and verified Cuervo model
         shell: bash
         run: |
           set -euo pipefail
-          godot --headless --path . --quit-after 90 2>&1 | tee /tmp/silent-murder-smoke.log
-          # Godot's dummy renderer emits harmless 'mesh_get_surface_count' errors
-          # when the scene is run headless. Only fail on actual script/runtime faults.
-          if grep -E 'SCRIPT ERROR|Parse Error|Invalid call|Invalid get index|Invalid assignment|Attempt to call function' /tmp/silent-murder-smoke.log; then
-            echo "GDScript failure detected during scene startup."
-            exit 1
-          fi
-
-      - name: Verify independent multi-finger input
+          p=build/cuervo_android_game
+          mkdir -p "$p/scripts" "$p/scenes" "$p/character_assets/el_cuervo/fase9_animaciones"
+          cp scripts/*.gd "$p/scripts/"
+          cp scenes/main.tscn "$p/scenes/"
+          cp project.godot export_presets.cfg "$p/"
+          cp character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb \
+            "$p/character_assets/el_cuervo/fase9_animaciones/"
+          grep -F 'package/unique_name="com.loloscarprr.silentmurder"' "$p/export_presets.cfg"
+          grep -F 'version/code=13' "$p/export_presets.cfg"
+          test -s "$p/character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb"
+          echo "APK staging preserves current game main scene, original scripts, package and original debug signing."
+      - name: Import real CC0 rig with two clips
         shell: bash
         run: |
           set -euo pipefail
-          godot --headless --path . --quit-after 160 res://tests/multitouch_test.tscn 2>&1 | tee /tmp/silent-murder-touch.log
-          grep -Fq 'MULTITOUCH_TEST_PASS' /tmp/silent-murder-touch.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-murder-touch.log; then
-            echo "Multi-finger test failed."
-            exit 1
-          fi
-
-      - name: Verify pistol, targets, ammo and multi-finger firing
+          godot --headless --path build/cuervo_android_game --editor --import --quit \
+            > /tmp/cuervo11_android_import.log 2>&1 || {
+              tail -80 /tmp/cuervo11_android_import.log
+              exit 1
+            }
+          tail -35 /tmp/cuervo11_android_import.log
+      - name: Android export of the actual Silent Killer mission
         shell: bash
         run: |
           set -euo pipefail
-          godot --headless --path . --quit-after 1800 res://tests/combat_test.tscn 2>&1 | tee /tmp/silent-murder-combat.log
-          grep -Fq 'COMBAT_TEST_PASS' /tmp/silent-murder-combat.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-murder-combat.log; then
-            echo "Combat test failed."
-            exit 1
-          fi
-
-      - name: Verify guard AI, line of sight, hearing and damage
+          mkdir -p build/apk
+          godot --headless --path build/cuervo_android_game --export-debug \
+             "Android" "$GITHUB_WORKSPACE/build/apk/SilentKiller_v0.7.2_debug.apk" \
+             > /tmp/cuervo11_android_export.log 2>&1 || {
+              tail -100 /tmp/cuervo11_android_export.log
+              exit 1
+            }
+          test -s build/apk/SilentKiller_v0.7.2_debug.apk
+          tail -50 /tmp/cuervo11_android_export.log
+      - name: Verify APK metadata, package, version code and arm64
         shell: bash
         run: |
           set -euo pipefail
-          godot --headless --path . --quit-after 1800 res://tests/guard_ai_test.tscn 2>&1 | tee /tmp/silent-murder-ai.log
-          grep -Fq 'GUARD_AI_TEST_PASS' /tmp/silent-murder-ai.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-murder-ai.log; then
-            echo "Guard AI test failed."
-            exit 1
-          fi
-
-      - name: Verify Noche Cero mission objective and extraction
+          file=build/apk/SilentKiller_v0.7.2_debug.apk
+          unzip -t "$file" | tail -2
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$file" > /tmp/cuervo11_badging.txt
+          grep -F "name='com.loloscarprr.silentmurder'" /tmp/cuervo11_badging.txt
+          grep -F "versionCode='13'" /tmp/cuervo11_badging.txt
+          grep -F 'arm64-v8a' /tmp/cuervo11_badging.txt
+          ls -lh "$file"
+          # Package name and signing must remain compatible with the existing
+          # debug installation; on-phone replacement still depends on the
+          # previously installed APK using the very same signing key.
+      - name: Record APK signature and checksum
         shell: bash
         run: |
           set -euo pipefail
-          godot --headless --path . --quit-after 1000 res://tests/mission_test.tscn 2>&1 | tee /tmp/silent-killer-mission.log
-          grep -Fq 'MISSION_TEST_PASS' /tmp/silent-killer-mission.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-mission.log; then
-            echo "Mission progression test failed."
-            exit 1
-          fi
-
-      - name: Verify terminal defeat at 0 HP and accessible retry
-        shell: bash
-        run: |
-          set -euo pipefail
-          godot --headless --path . --quit-after 1000 res://tests/mission_failure_test.tscn 2>&1 | tee /tmp/silent-killer-failure.log
-          grep -Fq 'MISSION_FAILURE_TEST_PASS' /tmp/silent-killer-failure.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-failure.log; then
-            echo "Mission failure test failed."
-            exit 1
-          fi
-
-      - name: Verify melee takedowns, frontal hits and touch controls
-        shell: bash
-        run: |
-          set -euo pipefail
-          godot --headless --path . --quit-after 900 res://tests/melee_test.tscn 2>&1 | tee /tmp/silent-killer-melee.log
-          grep -Fq 'MELEE_TEST_PASS' /tmp/silent-killer-melee.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-melee.log; then
-            echo "Melee test failed."
-            exit 1
-          fi
-
-      - name: Verify alert, stealth gating, stable melee UI and transient messages
-        shell: bash
-        run: |
-          set -euo pipefail
-          godot --headless --path . --quit-after 1100 res://tests/quality_fix_test.tscn 2>&1 | tee /tmp/silent-killer-quality.log
-          grep -Fq 'QUALITY_FIX_TEST_PASS' /tmp/silent-killer-quality.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-quality.log; then
-            echo "Quality regression test failed."
-            exit 1
-          fi
-
-      - name: Verify muzzle cover prevents camera-only shots
-        shell: bash
-        run: |
-          set -euo pipefail
-          godot --headless --path . --quit-after 900 res://tests/shot_cover_test.tscn 2>&1 | tee /tmp/silent-killer-muzzle.log
-          grep -Fq 'SHOT_COVER_TEST_PASS' /tmp/silent-killer-muzzle.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-muzzle.log; then
-            echo "Muzzle cover test failed."
-            exit 1
-          fi
-
-      - name: Verify AStar patrol, investigation and pursuit around warehouse crates
-        shell: bash
-        run: |
-          set -euo pipefail
-          godot --headless --path . --quit-after 1200 res://tests/navigation_test.tscn 2>&1 | tee /tmp/silent-killer-navigation.log
-          grep -Fq 'NAVIGATION_TEST_PASS' /tmp/silent-killer-navigation.log
-          if grep -E 'SCRIPT ERROR|Parse Error|Assertion failed|Invalid call|Invalid get index' /tmp/silent-killer-navigation.log; then
-            echo "Guard navigation regression failed."
-            exit 1
-          fi
-
-      - name: Export Android debug APK
-        run: |
-          set -e
-          mkdir -p build
-          godot --headless --path . --export-debug "Android" build/SilentKiller_v0.6_debug.apk
-          test -s build/SilentKiller_v0.6_debug.apk
-
-      - name: Upload APK artifact
+          cd build/apk
+          apk=SilentKiller_v0.7.2_debug.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$apk" | tee signing.txt
+          sha256sum "$apk" > SHA256SUMS.txt
+      - name: Upload verified APK
         uses: actions/upload-artifact@v4
         with:
-          name: SilentKiller-v0.6-Android-debug
-          path: build/SilentKiller_v0.6_debug.apk
+          name: SilentKiller-v0.7.2-Android-debug
+          path: build/apk/SilentKiller_v0.7.2_debug.apk
           if-no-files-found: error
+          retention-days: 30
+      - name: Retain validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SilentKiller-baseline-QA
+          path: |
+            /tmp/cuervo_fase11_*.log
+            /tmp/cuervo11_*.log
+            build/apk/signing.txt
+            build/apk/SHA256SUMS.txt
           retention-days: 30

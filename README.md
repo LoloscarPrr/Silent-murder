@@ -1,45 +1,19 @@
 # SILENT KILLER
 
-Juego original de acción y sigilo 3D para Android, desarrollado en **Godot 4.3 / GDScript**.
+Juego original de sigilo y acción 3D para Android horizontal. Godot 4.3 / GDScript.
 
-## Alpha 0.6 — guardias con navegación A*
+## Base de integración 0.7.2 (candidata, no lanzamiento aprobado)
 
-**Objetivo:** resolver el atasco de guardias en cajas y estanterías antes de ampliar el contenido visual o las misiones.
+- Rama de trabajo: `integration/phase-01-baseline`. Origen: fase 12, commit `758aceccf8e26aa63e03e2c358a973a444b190c7`.
+- Misión Operación Noche Cero: infiltración, recuperar expediente y extracción; tres guardias, A* en plano, controles multitouch, disparo, recarga, sigilo y melee.
+- El Cuervo: GLB real, 53 huesos, dos clips (Walk/Aim), fallback visual. Agacharse, correr y melee siguen siendo gestos temporales; arte sin aprobación definitiva.
+- Android arm64, paquete `com.loloscarprr.silentmurder`, versionCode 13. APK de depuración; la actualización depende de la firma previamente instalada.
+- Único workflow de producción: `.github/workflows/build-android.yml`. Pruebas de integración y nueve regresiones antes de exportar. El APK solo incluye el proyecto jugable y su GLB, sin candidatos Blender ni escenas de pruebas.
 
-### Mejoras
+## Verificación y desarrollo
 
-- Ruta de navegación con **AStarGrid2D** sobre el depósito plano. El mapa se construye a partir de los **mismos volúmenes de colisión** de las estanterías, la oficina, las cajas y las paredes.
-- Márgenes de seguridad alrededor de obstáculos para que una ruta no pase rozando las cajas.
-- Los guardias calculan una ruta para las tres acciones existentes: **patrullar**, **investigar sonidos** y **perseguir al protagonista**.
-- Recálculo de ruta cuando cambia el destino, transcurre un intervalo o el guardia detecta que se ha quedado atascado.
-- Simplificación de puntos intermedios únicamente cuando la línea recta no atraviesa obstáculos.
-- El A* funciona sobre el suelo del escenario actual; **todavía no es NavMesh**, no contiene escalones, desniveles ni evasión avanzada entre guardias móviles.
-- Se conservan la misión **Operación Noche Cero**, el expediente, la extracción, vida, tres guardias, disparos y combate melee.
-- Sin efectos adicionales que aumenten artificialmente el consumo de GPU en el Redmi 12 5G.
+El workflow compila el commit disparador, no una rama fija. Conserva registros, SHA256 y certificado de firma. Las pruebas headless no certifican FPS, consumo ni calidad artística en Android.
+Los workflows experimentales se conservan en `tools/archive/workflows/` y en la rama original. No se eliminan los archivos fuente de arte.
+Consultar [Fase 01](docs/FASE_01_CONSOLIDACION.md) para la puerta de aceptación y [Fase 0.6](docs/README_ALPHA_06.md) para el historial.
 
-### Pruebas automáticas
-
-Además de las pruebas previas de misión, derrota, disparos con cobertura, multitoque y melee, la suite incluye una prueba de navegación que obliga al guardia a encontrar una ruta alrededor de una estantería. Comprueba que los tramos no atraviesen obstáculos, que encuentre un desvío, que repita el cálculo, que cambie de ruta con un destino nuevo y que funcione en patrulla, investigación y persecución.
-
-### Lo que se debe probar en el teléfono
-
-- Deja que un guardia patrulle cerca de una estantería. Debe ser capaz de dar la vuelta cuando la ruta se lo exija.
-- Desde detrás de una caja, dispara para provocar una investigación. Debe buscar un camino hacia el ruido.
-- Provoca una alerta y cambia de lado de una estantería. Debe seguirte rodeando el obstáculo, no avanzar indefinidamente contra él.
-- Verifica que reducir guardias, recargar y recuperar el expediente sigan funcionando.
-- Mira los FPS durante persecuciones. **La suite de CI no mide rendimiento real en Android**.
-
-### Limitaciones conocidas
-
-No hay aún sonidos, NavMesh 3D, coordinación grupal avanzada, coberturas inteligentes, humanoides riggeados ni remates sincronizados. No ampliar misiones hasta aprobar la navegación real.
-
-### Android
-
-- Paquete: `com.loloscarprr.silentmurder` (se conserva para actualizar).
-- Versión `0.6.0`, versionCode **10**, arm64 horizontal.
-- Workflow **Android - Silent Killer**, artefacto `SilentKiller-v0.6-Android-debug`.
-- Repositorio actual `LoloscarPrr/Silent-murder`. El nombre visible de la app es **Silent Killer**.
-
-## Próximo hito
-
-Si la navegación supera las pruebas manuales, la fase 0.7 se centrará en mejorar las animaciones cuerpo a cuerpo, reacciones al daño, audio y presentación visual, sin perder rendimiento ni funcionalidad.
+Próximo hito: Fase 02, ampliar protección de regresiones y automatizar verificaciones adicionales. No fusionar en main hasta pasar CI y prueba móvil.
