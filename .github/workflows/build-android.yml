@@ -131,7 +131,22 @@ jobs:
           quality_fix_test:QUALITY_FIX_TEST_PASS
           shot_cover_test:SHOT_COVER_TEST_PASS
           navigation_test:NAVIGATION_TEST_PASS
+          touch_lifecycle_test:TOUCH_LIFECYCLE_TEST_PASS
+          ammo_boundary_test:AMMO_BOUNDARY_TEST_PASS
           TESTS
+      - name: Verify real mission reload after defeat and victory
+        run: |
+          set -euo pipefail
+          timeout 90s godot --headless --path /tmp/silent_killer_fase11 \
+            --script res://tests/mission_restart_test.gd > /tmp/fase11_mission_restart.log 2>&1 || {
+              cat /tmp/fase11_mission_restart.log
+              exit 1
+            }
+          grep -F 'MISSION_RESTART_TEST_PASS' /tmp/fase11_mission_restart.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Invalid call|Invalid get index|Invalid assignment|Assertion failed|MISSION_RESTART_FAILED' /tmp/fase11_mission_restart.log; then
+            cat /tmp/fase11_mission_restart.log
+            exit 1
+          fi
       - name: Stage only playable project and verified Cuervo model
         shell: bash
         run: |
@@ -144,7 +159,7 @@ jobs:
           cp character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb \
             "$p/character_assets/el_cuervo/fase9_animaciones/"
           grep -F 'package/unique_name="com.loloscarprr.silentmurder"' "$p/export_presets.cfg"
-          grep -F 'version/code=13' "$p/export_presets.cfg"
+          grep -F 'version/code=14' "$p/export_presets.cfg"
           test -s "$p/character_assets/el_cuervo/fase9_animaciones/El_Cuervo_Fase9_Walk_Aim_REVISION.glb"
           echo "APK staging preserves current game main scene, original scripts, package and original debug signing."
       - name: Import real CC0 rig with two clips
@@ -163,23 +178,23 @@ jobs:
           set -euo pipefail
           mkdir -p build/apk
           godot --headless --path build/cuervo_android_game --export-debug \
-             "Android" "$GITHUB_WORKSPACE/build/apk/SilentKiller_v0.7.2_debug.apk" \
+             "Android" "$GITHUB_WORKSPACE/build/apk/SilentKiller_v0.7.3_debug.apk" \
              > /tmp/cuervo11_android_export.log 2>&1 || {
               tail -100 /tmp/cuervo11_android_export.log
               exit 1
             }
-          test -s build/apk/SilentKiller_v0.7.2_debug.apk
+          test -s build/apk/SilentKiller_v0.7.3_debug.apk
           tail -50 /tmp/cuervo11_android_export.log
       - name: Verify APK metadata, package, version code and arm64
         shell: bash
         run: |
           set -euo pipefail
-          file=build/apk/SilentKiller_v0.7.2_debug.apk
+          file=build/apk/SilentKiller_v0.7.3_debug.apk
           unzip -t "$file" | tail -2
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$file" > /tmp/cuervo11_badging.txt
           grep -F "name='com.loloscarprr.silentmurder'" /tmp/cuervo11_badging.txt
-          grep -F "versionCode='13'" /tmp/cuervo11_badging.txt
-          grep -F "versionName='0.7.2'" /tmp/cuervo11_badging.txt
+          grep -F "versionCode='14'" /tmp/cuervo11_badging.txt
+          grep -F "versionName='0.7.3'" /tmp/cuervo11_badging.txt
           grep -F 'arm64-v8a' /tmp/cuervo11_badging.txt
           ls -lh "$file"
           # Package name and signing must remain compatible with the existing
@@ -190,14 +205,14 @@ jobs:
         run: |
           set -euo pipefail
           cd build/apk
-          apk=SilentKiller_v0.7.2_debug.apk
+          apk=SilentKiller_v0.7.3_debug.apk
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$apk" | tee signing.txt
           sha256sum "$apk" > SHA256SUMS.txt
       - name: Upload verified APK
         uses: actions/upload-artifact@v4
         with:
-          name: SilentKiller-v0.7.2-Android-debug
-          path: build/apk/SilentKiller_v0.7.2_debug.apk
+          name: SilentKiller-v0.7.3-Android-debug
+          path: build/apk/SilentKiller_v0.7.3_debug.apk
           if-no-files-found: error
           retention-days: 30
       - name: Retain validation evidence

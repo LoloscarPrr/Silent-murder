@@ -14,8 +14,9 @@
 5. Mantener intactos los scripts de juego, modelos, escenas y tests existentes.
 
 ## Puerta de aceptación (pendiente hasta obtener evidencia)
-- [ ] CI del commit de integración: integración real Cuervo + misión y las 9 regresiones existentes.
-- [ ] APK exportada, metadatos y firma verificados. Comparar certificado SHA256 con APK anterior antes de afirmar actualización compatible.
+- [x] CI del commit de integración: integración real Cuervo + misión y las 9 regresiones existentes. Run 45993305038, commit 4a8b3781d0c739874ca856f2edde1e069a25bd76.
+- [x] APK exportada, metadatos y firma verificados en run 45993305038.
+- [ ] Comparar certificado SHA256 con APK anterior antes de afirmar actualización compatible.
 - [ ] Android físico: instalación sobre versión previa sin desinstalar; iniciar Noche Cero, movimiento/cámara/disparo simultáneos, sigilo, navegación, expediente, extracción, derrota y reintento.
 - [ ] Sesión Android de 30 minutos con registro FPS, temperatura, memoria y fallos. Objetivo mínimo propuesto: 30 FPS sostenidos, no medido todavía.
 - [ ] Revisar pull request antes de fusionar; conservar main intacta hasta aprobar.
