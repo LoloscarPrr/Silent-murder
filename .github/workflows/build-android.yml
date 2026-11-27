@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 concurrency:
   group: silent-killer-android-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -175,6 +179,7 @@ jobs:
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$file" > /tmp/cuervo11_badging.txt
           grep -F "name='com.loloscarprr.silentmurder'" /tmp/cuervo11_badging.txt
           grep -F "versionCode='13'" /tmp/cuervo11_badging.txt
+          grep -F "versionName='0.7.2'" /tmp/cuervo11_badging.txt
           grep -F 'arm64-v8a' /tmp/cuervo11_badging.txt
           ls -lh "$file"
           # Package name and signing must remain compatible with the existing
@@ -201,8 +206,10 @@ jobs:
         with:
           name: SilentKiller-baseline-QA
           path: |
+            /tmp/fase11_*.log
             /tmp/cuervo_fase11_*.log
             /tmp/cuervo11_*.log
+            /tmp/cuervo11_badging.txt
             build/apk/signing.txt
             build/apk/SHA256SUMS.txt
           retention-days: 30
